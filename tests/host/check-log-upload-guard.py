@@ -43,7 +43,7 @@ check('otherwise the box is the one it was (Send, cleaned on this device, the me
       and '"\\(BCDFormat.bytes(log.bytes)), cleaned on this device before it leaves."' in confirm)
 check('Feedback attaches the game log when the newest has none, and says so when there is none',
       'if !LogUpload.hasGame(url) {' in live and 'if let i = BCDLogChoice.gameLogToOffer(items, now: Date()) { url = urls[i] }' in live
-      and '($0.hasGame ? "" : ": no game ran in it")' in feedback)
+      and 'hasGame: $0.hasGame)' in feedback and '(log.hasGame ? "" : " · no game ran in it")' in (app / 'BCDFeedbackAttach.swift').read_text())
 
 swiftc = shutil.which('swiftc')
 if swiftc:

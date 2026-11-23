@@ -230,8 +230,11 @@ check('only the header and the loader name the switch in the C sources and the a
 recs = json.loads((root / 'recommended/recommendations.json').read_text())
 setters = sorted(r['id'] for r in recs['rules'] if 'MADEIRA_KEYED_EVENT_PER_PROCESS' in json.dumps(r.get('config', [])) + json.dumps(r.get('smallRAMConfig', [])))
 # 2026-11-01 (58D8SD, build 626): Slay the Spire 2 v5 too; from build 626 it reaches its menu and then dies in this crash (1R1NCG, 58D8SD).
-check('in the list only the rules of Control, (round 626) CrossCode and (2026-11-01) Slay the Spire 2 set it (games whose logs stop at this crash)',
-      setters in ([], ['control'], ['control', 'crosscode'], ['control', 'crosscode', 'slay-the-spire-2']), str(setters))
+# round 707 (agent S1 S18; Send Log Z7H0Q2, build 665): Marvel's Spider-Man 2 v9 too; its log stops at the same RunOnce waiter fault
+# (ntdll.dll+0x68008, no frame in 282 s), as 15 archive logs of the game do. An experiment, the row says so.
+check('in the list only the rules of Control, (round 626) CrossCode, (2026-11-01) Slay the Spire 2 and (round 707) Spider-Man 2 set it (games whose logs stop at this crash)',
+      setters in ([], ['control'], ['control', 'crosscode'], ['control', 'crosscode', 'slay-the-spire-2'],
+                  ['control', 'crosscode', 'marvels-spider-man-2', 'slay-the-spire-2']), str(setters))
 spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

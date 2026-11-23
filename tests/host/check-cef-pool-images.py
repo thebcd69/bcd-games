@@ -337,8 +337,15 @@ others = sorted(p.name for p in (root / 'build/ntdll-unix').glob('*') if p.suffi
                 and p.name not in ('virtual_ios.c', 'process_ios.c', 'ios_cef_images.h') and 'MADEIRA_CEF_POOL_IMAGES' in p.read_text())
 check(not others, 'no other engine file names the key', others)
 app_users = sorted(p.name for p in (root / 'app/Madeira').glob('*.swift') if 'MADEIRA_CEF_POOL_IMAGES' in p.read_text())
-check(app_users == ['AutoTuneRules.generated.swift', 'ConfigCatalog.generated.swift', 'GameRecommendationsList.swift'],
-      'in the app only the catalog, the list policy and the auto-tune rule table name the key (no launcher sets it)', app_users)
+# Branch steam-client (2026-11-21, M1): Steam for Windows' session settings (SteamDesktop.swift, SteamDesktopProfile.lines) name it for
+# steamwebhelper.exe, in that session's own file only (tests/host/check-steam-desktop.py); no launcher and no other game's start sets it.
+check(app_users == ['AutoTuneRules.generated.swift', 'ConfigCatalog.generated.swift', 'GameRecommendationsList.swift', 'SteamDesktop.swift'],
+      'in the app only the catalog, the list policy, the auto-tune rule table and the Steam for Windows session\'s settings name the key '
+      '(no launcher sets it)', app_users)
+steam_desktop = read('app/Madeira/SteamDesktop.swift')
+check(steam_desktop.count('"env.MADEIRA_CEF_POOL_IMAGES = steamwebhelper.exe"') == 1 and '"env.MADEIRA_SC_PA_POOLS = 2"' in steam_desktop
+      and 'MADEIRA_CEF_POOL_IMAGES' not in read('app/Madeira/BCDSteamDesktopLive.swift') and 'MADEIRA_CEF_POOL_IMAGES' not in read('app/Madeira/BCDLaunchers.swift'),
+      'there it is one line of the session\'s settings, for steamwebhelper.exe, with layout 2 beside it')
 
 # ---- the catalog ------------------------------------------------------------------------------------------------------------------
 gen = read('build/tools/gen-config-catalog.py')

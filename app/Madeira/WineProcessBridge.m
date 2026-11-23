@@ -2079,8 +2079,16 @@ static void *wine_process_thread(void *arg) {
          * game", LibraryEntry.configureLaunch) knows its title too. It passes that
          * game's App ID and install folder in MADEIRA_STEAM_APPID / MADEIRA_STEAM_APPPATH,
          * and this launch publishes the game's own identity instead of the fixed one. Both
-         * are cleared here, so no later launch inherits them. */
+         * are cleared here, so no later launch inherits them.
+         *
+         * madeira-bcd (branch steam-client, 2026-11-21, milestone M1): a Steam for Windows session (Valve's own
+         * steam.exe in the Wine desktop, SteamDesktop.swift) is the second launch that can know: Valve's client
+         * gives every game it starts that game's own identity, and the fixed one reached the client and each of
+         * its games (a hand-started steam.exe carried it: "[steam-env] fixed Steam identity published (app
+         * 356400)", 77VQJK). ContentView sets MADEIRA_STEAM_DESKTOP_SESSION=1 for that session only and clears
+         * it for every other launch, so every other launch takes the branch it took before. */
         const char *dock_session = getenv("MADEIRA_DOCK_SESSION");
+        const char *desktop_session = getenv("MADEIRA_STEAM_DESKTOP_SESSION");   /* set by the app for a Steam for Windows session; not a setting */
         const char *direct_app = getenv("MADEIRA_STEAM_APPID");    /* set by the library for one direct Steam start (Start with: The game); not a setting */
         const char *direct_path = getenv("MADEIRA_STEAM_APPPATH"); /* that game's install folder, with MADEIRA_STEAM_APPID; not a setting */
         /* madeira-bcd (lead, 2026-10-24): env.MADEIRA_STEAM_IDENTITY = none in a game's file publishes no Steam identity at all.
@@ -2099,6 +2107,11 @@ static void *wine_process_thread(void *arg) {
             unsetenv("SteamGameId");
             unsetenv("SteamAppId");
             dprintf(STDERR_FILENO, "[steam-env] BCD Dock session: no fixed Steam game identity published\n");
+        } else if (desktop_session && desktop_session[0] == '1') {
+            unsetenv("SteamAppPath");
+            unsetenv("SteamGameId");
+            unsetenv("SteamAppId");
+            dprintf(STDERR_FILENO, "[steam-env] Steam for Windows session: no fixed Steam game identity published\n");
         } else if (direct_app && direct_app[0] && strlen(direct_app) <= 10 &&
             strspn(direct_app, "0123456789") == strlen(direct_app) &&
             direct_path && (direct_path[0] == 'C' || direct_path[0] == 'c') && direct_path[1] == ':' &&
@@ -3271,6 +3284,8 @@ static void *wine_process_thread(void *arg) {
                 }
                 if ([wanted containsObject:@"evr"]) [wanted addObject:@"dxva2"];
                 if ([wanted containsObject:@"sfc"]) [wanted addObject:@"sfc_os"];
+                /* madeira-bcd (M1-S10, build 708): BCD's icuin.dll (ICU's i18n library) imports icuuc.dll, so listing icuin brings icuuc, as evr brings dxva2. */
+                if ([wanted containsObject:@"icuin"]) [wanted addObject:@"icuuc"];
                 /* madeira-bcd (round 630, agent U S2; Football Manager 27 88YTP3): env.MADEIRA_ZERO_MITIGATION_POLICY = 1 is read only by the
                  * opt-in kernelbase (wine dlls/kernelbase/process.c), so the key brings it along: one line in a game's file (or one tried
                  * by the app) is enough. Unset or any other value: the list is as written. */
@@ -4113,6 +4128,7 @@ int wine_process_start(const char *prefix_path) {
     }
     g_wine_main_returned = 0; g_launch_exit_claim = 0; g_launch_exit_seen = 0; g_launch_exit_boot = 0;
     g_launch_exit_code = 0; g_launch_exit_ns = 0; g_session_end_claim = 0;
+    { extern void madeira_child_table_new_session(void); madeira_child_table_new_session(); }   /* madeira-bcd (round 707, G1-S15): no process of an earlier session counts in this one */
 
     g_wine_running = 1;
 

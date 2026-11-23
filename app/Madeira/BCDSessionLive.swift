@@ -78,6 +78,11 @@ struct BCDSessionLiveLayer: View {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.refresh() }
             .store(in: &watchers)
+        // Round 707 (G1-S15): the menu's quit row becomes "End the game now" 45 s after a Close that did nothing; a menu that is open shows it at once.
+        model.$forceEnd.dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.hud.menu?.changed() }
+            .store(in: &watchers)
     }
 
     func appeared() {
@@ -470,6 +475,29 @@ struct BCDSessionLiveLayer: View {
             ]))
             return out
         }
+        // Round 707 (G1-S15; Hollow Knight DEQCHZ): a game that ignored Close for 45 s (LibraryModel.watchForceEnd, SessionForceEnd.swift).
+        switch model.forceEnd {
+        case .offered:
+            out.append(BCDMenuSection(id: "quit", rows: [
+                BCDMenuRow(id: "quit", title: SessionForceEnd.menuTitle, detail: SessionForceEnd.menuDetail, symbol: "xmark.octagon",
+                           kind: .action(destructive: true),
+                           confirm: BCDConfirm(title: SessionForceEnd.confirmTitle, message: SessionForceEnd.confirmMessage,
+                                               answers: [.init(id: "force", title: SessionForceEnd.answerTitle, destructive: true)])),
+            ]))
+            return out
+        case .ending:
+            out.append(BCDMenuSection(id: "quit", rows: [
+                BCDMenuRow(id: "quit.ending", title: SessionForceEnd.endingWords, symbol: "hourglass", kind: .note(.soft)),
+            ]))
+            return out
+        case .stuck:
+            out.append(BCDMenuSection(id: "quit", rows: [
+                BCDMenuRow(id: "quit.stuck", title: SessionForceEnd.stuckWords, symbol: "exclamationmark.triangle.fill", kind: .note(.warm)),
+            ]))
+            return out
+        case .none:
+            break
+        }
         out.append(BCDMenuSection(id: "quit", rows: [
             BCDMenuRow(id: "quit", title: BCDDuoFeatures.active && model.activeEntry?.desktop == true ? "Close Windows" : "Quit game", detail: "Progress you haven't saved is lost.", symbol: "stop.circle",
                        kind: .action(destructive: true),
@@ -786,6 +814,7 @@ struct BCDSessionLiveLayer: View {
         if BCDHUDMenu.owns(row) { return applyHUD(BCDHUDMenu.answer(row, answer, BCDHUDState.shared.setup)) }
         switch (row, answer) {
         case ("quit", "quit"): model.requestQuit()
+        case ("quit", "force"): model.endGameNow()   // round 707 (G1-S15): offered only after a Close that did nothing for 45 s
         case ("cloud.replace", "replace"): uploadAndClose(replace: true)
         default: break
         }

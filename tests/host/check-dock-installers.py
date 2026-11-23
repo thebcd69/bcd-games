@@ -112,8 +112,13 @@ require(content.count('setenv("MADEIRA_MADSYNC_SESSION", "0", 1)') == 1 and
 for name, text in [('MadeiraDock.swift', dock), ('MadeiraDockModel.swift', view), ('BCDDock.swift', bcd_dock)]:
     require('MADEIRA_MADSYNC_SESSION' not in text, f'{name}: does not touch the madsync session switch')
 # madeira-bcd: a shared launcher's session lines (Ubisoft Connect: env.MADEIRA_APC_BUSY_QUEUE = 1), set by startDock for this start only.
-require('static let sharedLauncherSessionEnv: [String: [String: String]] = [\n        "ubisoftconnectinstaller.exe": ["MADEIRA_APC_BUSY_QUEUE": "1", "MADEIRA_FEX_SPLIT_LOCK": "1", "MADEIRA_SELF_WRITE": "1"],\n    ]'
-        in installers, 'Ubisoft Connect\'s session lines are the busy queue, the program\'s own writes into itself and the inline split-lock atomics, keyed by its installer, and nothing else')
+session_code = [l.strip() for l in session_table.splitlines()[1:] if l.strip() and not l.strip().startswith('//')]
+require(session_code == ['"ubisoftconnectinstaller.exe": ["MADEIRA_APC_BUSY_QUEUE": "1", "MADEIRA_FEX_SPLIT_LOCK": "1", "MADEIRA_SELF_WRITE": "1"],',
+                         '"eaappinstaller.exe": ["MADEIRA_DOCK_GAME_SCM": "1"],'],
+        'the shared launchers\' session lines: Ubisoft Connect\'s busy queue, its own writes into itself and the inline split-lock atomics; '
+        'the EA app\'s service manager for an EA game\'s Steam launcher (round 707); keyed by their installers, nothing else')
+require('MADEIRA_OPTIN_DLLS' not in '\n'.join(session_code),
+        'no shared launcher sets the opt-in DLLs: the unset loop would take a Paradox start\'s msi set away (ContentView, MADEIRA_PARADOX_LAUNCHER_MSI)')
 start_at = content.index('private func startDock(')
 sd = content[start_at:content.index('\n    }\n', start_at)]
 unset_loop = 'for name in DockInstallScripts.sharedLauncherSessionNames where DockInstallers.launcherSessionEnv[name] == nil { unsetenv(name) }'

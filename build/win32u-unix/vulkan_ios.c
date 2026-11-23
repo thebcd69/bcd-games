@@ -66,6 +66,61 @@ static int ios_vulkan_close(void *handle)
     return handle == &ios_vulkan_token ? 0 : dlclose(handle);
 }
 
+/* madeira-bcd (build 703; tools/patch-wine-vulkan-fps-cap.py calls it in win32u_vkQueuePresentKHR, before the host's present):
+ * the app's frame-rate limit for a Windows Vulkan game. A DXMT game's frames are held by winemetal's present (the vsync mode:
+ * 1 = 60, 3 = 30, 4 = 40 FPS, 0 and 2 = no limit; madeira_get_vsync_locked, live from the in-game menu); a Vulkan game's
+ * presents never went through it, so X-Plane 12 ran its menu at the screen's 120 with the limit at 60. This holds the
+ * presenting thread to the limit's grid with mach_wait_until: the next deadline is the previous one plus the period, so a
+ * frame that ran long is not paid for twice, and a frame more than one period late starts a new grid without waiting (a
+ * game slower than the limit never waits). One grid per presenting thread. MADEIRA_VK_FPS_CAP=0 turns it off. Frames the
+ * driver adds between the game's (KosmicKrisp's Apple frame interpolation, Lossless Scaling) come on top, as with DXMT. Round 707: the
+ * fixed frame cap (ios_fps_cap) too, whichever is lower. */
+#include <mach/mach_time.h>
+extern int madeira_get_vsync_locked(void) __attribute__((weak_import));
+/* round 707 (A2 F12, 140WHX): the fixed frame cap (env.MADEIRA_FPS_CAP, Settings > Graphics > Frame cap: 20, 24, 25, 30, 40, 60), which
+ * server_ios.c's governor publishes for DXMT's and madeira-d3d12's presenters, holds a Vulkan game too: the lower of it and the limit. */
+extern volatile int ios_fps_cap __attribute__((weak_import));
+static __attribute__((unused)) void madeira_vk_fps_cap_pace(void)
+{
+    static int enabled = -1;
+    static mach_timebase_info_data_t tb;
+    static __thread uint64_t deadline;
+    int mode;
+    double period;
+    uint64_t now, step;
+
+    if (enabled < 0)
+    {
+        const char *e = getenv( "MADEIRA_VK_FPS_CAP" );
+        enabled = !(e && e[0] == '0' && !e[1]);
+        fprintf( stderr, "[winios-vk] the frame-rate limit %s Vulkan presents (MADEIRA_VK_FPS_CAP=0 turns it off)\n",
+                 enabled ? "holds" : "does not hold" );
+    }
+    if (!enabled) return;
+    mode = madeira_get_vsync_locked ? madeira_get_vsync_locked() : 0;
+    period = mode == 1 ? 1.0 / 60.0 : mode == 3 ? 1.0 / 30.0 : mode == 4 ? 1.0 / 40.0 : 0.0;
+    if (&ios_fps_cap)
+    {
+        int fixed = ios_fps_cap;
+        if (fixed >= 10 && fixed <= 120 && 1.0 / fixed > period) period = 1.0 / fixed;   /* the lower rate wins */
+    }
+    if (period <= 0.0)
+    {
+        deadline = 0;
+        return;
+    }
+    if (!tb.denom) mach_timebase_info( &tb );
+    step = (uint64_t)(period * 1e9 * (double)tb.denom / (double)tb.numer);
+    now = mach_absolute_time();
+    if (!deadline || now > deadline + step)
+    {
+        deadline = now;   /* the first frame, or one more than a period late: a new grid, no wait */
+        return;
+    }
+    deadline += step;
+    if (deadline > now) mach_wait_until( deadline );
+}
+
 static void *madeira_vulkan_dlopen( const char *name, int flags );
 static int madeira_vulkan_pthread_once( pthread_once_t *once, void (*init)(void) );
 

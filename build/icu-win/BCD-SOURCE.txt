@@ -1,0 +1,46 @@
+ICU4C (International Components for Unicode for C/C++): icuuc.dll and icuin.dll for 64-bit Windows programs
+
+  Project:   https://icu.unicode.org/ (Unicode, Inc. and others; originally IBM)
+  Licence:   Unicode License V3 (SPDX: Unicode-3.0) for ICU's code and for the Unicode and CLDR data, with the third-party notices that
+             ICU's LICENSE lists for parts of the data and tools (the Chinese/Japanese, Lao and Burmese word-break dictionaries, the
+             time zone database, the double-conversion library, and others; some of them concern parts this build leaves out). All of it
+             may be combined with GPL-3.0 code. The project's LICENSE is kept exactly as received in build/icu-win/ICU-LICENSE.txt, in
+             LICENSES/ICU-LICENSE.txt and in the app (legal/LICENSES/ICU-LICENSE.txt); tools/build-icu-optin.sh refuses a tarball whose
+             LICENSE is not those bytes.
+  Version:   ICU 78.3 (Unicode 17.0 data, CLDR 48), the release tarball of March 2026.
+  Taken from Debian's archive as icu_78.3.orig.tar.gz (https://deb.debian.org/debian/pool/main/i/icu/, with snapshot.debian.org as the second
+  source), 27,977,255 bytes, SHA-256 3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0, the value in Debian's icu_78.3-2.dsc
+  (Checksums-Sha256). tools/build-icu-optin.sh checks it before unpacking and stops by name on any other file. NOT used: the project's GitHub
+  release (the build does not use GitHub), Microsoft's own icu.dll / icuuc.dll / icuin.dll (Windows System32; not redistributable by BCD).
+
+  Changes by BCD to the source: none. No patch: ICU's own configure and makefiles build common and i18n. What BCD chooses:
+    - the C API UNVERSIONED (--disable-renaming; ucol_open, not ucol_open_78), as Windows' system ICU exports it and as Qt 6 on Windows
+      is built to import it (Qt6Core.dll imports icuuc.dll and icuin.dll: Bloodborne's launcher, Anki, the Albion launcher);
+    - the libraries common (icuuc.dll) and i18n (icuin.dll) only; no tools, tests, samples, extras, layoutex or icuio;
+    - ARM64EC for the phone (the x86-64 flavour of the same build, ICU_TARGET=x86_64-w64-mingw32, exists only for the host test that runs
+      under a Wine and is never shipped);
+    - the DLLs are named icuuc.dll and icuin.dll (the makefiles' version number is dropped), icuin.dll imports icuuc.dll by that name, and
+      the data is linked into icuuc.dll as the symbol icudt78_dat (ICU's own entry point for its common data), so there is no icudt78.dll;
+    - the data package (the tarball's source/data/in/icudt78l.dat, 33,107,232 bytes, 4,305 items) is trimmed with ICU's own icupkg by the rules
+      of build/icu-win/trim-data.py to 276 items, 6,842,912 bytes: the root and English locales in every tree (en, en_001, en_GB, en_US,
+      en_US_POSIX), the root collation (coll/root.res, ucadata.icu), the break-iterator rules (char, line, sentence, title, word), the time
+      zone data (zoneinfo64, metaZones, windowsZones, timezoneTypes), the Unicode normalisation, emoji and layout data, the converters a
+      Windows program meets (every converter with an IANA name except ISO-2022-JP-2, ISO-2022-CN, ISO-2022-CN-EXT and GB 2312-80), and the
+      stringprep and IDNA data. Out: every other locale (ICU then answers with the root or English data, with U_USING_DEFAULT_WARNING, as it does for any
+      locale it has no data for), the collation tailorings of other languages, the five word-break dictionaries (Thai, Lao, Khmer, Burmese,
+      Chinese/Japanese: those scripts break by ICU's rules only), transliteration, character names, the spoof checker's data, and the
+      mainframe and rarely used East Asian converters (EBCDIC double-byte, EUC-TW, CNS 11643, ISO-2022-CN). The trimmed package must answer
+      build/icu-win/icu-probe.c, a Qt-like user of the C API, exactly as the full data does (build/icu-win/icu-probe.expected); the one thing
+      icupkg's dependency check may report is that brkitr/root.res names the five dictionaries.
+  The data is the Unicode Consortium's (Unicode Character Database, CLDR, IANA time zone database): all under the licence above.
+
+  Build (tools/build-icu-optin.sh): a native ICU for the Mac (icupkg, the static libraries the probe links), then ICU's configure and make with
+  the tracked llvm-mingw (20260421, ucrt) as a cross compiler for arm64ec-w64-mingw32, shared, and the stripped result checked by
+  build/icu-win/check-icu-dlls.py: ARM64EC, every public C function of both libraries' headers exported, the names Qt 6 uses, imports only
+  kernel32, advapi32 and the UCRT sets (and icuuc.dll for icuin.dll), the data inside icuuc.dll only, no path of the build machine
+  (-ffile-prefix-map), a PE time stamp of 0 and no runtime pseudo relocations (the same inputs give the same bytes: two builds in different work
+  folders were compared). libc++, libunwind and the MinGW-w64 runtime are linked in statically (Apache-2.0 with LLVM exception and
+  LICENSES/MinGW-w64-runtime.txt). About 9.5 MB for icuuc.dll (6.8 MB of it data) and 4.3 MB for icuin.dll.
+  It ships as app/Madeira/arm64ec-windows/icuuc-optin.dll and icuin-optin.dll and runs as icuuc.dll and icuin.dll only in a session of a game
+  whose file has env.MADEIRA_OPTIN_DLLS = icuuc,icuin (app/Madeira/WineProcessBridge.m links them into sysx64, and system32 in an ARM64EC
+  session). They are separate DLLs a Windows program loads at run time; nothing of ICU is linked into BCD.

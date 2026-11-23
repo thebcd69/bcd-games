@@ -38,18 +38,23 @@ def function(signature):
 
 
 on_fn = function('static int ios_wow_jumbo_inside_on( void )')
+guest_fn = function('static int ios_wow_guest_limit( ULONG_PTR limit_low, ULONG_PTR limit_high )')
+ai_fn = function('static int ios_wow_alloc_inside_on( void )')
 out_fn = function('static int ios_wow_jumbo_outside( ULONG_PTR wb, ULONG_PTR base, SIZE_T size )')
 
 # wiring: the refusal is in the plain entry point only, after the census, unhinted, without address limits
 census = function('static void ios_jumbo_census( void *hint, size_t size, void *result, unsigned st )')
 check('the census prints [jumbo-wow] for a 32-bit caller after a successful placement, 16 lines at most, with the host address, the window and inside=',
       'if (log_this && result && !st && ios_wow_base())' in census and 'wow_said++ < 16' in census and 'window=[0x%lx,0x%lx) inside=%d guest-visible=0x%08x' in census)
-site = 'if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 1 && ios_wow_base() &&'
-site2 = 'if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 2 && ios_wow_base() &&'
+site = 'if (is_jumbo && !st && !jumbo_hint && ios_wow_guest_limit( 0, limit ) && ios_wow_jumbo_inside_on() == 1 && ios_wow_base() &&'
+site2 = 'if (is_jumbo && !st && !jumbo_hint && ios_wow_guest_limit( 0, limit ) && ios_wow_jumbo_inside_on() == 2 && ios_wow_base() &&'
 census_call = 'if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL : *ret, (unsigned)st );'
-check('the refusal (1) and the retry (2) sit once each, right after the census of NtAllocateVirtualMemory, only for an unhinted request without limits, '
-      'and never in the Ex entry point (the emulator\'s)',
-      native.count(site) == 1 and native.count(site2) == 1 and native.count('ios_wow_jumbo_inside_on()') == 2 and
+# Round 707 (agents S1 S12, G2 S15): wow64 always passes a 32-bit program's own limit (its default zero_bits; VirtualAlloc2's HighestEndingAddress),
+# so "without limits" never ran for one; the guest's own limit (at or below 4 GB, never none) is the test now, in both entry points.
+check('the refusal (1) and the retry (2) sit once each, right after the census of NtAllocateVirtualMemory, only for an unhinted request with a 32-bit '
+      'program\'s own limit; the Ex entry point (VirtualAlloc2, mimalloc) has one more site for its own limit only',
+      native.count(site) == 1 and native.count(site2) == 1 and native.count('ios_wow_jumbo_inside_on()') == 3 and
+      'if (!st && !jumbo_hint && ios_wow_base() && limit_high && ios_wow_guest_limit( limit_low, limit_high ) &&' in native and
       native.index(census_call) < native.index(site2) < native.index(site) < native.index('/* madeira-bcd: remember a helper\'s large reservation for ios_sc_reap_dead */'))
 retry = native[native.index(site2):native.index(site)]
 check('build 666 (issue #53): 2 asks again with the window as the range while the outside one is held, takes an inside answer and releases the '
@@ -91,6 +96,13 @@ int main( int argc, char **argv )
         printf( "%lx %lx\n", (unsigned long)lo, (unsigned long)hi );
         return 0;
     }
+    if (argc > 1 && argv[1][0] == 'g')
+    {   /* round 707: whose request is it */
+        printf( "%d%d%d%d%d%d\n", ios_wow_guest_limit( 0, 0x7fffffff ), ios_wow_guest_limit( 0, 0xffffffff ), ios_wow_guest_limit( 0, 0 ),
+                ios_wow_guest_limit( 0, 0x7fffffffffffULL ), ios_wow_guest_limit( 0x10000, 0x7fffffff ), ios_wow_guest_limit( 0, 0x100000000ULL ) );
+        return 0;
+    }
+    if (argc > 1 && argv[1][0] == 'a') { printf( "%d\n", ios_wow_alloc_inside_on() ); return 0; }
     if (argc > 1) { printf( "%d\n", ios_wow_jumbo_inside_on() ); return 0; }
     printf( "%d%d%d%d%d%d%d%d%d\n",
             ios_wow_jumbo_outside( B, 0x703ac00000ULL, 1ULL << 30 ),          /* 4QSSTH: below the window */
@@ -106,7 +118,7 @@ int main( int argc, char **argv )
 }
 '''
 tmp = Path(tempfile.mkdtemp(prefix='madeira-wow-jumbo-'))
-(tmp / 'm.c').write_text(program.replace('@FUNCS@', on_fn + '\n' + out_fn).replace('@TL@', tl))
+(tmp / 'm.c').write_text(program.replace('@FUNCS@', on_fn + '\n' + out_fn + '\n' + guest_fn + '\n' + ai_fn).replace('@TL@', tl))
 cc = os.environ.get('CC', 'cc')
 b = subprocess.run([cc, '-std=gnu11', '-O1', '-Wall', '-Wno-unused-function', str(tmp / 'm.c'), '-o', str(tmp / 'm')], capture_output=True, text=True)
 check('the production helpers compile on the host', b.returncode == 0, b.stdout + b.stderr)
@@ -116,6 +128,18 @@ if b.returncode == 0:
         e.update(env)
         return subprocess.run([str(tmp / 'm')] + list(args), capture_output=True, text=True, env=e).stdout.strip()
 
+    r = run('g')
+    check('round 707: wow64\'s default limits (0x7fffffff, 0xffffffff) are a 32-bit program\'s own; no limit, a 64-bit limit, a lower bound or a limit '
+          'past 4 GB are not (the emulator\'s requests stay out)', r == '110000', r)
+    for val, want in ((None, '0'), ('', '0'), ('0', '0'), ('1', '1'), ('11', '0'), ('2', '0')):
+        check('MADEIRA_WOW_ALLOC_INSIDE=%r: %s' % (val, 'on' if want == '1' else 'off'), run('a', MADEIRA_WOW_ALLOC_INSIDE=val) == want if val is not None else run('a') == want)
+    na = native[native.index('static NTSTATUS ios_wow_alloc_inside( void **ret, SIZE_T *size_ptr'):]
+    na = na[:na.index('\n}\n')]
+    check('MADEIRA_WOW_ALLOC_INSIDE: an outside placement of any size is asked again inside (the outside one released), or released and answered '
+          'STATUS_NO_MEMORY; both entry points, an unhinted request with the program\'s own limit only',
+          'if (ios_wow_reask_inside( ret, size_ptr, want, type, protect, align, attributes ))' in na and 'return STATUS_NO_MEMORY;' in na
+          and native.count('ios_wow_alloc_inside_on())') == 2 and 'st = ios_wow_alloc_inside( ret, size_ptr, jumbo_size, type, protect, 0, 0, "VirtualAlloc" );' in native
+          and 'st = ios_wow_alloc_inside( ret, size_ptr, jumbo_size, type, protect, align, attributes, "VirtualAlloc2" );' in native)
     for val, want in ((None, '0'), ('', '0'), ('0', '0'), ('1', '1'), ('11', '0'), ('2', '2'), ('3', '0'), ('21', '0')):
         check('MADEIRA_WOW_JUMBO_INSIDE=%r: %s' % (val, {'0': 'off', '1': 'refuse', '2': 'retry inside'}[want]),
               run('k', **({} if val is None else {'MADEIRA_WOW_JUMBO_INSIDE': val})) == want)

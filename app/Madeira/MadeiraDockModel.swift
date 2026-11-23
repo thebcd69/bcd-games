@@ -14,7 +14,7 @@ final class MadeiraDockModel: ObservableObject {
     @Published private(set) var clientInstalled = false
     /// Night round 2026-11-11 (A1 S7): the first 12 hex digits of the SHA-256 of a client the Dock host does not support, else nil.
     @Published private(set) var clientUnsupportedBuild: String?
-    /// Round 660 (M139): the supported client build in the prefix (202601, 202609), nil when there is none or it is unknown.
+    /// Round 660 (M139): the supported client build in the prefix (202601, 202609, 202611), nil when there is none or it is unknown.
     @Published private(set) var clientBuild: Int?
     @Published private(set) var preparing = false
     @Published private(set) var progress = ""

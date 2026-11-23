@@ -5,7 +5,10 @@
 #
 # madeira-bcd (build 676): a KosmicKrisp source tree whose patches are not the series any more is unpacked again.
 #
-#   kk-stale-source.sh SRC PATCH_DIR
+#   kk-stale-source.sh SRC PATCH_DIR [LABEL]
+#
+# LABEL names the tree in the message (default kosmickrisp). build/mesa-ios/build.sh runs it for OSMesa + Zink too (osmesa,
+# 2026-11-22): its patch loop had kept the empty markers of build 676 until then.
 #
 # build-kosmickrisp.sh applies each patch once and leaves SRC/.madeira-applied-<name> holding the patch's SHA-256.
 # Build 676 found the old way wanting: the marker was empty and named the file only, so 0035, corrected under the same
@@ -16,6 +19,7 @@
 set -eu
 SRC=$1
 DIR=$2
+LABEL=${3:-kosmickrisp}
 [ -d "$SRC" ] || exit 0
 stale=
 for m in "$SRC"/.madeira-applied-*; do
@@ -32,5 +36,5 @@ for m in "$SRC"/.madeira-applied-*; do
     fi
 done
 [ -n "$stale" ] || exit 0
-echo "kosmickrisp: $stale; removing $SRC so the pinned source is unpacked and patched again"
+echo "$LABEL: $stale; removing $SRC so the pinned source is unpacked and patched again"
 rm -rf "$SRC"

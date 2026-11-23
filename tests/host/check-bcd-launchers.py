@@ -634,7 +634,10 @@ func touch(_ url: URL, _ data: Data = Data("x".utf8)) {
         Mock.redirects["dl.winehq.org/wine/wine-gecko/test/b.msi"] = nil
         gecko.install()
         // Up to 30 s (was 3 s): build 657 failed here on a loaded host (WindowServer at 4.6 cores), the download itself was fine.
-        for _ in 0..<3000 { if gecko.isReady { break }; try? await Task.sleep(nanoseconds: 10_000_000) }
+        // Build 701 (2026-11-22, 12 checks at once): isReady reads the files on disk and turns true as soon as both have landed,
+        // while the model publishes .installed a moment later, so waiting for isReady alone could end before the state did.
+        // Wait for the whole condition the check asks for.
+        for _ in 0..<3000 { if gecko.isReady && gecko.state == .installed { break }; try? await Task.sleep(nanoseconds: 10_000_000) }
         check(gecko.isReady && gecko.lastError == nil && gecko.state == .installed, "Gecko model: Settings' Download finishes the job after a failure")
 
         print(failed ? "DRIVER FAILED" : "DRIVER OK")

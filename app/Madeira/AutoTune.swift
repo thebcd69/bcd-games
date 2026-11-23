@@ -246,7 +246,14 @@ enum AutoTune {
 
     /// H1, BCDLaunch.applyLibrary after applyExtras: a tuned game's lines go under its own file.
     static func exportLayer(for entry: LibraryEntry) {
-        guard enabled, eligible(entry), isOn(entry.windowsPath) else { return }
+        guard enabled, eligible(entry), isOn(entry.windowsPath) else {
+            // Round 707 (agent M1 S6; Spider-Man Remastered XDV91N: a verdict named its next lines and the next start had none, and the log
+            // could not say why): a game auto-tune knows but whose own switch is off says so.
+            if enabled, eligible(entry), !state(entry.windowsPath).attempts.isEmpty {
+                LogStore.shared.log("[autotune] \(entry.title): auto-tune is off for this game: no layer this start")
+            }
+            return
+        }
         let path = entry.windowsPath
         // Night round 2026-11-11 (agent T3 S7): the verdict about the last session of this game may still be being written. The lead did
         // not take the agent's wait (up to 20 s on the main thread, where this runs: the interface would freeze and iOS may end the app);
@@ -263,14 +270,27 @@ enum AutoTune {
         if !waiting.isEmpty {
             LogStore.shared.log("[autotune] \(entry.title): \(waiting.joined(separator: "; ")) waits for the player's yes (Ask before trying a fix); this start runs without it")
         }
-        let lines = AutoTuneAsk.layer(s, path).filter { !blocked.contains(AutoTuneRules.key($0)) }
-        guard !lines.isEmpty, let launch = launchURL else { return }
+        let layer = AutoTuneAsk.layer(s, path)
+        let lines = layer.filter { !blocked.contains(AutoTuneRules.key($0)) }
+        guard !lines.isEmpty, let launch = launchURL else {
+            // Round 707 (agent M1 S6): a start that gets no layer although auto-tune has lines for the game says what held them back.
+            if !layer.isEmpty || !s.kept.isEmpty || s.candidate != nil {
+                let held = layer.filter { blocked.contains(AutoTuneRules.key($0)) }
+                LogStore.shared.log("[autotune] \(entry.title): no layer this start (kept \(s.kept.count), candidate \(s.candidate ?? []), layer "
+                                    + "\(layer.count) line(s), held back by the player's own keys \(held), launch file "
+                                    + (launchURL == nil ? "unavailable" : "ok") + ")")
+            }
+            return
+        }
         let profile = GameProfile(windowsPath: path)
         var own = profile.text
-        // The game's own file comes after the layer and wins. A list line a layer line raises (swap-mb = 3072 -> 6144) must not win over it:
-        // that line leaves the launch file's copy of the game's file (the file itself is not touched).
+        // The game's own file comes after the layer and wins. A list line a layer line raises (swap-mb = 3072 -> 6144), or an opt-in DLL line the
+        // layer's holds with more names (round 707), must not win over it: that line leaves the launch file's copy of the game's file (the file
+        // itself is not touched).
         let listed = listValues(entry)
         let raised = Set(lines.filter { line in
+            // Round 707 (owner 2026-11-22): an env.MADEIRA_OPTIN_DLLS line that holds the list's names and more (AutoTuneState.optinOverList).
+            if AutoTuneState.supersedesListOptin(line, listValue: listed[AutoTuneState.optinKey]) { return true }
             guard let had = listed[AutoTuneRules.key(line)], let old = Int(had), let new = Int(AutoTuneRules.value(line)) else { return false }
             return new > old
         }.map(AutoTuneRules.key))

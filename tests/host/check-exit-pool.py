@@ -57,7 +57,16 @@ check("nothing is looked up or touched without a switch (find_key and the exit h
       "if (ios_exit_pool_key != -1 || (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on())) return;" in block
       and "if (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on()) return;" in block)
 check("libobjc's functions come from dlsym (no link dependency, no header), and the key is used only for exactly one changed slot that the pop cleared again",
-      block.count("dlsym( RTLD_DEFAULT,") == 3 and "if (n == 1 && !tsd[found])" in block and "if (ios_exit_pool_skip_on() && key >= 40 && tsd[key])" in block)
+      block.count("dlsym( RTLD_DEFAULT,") == 6 and "if (n == 1 && !tsd[found])" in block and "if (ios_exit_pool_skip_on() && key >= 40 && tsd[key])" in block)
+# madeira-bcd (2026-11-17): libobjc may keep a pool's first objects in further direct slots instead of a page (the macos-15
+# runner: 44 and 45, with the pool's own slot 43 left at 0x1). find_key autoreleases one probe object to see them, keeps only the slots
+# the pop gives back, and the exit clears them with the pool's slot.
+check("find_key also records the slots of a pool's first objects (one autoreleased probe, only those the pop clears) and the exit clears them",
+      'dlsym( RTLD_DEFAULT, "objc_autorelease" )' in block and 'get_class( "NSObject" )' in block
+      and "if (40 + k != found && !before[k] && tsd[40 + k]) more |= 1u << k;" in block
+      and "if (((more >> k) & 1) && tsd[40 + k]) more &= ~(1u << k);" in block
+      and block.index("pop( token );") < block.index("ios_exit_pool_more = more;")
+      and "if ((more >> k) & 1) tsd[40 + k] = NULL;" in block[block.index("tsd[key] = NULL;"):])
 check("the exit wrapper calls the hook once, after ios_thread_qos_exit and just before pthread_exit; start_thread calls find_key once, after the TEB is published",
       src.count("ios_exit_pool_at_exit();") == 1 and src.count("ios_exit_pool_find_key();") == 1
       and src.index("ios_thread_qos_exit( (unsigned)(ULONG_PTR)NtCurrentTeb()->ClientId.UniqueThread );") < src.index("ios_exit_pool_at_exit();")
@@ -122,6 +131,25 @@ static void *worker( void *arg )
         fflush( stdout );
         return NULL;
     }
+    if (scenario == 8)                                         /* madeira-bcd: diagnostic only, where the pool lives on this Mac */
+    {
+        uintptr_t b; void **tsd; int s, phase;
+        @TSDBASE@
+        tsd = (void **)(b & ~7ULL);
+        void *(*push8)( void ) = (void *(*)( void ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPush" );
+        id o8 = 0;
+        for (phase = 0; phase < 4; phase++)
+        {
+            if (phase == 1) push8();
+            if (phase == 2) { o8 = class_createInstance( objc_getClass( "NSObject" ), 0 ); objc_autorelease( o8 ); }
+            if (phase == 3) object_dispose( o8 );
+            printf( "slots %s:", phase == 0 ? "start" : phase == 1 ? "push" : phase == 2 ? "autorelease" : "dispose" );
+            for (s = 0; s < 128; s++) if (tsd[s]) printf( " %d=%p", s, tsd[s] );
+            printf( "\n" );
+        }
+        fflush( stdout );
+        _exit( 0 );
+    }
     void *(*push)( void ) = (void *(*)( void ))dlsym( RTLD_DEFAULT, "objc_autoreleasePoolPush" );
     void *token = push();
     (void)token;
@@ -171,6 +199,11 @@ int main( int argc, char **argv )
             fix = run(1, MADEIRA_EXIT_POOL_SKIP="1")
             check("with MADEIRA_EXIT_POOL_SKIP=1 the same thread exits cleanly, and the log says it cleared the slot (the pool's pages leak)",
                   fix.returncode == 0 and "survived" in fix.stdout and "clears libobjc's autorelease-pool slot" in fix.stderr, "rc=%d %s" % (fix.returncode, fix.stderr))
+            if not (fix.returncode == 0 and "survived" in fix.stdout):
+                # madeira-bcd (2026-11-17): diagnostic only, no verdict: which TSD slots this Mac's libobjc uses for a pool
+                # (macos-15 runner: the found slot held 0x1, the empty-pool placeholder, at exit, and the thread still crashed).
+                d = run(8)
+                print("     diagnostic, non-NULL TSD slots (rc=%d):\n     %s" % (d.returncode, d.stdout.strip().replace("\n", "\n     ")))
             diag = run(3, MADEIRA_EXIT_POOL_DIAG="1")
             check("with MADEIRA_EXIT_POOL_DIAG=1 a healthy pool is described (tid, stack bounds, key and slot) and the thread exits cleanly",
                   diag.returncode == 0 and "survived" in diag.stdout and re.search(r"\[exit-pool\] tid=00ec exiting: stack=\[0x[0-9a-f]+,0x[0-9a-f]+\)", diag.stderr), "rc=%d %s" % (diag.returncode, diag.stderr))

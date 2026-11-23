@@ -27,8 +27,10 @@ private var bcdVTInterpHolds = false
         var ios26 = false
         if #available(iOS 26.0, *) { ios26 = true }
         let presentFX = (MadeiraConfig.gameValue(BCDVTInterp.presentKey) ?? MadeiraConfig.get(BCDVTInterp.presentKey)) == "1"
+        let kosmickrisp = MadeiraConfig.gameValue(BCDVTInterp.vulkanKey) == BCDVTInterp.kosmickrispValue
         let start = BCDVTInterp.start(line: MadeiraConfig.gameValue(BCDVTInterp.key), ios26: ios26,
-                                      lossless: getenv(BCDVTInterp.losslessVariable) != nil, presentFX: presentFX)
+                                      lossless: getenv(kosmickrisp ? BCDVTInterp.losslessKosmicKrispVariable : BCDVTInterp.losslessVariable) != nil,
+                                      presentFX: presentFX, kosmickrisp: kosmickrisp)
         if case .on(let frames) = start {
             setenv(BCDVTInterp.variable, String(frames), 1)
             _ = madeira_fgl_set(0)   // one frame generator at a time: MetalFX's stays off for this session
@@ -43,13 +45,33 @@ private var bcdVTInterpHolds = false
         ProMotionIntent.apply(mode: madeira_get_vsync_locked())   // the screen's top rate while frames are added
     }
 
+    // KosmicKrisp's own copy (build 703, build/mesa-ios/playport-patches/0036: madeira_kk_vti_set, _status, _why, _session_ended, the
+    // same contract as winemetal's), exported by the driver's library once win32u has loaded it for a `vulkan = kosmickrisp` game. The app
+    // does not link the driver, so they are looked up in the process; in any other session they are not there and nothing changes.
+    private typealias KKSet = @convention(c) (Int32) -> Int32
+    private typealias KKStatus = @convention(c) (UnsafeMutablePointer<Int32>?, UnsafeMutablePointer<Int32>?, UnsafeMutablePointer<Double>?,
+                                                 UnsafeMutablePointer<Double>?, UnsafeMutablePointer<Double>?) -> Int32
+    private typealias KKWhy = @convention(c) (UnsafeMutablePointer<CChar>?, Int32) -> Int32
+    private typealias KKEnded = @convention(c) () -> Void
+    nonisolated private static func kosmickrisp<T>(_ name: String, _ type: T.Type) -> T? {
+        guard let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), name) else { return nil }   // RTLD_DEFAULT
+        return unsafeBitCast(symbol, to: type)
+    }
+
     static var status: BCDVTInterp.Status {
         var w: Int32 = 0, h: Int32 = 0, game = 0.0, generated = 0.0, pair = 0.0
-        let raw = madeira_vti_status(&w, &h, &game, &generated, &pair)
+        var raw = madeira_vti_status(&w, &h, &game, &generated, &pair)
+        var driver = false
+        if raw == BCDVTInterp.Status.State.off.rawValue, let kk = kosmickrisp("madeira_kk_vti_status", KKStatus.self) {
+            raw = kk(&w, &h, &game, &generated, &pair)   // a Vulkan game: KosmicKrisp makes the pictures
+            driver = raw != BCDVTInterp.Status.State.off.rawValue
+        }
         var why = ""
         if raw == BCDVTInterp.Status.State.impossible.rawValue {
             var text = [CChar](repeating: 0, count: 240)
-            if madeira_vti_why(&text, Int32(text.count)) > 0 { why = String(cString: text) }
+            let length = driver ? (kosmickrisp("madeira_kk_vti_why", KKWhy.self)?(&text, Int32(text.count)) ?? 0)
+                                : madeira_vti_why(&text, Int32(text.count))
+            if length > 0 { why = String(cString: text) }
         }
         return BCDVTInterp.Status(raw: raw, width: w, height: h, gameFPS: game, generatedFPS: generated, pairMs: pair, why: why)
     }
@@ -58,6 +80,7 @@ private var bcdVTInterpHolds = false
     static func switched(on new: Bool) {
         guard live else { return }
         on = madeira_vti_set(new ? 1 : 0) != 0
+        if let kk = kosmickrisp("madeira_kk_vti_set", KKSet.self), kk(new ? 1 : 0) != 0 { on = true }   // a Vulkan game's own
         bcdVTInterpHolds = on
         ProMotionIntent.apply(mode: madeira_get_vsync_locked())
         LogStore.shared.log("[feel] Apple frame interpolation \(new ? "on" : "off") now, while the game runs" + (on == new ? "" : " (the engine answers \(on ? "on" : "off"))"))
@@ -65,6 +88,7 @@ private var bcdVTInterpHolds = false
 
     static func sessionEnded() {
         madeira_vti_session_ended()   // its reading of MADEIRA_VT_INTERP goes too, also for a session that never asked for it
+        kosmickrisp("madeira_kk_vti_session_ended", KKEnded.self)?()   // KosmicKrisp's copy, where the driver was loaded
         bcdVTInterpHolds = false
         on = true
     }

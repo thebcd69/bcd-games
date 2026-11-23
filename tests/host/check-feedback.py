@@ -17,7 +17,7 @@ Static contracts:
     identifier from uname, not UIDevice; the limits agree in the Worker, the client and the view
     (4000 characters, 20 KB); the last 20 sent are kept as code, kind, date and first line;
   - Settings: the Feedback section sits right after Logs, with a symbol; its page has the three
-    kind chips, a message field with a counter, "Attach my newest log", Send, the sent list and
+    kind chips, a message field with a counter, "Attach my last game's log", Send, the sent list and
     the privacy line; every control is reachable by a controller and A on the message opens the
     keyboard; the live backend sends the log first and puts its code in the message; the view and
     the preview's sample name no engine type; no "Madeira" in what a person reads;
@@ -194,11 +194,12 @@ check("var feedback: any BCDFeedbackBackend" in settings and "case .feedback: Se
 check("let privacy = \"BCD sends what you write, the BCD build, the iOS version and the device model. No name or account.\"" in view
       and "Text(BCDFeedbackRules.privacy)" in view,
       "Feedback: the privacy line, word for word")
-check(all(w in view for w in ('title: "Attach my newest log"', 'Label(sending ? "Sending…" : "Send"', "TextEditor(text: $draft.text)",
+check(all(w in view for w in ('title: BCDFeedbackAttach.title', 'Label(sending ? "Sending…" : "Send"', "TextEditor(text: $draft.text)",
                               'case .bug: return "Bug"', 'case .idea: return "Idea"', 'case .other: return "Other"',
                               "\\(used) / \\(BCDFeedbackRules.maxCharacters)", "Sent. Your code: ", 'title: "Sent"'))
       and "ForEach(BCDFeedbackKind.allCases)" in view and "backend.sent.prefix(5)" in view,
-      "Feedback: three kind chips, the message with a counter, Attach my newest log, Send and its status, the sent list")
+      "Feedback: three kind chips, the message with a counter, Attach my last game's log (BCDFeedbackAttach.title), Send and its status, the sent list")
+check('static let title = "Attach my last game\'s log"' in (APP / "BCDFeedbackAttach.swift").read_text(), "Feedback: the attach row's title (tests/host/check-feedback-attach.py holds the rest)")
 check("if BCDFeedbackRules.count(new) > BCDFeedbackRules.maxCharacters { draft.text = BCDFeedbackRules.limited(new) }" in view,
       "Feedback: the field stops at 4000 characters")
 ids = re.findall(r'BCDSettingsID\.control\(\.feedback, "([^"]+)"\)', view)
@@ -219,7 +220,7 @@ lf = block(live, "final class BCDFeedbackLive: BCDFeedbackBackend")
 check(lf.index("LogUpload.send(url") < lf.index("post(kind, text, log: code)") < lf.index("FeedbackUpload.send(kind: kind, text: text, log: log)")
       and "guard draft.attachLog, let url = newest else { return post(kind, text, log: nil) }" in lf
       and "LogUpload.recentLogs()" in lf,
-      "live: with Attach my newest log on, the newest log goes first through LogUpload.send and its code goes into the message")
+      "live: with Attach my last game's log on, the newest log goes first through LogUpload.send and its code goes into the message")
 check("draft.text = \"\"" in lf and "Your message is still here" in lf,
       "live: a sent message clears the field; a failure keeps the words")
 engine = ["LibraryModel", "LogUpload", "LogStore", "MadeiraConfig", "FeedbackUpload", "FeedbackCore", "UIDevice"]

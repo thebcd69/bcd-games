@@ -1,0 +1,396 @@
+[07:47:15.496] [INFO] Checking entitlements...
+[07:47:15.496] [INFO] [build] v0.1.686 (686)
+[07:47:15.497] [INFO] [device] model=iPad16,4 idiom=pad os=iPadOS Version 27.2.1 (Build 24B156) ram=7455MB available=8170MB cores=9
+[07:47:15.497] [INFO] [device] address-map=[0x1041a4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[07:47:15.497] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[07:47:15.516] [INFO] [device] settings: low-power=0 thermal=nominal screen=1668x2420@1.7195876288659795x max-fps=120 utc-offset=-06:00 free-disk=71GB stikdebug-url=0
+[07:47:15.519] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[07:47:17.311] [INFO] Requesting JIT with Built-in StikJIT...
+[07:47:23.261] [INFO] [bcd-ui] play local
+[07:47:23.314] [INFO] [bcd] library launch underkeep.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[07:47:24.603] [INFO] Running full Wine sequence...
+[07:47:24.603] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1041a4000,0x8000000000) 512GB available=8162MB low-power=0 thermal=nominal
+[07:47:24.632] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[07:47:24.633] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): the library knows this game as D3D11/D3D12/D3D9/OpenGL/Vulkan
+[07:47:24.635] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[07:47:24.641] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[07:47:24.641] [INFO] Allocating 896MB JIT pool via debugger...
+[07:47:24.641] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[07:47:24.642] [INFO] [jit-debugger] attached=1 at the pool request
+[07:47:24.642] [INFO] [jit-age] attach age=5s source=enable-jit method=builtin thermal=0
+[07:47:24.643] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[07:47:24.645] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[07:47:25.298] [INFO] RX pool at 0x148000000
+[07:47:25.315] [OK] JIT pool ready (debugger still attached).
+[07:47:25.315] [INFO] BRK suspension lasted 0.67s
+[07:47:25.317] [INFO] Detaching debugger...
+[07:47:25.320] [OK] Debugger detached.
+[07:47:25.321] [OK] [early-detach] rev=ml524 took 5 ms
+[07:47:25.334] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.723s rev=ml526
+[07:47:25.364] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/b5faa5b8b46602f7.cfg (read)
+[WineProc] Target exe: C:\External\<uuid>\Nueva carpeta con elementos 4\underkeep\underkeep.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[07:47:25.600] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[Wine init_process] reply_pipe=41, sending init_first_thread...
+[07:47:25.600] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7585 MB + phys_footprint=606 MB = 8192 MB (hw.memsize says 7455 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7455 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x484000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x484000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x125000000+0x484000 (underkeep.exe) → pool 0x148005000 used=0x48d000/0x23000000 tramp+0x0
+[copy-verify] underkeep.exe: OK, 191 .text pages executable (copy @0x148005000)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14848c000 used=0x5c4000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14848c000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x125000000 IAT window 0x1252fb000+0x6c0: 210 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x125000000 IAT window 0x1252fb000+0x6c0: 210 slot(s), 0 data import(s) bound
+[window] 0x7048000000..0x7400000000 regions=77 occupied=8211 MB of 15232 MB free=7020 MB maxhole=7020 MB@0x7048000000 rev=ml787 (periodic)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x1485c7000 used=0x9f3000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x1485c7000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x1489f0000 used=0xb24000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1489f0000)
+[window] 0x125000000..0x7803000000 regions=71860 occupied=462100 MB of 486880 MB free=41211 MB maxhole=16432 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 0 MB in 0 views of the 16384 MB arena (0 MB of them in 0 unity-va views), highest end +0 MB, largest free gap 16384 MB
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=626 MB (peak 626) internal=624 MB compressed=0 MB external=77 MB reusable=3 MB (cycle=1)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x148b24000 used=0xbec000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148b24000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x148bec000 used=0xeec000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x148bec000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module underkeep.exe (underkeep.exe-644aac30ae04e9ac): 125000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module fmod.dll (fmod.dll-01cc73ffdafb14b1): 71FE140000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FE0A0000
+[x64-data-imp] ml1245 importer pe=0x71fe140000 IAT window 0x71fe28b000+0x478: 138 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fe140000 IAT window 0x71fe28b000+0x478: 138 slot(s), 0 data import(s) bound
+D 24 Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71FDF80000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FDD60000
+[copy-verify] msacm32.dll: OK, 4 .text pages executable (copy @0x149ccc000)
+[x64-data-imp] ml1245 importer pe=0x71fe140000 IAT window 0x71fe28b000+0x478: 138 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fe140000 IAT window 0x71fe28b000+0x478: 138 slot(s), 0 data import(s) bound
+[copy-verify] SDL3.dll: OK, 120 .text pages executable (copy @0x149d60000)
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x14a020000)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x14a104000)
+[copy-verify] imm32.dll: OK, 5 .text pages executable (copy @0x14a188000)
+[file-fail] ml665 #48 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\External\<uuid>\Nueva carpeta con elementos 4\underkeep\WININET.dll
+E 24 [iOS-xins] tracker=0x148995fd8 WININET.dll sec=0x71faf60000-0x71faf9b029
+E 24 [iOS-xins] tracker=0x148995fd8 WININET.dll sec=0x71fafa0000-0x71fafa0f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FAF50000
+E 24 [iOS-xins] tracker=0x148995fd8 WININET.dll sec=0x71faf60000-0x71faf9b029
+E 24 [iOS-xins] tracker=0x148995fd8 WININET.dll sec=0x71fafa0000-0x71fafa0f90
+E 24 [img-map] ml710 #28 intervals-only WININET.dll base=0x71faf50000
+[copy-verify] mswsock.dll: OK, 1 .text pages executable (copy @0x14c5ac000)
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[dns] madeira-bcd begin #1 "galaxy-log.gog.com" "(null)" family=2 flags=0x0 type=2
+[dns] madeira-bcd end #1 "galaxy-log.gog.com" = 0 after 0 ms (4 result(s))
+E 2C [thr-term] rev=ml435 deinit #1 tid=0x2c
+0030:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0030:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp-names] m6257533 "wine-x18-exc"
+[xp] 07:47:26.364 +0.69 dt=338 cpu=217 (thr 171) P=209 E=8 run=385 pgw=50.9 GHz P=3.95 E=2.79 Minst=3091 IPC=3.64 mJ=1043 pin=768 rdKB=13040 fpMB=848
+[dns] madeira-bcd begin #2 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #2 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62902 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[apc-requeue] on (MADEIRA_APC_REQUEUE=0 restores dropping async I/O APCs for busy threads)
+[apc-requeue] #1 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[dns] madeira-bcd begin #3 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #3 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62903 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[apc-requeue] #2 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[xp] 07:47:26.639 +0.97 dt=275 cpu=173 (thr 173) P=40 E=133 run=180 pgw=0.0 GHz P=2.94 E=2.70 Minst=1677 IPC=3.51 mJ=215 pin=0 rdKB=0 fpMB=864
+[dns] madeira-bcd begin #4 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #4 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62904 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[apc-requeue] #3 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[xp] 07:47:26.892 +1.22 dt=253 cpu=38 (thr 37) P=6 E=33 run=45 pgw=0.0 GHz P=1.43 E=2.79 Minst=131 IPC=1.32 mJ=14 pin=0 rdKB=0 fpMB=864
+[dns] madeira-bcd begin #5 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #5 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62905 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[apc-requeue] #4 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[xp] 07:47:27.146 +1.47 dt=255 cpu=12 (thr 13) P=0 E=12 run=18 pgw=0.0 GHz P=0.00 E=2.77 Minst=48 IPC=1.44 mJ=4 pin=0 rdKB=0 fpMB=864
+[xp] 07:47:27.425 +1.75 dt=279 cpu=35 (thr 35) P=5 E=30 run=42 pgw=0.0 GHz P=1.43 E=2.57 Minst=114 IPC=1.34 mJ=12 pin=0 rdKB=0 fpMB=865
+[xp] 07:47:27.687 +2.01 dt=261 cpu=14 (thr 14) P=0 E=14 run=19 pgw=0.0 GHz P=0.00 E=2.58 Minst=41 IPC=1.15 mJ=4 pin=0 rdKB=0 fpMB=865
+[footprint] rev=ml358 phys=869 MB (peak 869) internal=866 MB compressed=0 MB external=114 MB reusable=2 MB (cycle=2)
+[dns] madeira-bcd begin #6 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #6 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62906 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[apc-requeue] #5 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62907 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[footprint] rev=ml358 phys=869 MB (peak 869) internal=867 MB compressed=0 MB external=114 MB reusable=2 MB (cycle=3)
+[footprint] rev=ml358 phys=869 MB (peak 869) internal=867 MB compressed=0 MB external=114 MB reusable=2 MB (cycle=4)
+[apc-requeue] #11 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[apc-requeue] #12 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[footprint] rev=ml358 phys=869 MB (peak 869) internal=867 MB compressed=0 MB external=114 MB reusable=2 MB (cycle=5)
+[apc-requeue] #13 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[apc-requeue] #14 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[apc-requeue] #15 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[footprint] rev=ml358 phys=869 MB (peak 869) internal=867 MB compressed=0 MB external=114 MB reusable=2 MB (cycle=6)
+[apc-requeue] #16 async I/O APC status=c0000236 for busy thread 0030 -> waiting thread 0054
+[srv-conn-done] dport=9977 event=|HUP err=61 fd=183 peer=NO path=SYNTHESIZED-or-still-connecting rev=ml576
+[dns] madeira-bcd begin #18 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #18 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62918 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #19 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #19 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62919 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #20 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #20 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62920 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #21 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #21 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62921 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[xp-api-top] 07:47:39.859 732 samples: kernel32.dll+0x26678=17204/s ntdll.dll+0x281ac=3561/s ntdll.dll+0x27cc8=3461/s kernelbase.dll+0x6d470=1856/s ntdll.dll+0x71aac=1806/s ntdll.dll+0x23c0c=1755/s ntdll.dll+0x680ec=1755/s kernelbase.dll+0x6a524=1705/s kernelbase.dll+0x6c248=1705/s ntdll.dll+0x6886c=1705/s ntdll.dll+0x6784c=100/s kernelbase.dll+0x23d98=50/s kernelbase.dll+0x6a8ec=50/s
+[dns] madeira-bcd begin #22 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #22 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62922 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #23 "<ip>" "9977" family=0 flags=0x400 type=1
+[dns] madeira-bcd end #23 "<ip>" = 0 after 0 ms (1 result(s))
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=62923 dport=9977 nb=0 ret=-1 plen=16 rev=ml478
+[xp-api-top] 07:47:41.113 722 samples: kernel32.dll+0x26678=17305/s ntdll.dll+0x281ac=3624/s ntdll.dll+0x27cc8=3522/s ntdll.dll+0x680ec=1787/s ntdll.dll+0x71aac=1787/s kernelbase.dll+0x6c248=1736/s ntdll.dll+0x23c0c=1736/s ntdll.dll+0x6886c=1736/s kernelbase.dll+0x6a524=1685/s kernelbase.dll+0x6d470=1685/s kernelbase.dll+0x23d98=102/s ws2_32.dll+0x17adc=51/s ws2_32.dll+0x184b0=51/s kernelbase.dll+0x6db54=51/s
+[file-wfail] ml669 #6 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+E 38 [thr-term] rev=ml435 deinit #3 tid=0x38
+E 44 [thr-term] rev=ml435 deinit #4 tid=0x44
+E 3C [thr-term] rev=ml435 deinit #2 tid=0x3c
+E 40 [thr-term] rev=ml435 deinit #5 tid=0x40
+E 50 [thr-term] rev=ml435 deinit #6 tid=0x50
+E 4C [thr-term] rev=ml435 deinit #7 tid=0x4c
+E 34 [thr-term] rev=ml435 deinit #9 tid=0x34
+E 48 [thr-term] rev=ml435 deinit #8 tid=0x48
+0024:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=0000000148C04110 flags=1 nparams=4 tid=0024 hit=1
+[file-census] r624 15s: case-sensitive=1 full-path-tries=173 full-path-hits=51 component-lookups=593 shortcut-hits=378 misses=182 scans=215 entries-scanned=26171 us-in-lookup=264660 (1% of the window) slowest=15.285 ms ...27-AC47-859153B61A42/Nueva carpeta con elementos 4/underkeep
+[image-reload] unmapped image 0x71fa640000+0xb0000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[winios-vk] Vulkan is off for this session (the game's file has no vulkan = moltenvk, or the library is not bundled)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x40000000
+[vmode] synthesized CURRENT = 1160x800 @60Hz
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000000 -> 0
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg-mismatch] QueryDisplayConfig flags=0x2 answered success with 0 paths 0 modes (room for 1 paths 2 modes offered; 1 monitor(s) without a source skipped) after GetDisplayConfigBufferSizes said 1 paths 2 modes: a program that trusts the sizes call and reads the result finds no monitor; env.MADEIRA_VDCFG_PATH = 1 lists the virtual monitor's path
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x40000040
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000040 -> 0
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=00000014 vis={0,0,870,600} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #3 hwnd=0x10030 class='SDLHelperWindowInputCatcher' text="" rev=ml853
+[win-pos] #4 hwnd=0x10030 after=0x0 flags=00000010 vis={0,0,870,600} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #4 hwnd=0x10030 class='SDLHelperWindowInputCatcher' text="SDLHelperWindowInputMsgWindow" rev=ml853
+00a0:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=00a0 status=00000001 caller=0000000148B4A474
+E A0 [thr-term] rev=ml435 deinit #10 tid=0xa0
+[free-delay] #1 release of 0x7024cd0000+0x800000 held for 2000 ms (1 in flight)
+[win-pos] #5 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #5 hwnd=0x10032 class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[win-pos] #6 hwnd=0x10032 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10024
+[win-name] #6 hwnd=0x10032 class='SDL_HIDAPI_DEVICE_DETECTION' text="" rev=ml853
+[jit-pool] image 0x71fa390000+0x90000 (xinput1_4.dll) → pool 0x14ca24000 used=0x4ab8000/0x23000000 tramp+0x4000
+D 24 Load module XInput1_4.dll (xinput1_4.dll-a6149d37793c4485): 71FA390000
+[jit-pool] image 0x71fa2e0000+0xb0000 (dinput8.dll) → pool 0x14cab8000 used=0x4b6c000/0x23000000 tramp+0x4000
+D 24 Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71FA2E0000
+[jit-pool] image 0x71fa160000+0x180000 (comctl32.dll) → pool 0x14cb6c000 used=0x4cf0000/0x23000000 tramp+0x4000
+D 24 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71FA160000
+[win-name] #7 hwnd=0x10034 class='Message' text="" rev=ml853
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x40000080
+[vmode] synthesized CURRENT = 1160x800 @60Hz
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000080 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x400000c0
+[vkmt] tid=0024 CloseAdapter hAdapter=0x400000c0 -> 0
+[jit-pool] image 0x71f9f80000+0x160000 (opengl32.dll) → pool 0x14ccf0000 used=0x4e54000/0x23000000 tramp+0x4000
+D 24 Load module OPENGL32.DLL (opengl32.dll-9fddefc254677b75): 71F9F80000
+[unixlib] opengl32 (GL-absent stub table) (module 0x71f9f80000) -> 64-bit table (0x107c60d10)
+[win-name] #11 hwnd=0x1003c class='SDL_app' text="" rev=ml853
+[win-name] #14 hwnd=0x1003c class='SDL_app' text="SDL_app" rev=ml853
+[win-name] #15 hwnd=0x10040 class='SDL_app' text="" rev=ml853
+[win-name] #16 hwnd=0x10040 class='SDL_app' text="" rev=ml853
+[jit-pool] image 0x71f9ed0000+0xb0000 (uxtheme.dll) → pool 0x14ce54000 used=0x4f08000/0x23000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F9ED0000
+[image-reload] unmapped image 0x71f9ed0000+0xb0000: 1 pool copy marked
+[win-name] #17 hwnd=0x10040 class='SDL_app' text="" rev=ml853
+[win-name] #18 hwnd=0x10040 class='SDL_app' text="" rev=ml853
+[win-name] #19 hwnd=0x20048 class='SDL_app' text="" rev=ml853
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x40000100
+[vmode] synthesized CURRENT = 1160x800 @60Hz
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000100 -> 0
+[vkmt] tid=0024 OpenAdapterFromLuid luid=09030000:01000000 -> 0 hAdapter=0x40000140
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000140 -> 0
+[win-name] #26 hwnd=0x20044 class='SDL_app' text="" rev=ml853
+[jit-pool] image 0x71f9ed0000+0xb0000 (uxtheme.dll) → pool 0x14ce54000 used=0x4f08000/0x23000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71F9ED0000
+[image-reload] unmapped image 0x71f9ed0000+0xb0000: 1 pool copy marked
+[win-name] #27 hwnd=0x20044 class='SDL_app' text="" rev=ml853
+[win-name] #28 hwnd=0x20044 class='SDL_app' text="" rev=ml853
+[win-name] #29 hwnd=0x1004c class='SDL_app' text="" rev=ml853
+[win-name] #30 hwnd=0x1004c class='SDL_app' text="SDL_app" rev=ml853
+[win-name] #31 hwnd=0x2004c class='SDL_app' text="" rev=ml853
+[win-name] #32 hwnd=0x2004c class='SDL_app' text="SDL_app" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #33 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #34 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #38 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #42 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #46 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #50 hwnd=0x30044 class='#32770' text="" rev=ml853
+[win-name] #83 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #84 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #85 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #86 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #87 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #88 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #89 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #90 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #92 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #93 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-name] #95 hwnd=0x10062 class='Static' text="Cannot initialize window with OpenGL context. OpenGL 3.2 is required at minimum. [bool __cdecl _CreateWindowAndContext(const struct WindowSetup &):System_sdl3.cpp:1093]" rev=ml853
+[win-name] #98 hwnd=0x20060 class='Wine IME' text="" rev=ml853
+[win-pos] #99 hwnd=0x10056 after=0x0 flags=0000001c vis={126,68,208,94} surface=0x0 rev=ml505 style=50030001 visible=0 parent=0x30044
+[win-name] #99 hwnd=0x10056 class='Button' text="Aceptar" rev=ml853
+[win-pos] #100 hwnd=0x30044 after=0x0 flags=00001967 vis={412,333,747,467} surface=0x1275cc3c0 rev=ml505 style=94c801c4 visible=1 parent=0x10022
+[win-name] #100 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[launch-view] dismissed reason=surface logs=1
+[xp-api-top] 07:47:42.371 964 samples: kernel32.dll+0x26678=15896/s ntdll.dll+0x281ac=6615/s ntdll.dll+0x27cc8=4666/s ntdll.dll+0x680ec=3846/s ntdll.dll+0x6886c=3641/s kernelbase.dll+0x23d98=1692/s ntdll.dll+0x71aac=1641/s kernelbase.dll+0x6c248=1333/s kernelbase.dll+0x6a524=1128/s kernelbase.dll+0x6d4c0=1128/s ntdll.dll+0x23c0c=1128/s kernelbase.dll+0x6d470=1077/s kernelbase.dll+0x6db9c=1077/s ntdll.dll+0x68788=1077/s ntdll.dll+0x68bc8=769/s kernelbase.dll+0x6a6c8=564/s ntdll.dll+0x29488=461/s ntdll.dll+0x7e16c=410/s user32.dll+0x3c1e8=308/s user32.dll+0x3c56c=103/s kernelbase.dll+0x163d0=103/s kernelbase.dll+0x6db54=103/s user32.dll+0x949cc=51/s 0x71fa527084=51/s 0x71fa529e44=51/s win32u.dll+0x120b8=51/s gdi32.dll+0x11334=51/s user32.dll+0x5434c=51/s
+[xp-api-top] 07:47:43.589 691 samples: kernel32.dll+0x26678=17146/s ntdll.dll+0x27cc8=3492/s ntdll.dll+0x281ac=3388/s kernelbase.dll+0x6a524=1720/s kernelbase.dll+0x6c248=1720/s kernelbase.dll+0x6d470=1720/s ntdll.dll+0x23c0c=1720/s ntdll.dll+0x6886c=1720/s ntdll.dll+0x71aac=1720/s ntdll.dll+0x680ec=1668/s
+[xp-api-top] 07:47:44.897 741 samples: kernel32.dll+0x26678=18664/s ntdll.dll+0x281ac=3754/s ntdll.dll+0x27cc8=3701/s ntdll.dll+0x680ec=1903/s ntdll.dll+0x6886c=1903/s kernelbase.dll+0x6a524=1851/s kernelbase.dll+0x6c248=1851/s kernelbase.dll+0x6d470=1851/s ntdll.dll+0x23c0c=1851/s ntdll.dll+0x71aac=1851/s
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bc5a230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16bf9cc90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c62c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[xp-api-top] 07:47:46.061 659 samples: kernel32.dll+0x26678=15778/s ntdll.dll+0x27cc8=3196/s ntdll.dll+0x281ac=3196/s kernelbase.dll+0x6a524=1623/s kernelbase.dll+0x6c248=1623/s kernelbase.dll+0x6d470=1623/s ntdll.dll+0x23c0c=1623/s ntdll.dll+0x71aac=1623/s ntdll.dll+0x680ec=1573/s ntdll.dll+0x6886c=1573/s
+[rip-profile] ml981 gen=1 threads=9 samples=1800 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=1 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[hwinput] keyboard focus: elsewhere (poll)
+[07:47:55.441] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=43 resident=499MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (poll)
+[hwinput] keyboard focus: elsewhere (poll)
+[xp-api-top] 07:48:02.904 723 samples: kernel32.dll+0x26678=17537/s ntdll.dll+0x27cc8=3518/s ntdll.dll+0x281ac=3467/s kernelbase.dll+0x6a524=1784/s kernelbase.dll+0x6c248=1784/s kernelbase.dll+0x6d470=1784/s ntdll.dll+0x23c0c=1784/s ntdll.dll+0x680ec=1733/s ntdll.dll+0x6886c=1733/s ntdll.dll+0x71aac=1733/s
+[xp-api-top] 07:48:04.076 676 samples: kernel32.dll+0x26678=17645/s ntdll.dll+0x27cc8=3496/s ntdll.dll+0x281ac=3442/s kernelbase.dll+0x6a524=1803/s kernelbase.dll+0x6c248=1803/s kernelbase.dll+0x6d470=1803/s ntdll.dll+0x23c0c=1803/s ntdll.dll+0x71aac=1748/s ntdll.dll+0x680ec=1693/s ntdll.dll+0x6886c=1693/s
+[hwinput] keyboard focus: program (poll)
+[xp-api-top] 07:48:05.388 745 samples: kernel32.dll+0x26678=17416/s ntdll.dll+0x27cc8=3464/s ntdll.dll+0x281ac=3464/s ntdll.dll+0x680ec=1756/s ntdll.dll+0x6886c=1756/s kernelbase.dll+0x6c248=1707/s kernelbase.dll+0x6d470=1707/s ntdll.dll+0x23c0c=1707/s ntdll.dll+0x71aac=1707/s kernelbase.dll+0x6a524=1659/s
+[srv-input] btn msg=0x201 at (0,0) hit win=00010022 thread=0x0
+[xp-api-top] 07:48:06.616 695 samples: kernel32.dll+0x26678=17296/s ntdll.dll+0x27cc8=3438/s ntdll.dll+0x281ac=3438/s kernelbase.dll+0x6d470=1771/s ntdll.dll+0x23c0c=1771/s kernelbase.dll+0x6a524=1719/s kernelbase.dll+0x6c248=1719/s ntdll.dll+0x71aac=1719/s ntdll.dll+0x680ec=1667/s ntdll.dll+0x6886c=1667/s
+[xp-api-top] 07:48:07.891 732 samples: kernel32.dll+0x26678=17577/s ntdll.dll+0x27cc8=3536/s ntdll.dll+0x281ac=3536/s ntdll.dll+0x680ec=1818/s ntdll.dll+0x6886c=1818/s kernelbase.dll+0x6c248=1768/s ntdll.dll+0x71aac=1768/s kernelbase.dll+0x6a524=1717/s kernelbase.dll+0x6d470=1717/s ntdll.dll+0x23c0c=1717/s
+[srv-input] btn msg=0x201 at (604,443) hit win=00030044 thread=0x11edf8300
+[srv-input] btn msg=0x201 at (604,443) hit win=00030044 thread=0x11edf8300
+[srv-input] btn msg=0x201 at (604,443) hit win=00030044 thread=0x11edf8300
+[srv-input] btn msg=0x201 at (604,443) hit win=00030044 thread=0x11edf8300
+[win-pos] #101 hwnd=0x30044 after=0x0 flags=000018bf vis={412,333,747,467} surface=0x10769ac10 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #101 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #102 hwnd=0x30044 after=0x0 flags=0000181f vis={412,333,747,467} surface=0x10769ac10 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #102 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #103 hwnd=0x30044 after=0x0 flags=0000181f vis={412,333,747,467} surface=0x10769ac10 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #103 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+[win-pos] #104 hwnd=0x30044 after=0x0 flags=0000181f vis={412,333,747,467} surface=0x10769ac10 rev=ml505 style=84c801c4 visible=0 parent=0x10022
+[win-name] #104 hwnd=0x30044 class='#32770' text="Fatal Error" rev=ml853
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=110548
+[unwind] term ml661 begin rip=71fe6f0690 rsp=702380edb8 window=[702380edb8..702400edb8) max=32
+[unwind] term ml661 #00 pc=71fe6f0690 rsp=702380edb8  kernel32.dll+0x40690
+[unwind] term ml662 #00 nv: rbx=1 rbp=702380ee40 rsi=445 rdi=70240868e0 r12=12532da30 r13=0 r14=12531c380 r15=702380f290
+[unwind] term ml662   rbp=702380ee40: 70bd3125 01000000 d6140725 01000000 01000000 00000000 00000000 01000000
+[unwind] term ml662   rdi=70240868e0: 01000000 00000000 00000000 00000000 00000000 00000000 03000800 11007580
+[unwind] term ml661 #01 pc=1252d7a74 rsp=702380edc0  underkeep.exe+0x2d7a74
+[unwind] term ml661 #02 pc=1252d7a46 rsp=702380edf0  underkeep.exe+0x2d7a46
+[unwind] term ml661 #03 pc=1250714d6 rsp=702380ee50  underkeep.exe+0x714d6
+[unwind] term ml661 #04 pc=12500c48f rsp=702380ee80  underkeep.exe+0xc48f
+[unwind] term ml661 #12 pc=1252cb6a6 rsp=702380ff70  underkeep.exe+0x2cb6a6
+[unwind] term ml662 #12 nv: rbx=0 rbp=702380ffd0 rsi=0 rdi=0 r12=0 r13=0 r14=0 r15=0
+[unwind] term ml661 #13 pc=148b55b0c rsp=702380ffb0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+000: call* 1252d7a74  underkeep.exe+0x2d7a74
+[term-stack] ml660 sp+030: CALL 1252d7a46  underkeep.exe+0x2d7a46
+[term-stack] ml660 sp+088:   ? 12531bd70  underkeep.exe+0x31bd70
+[term-stack] ml660 sp+090: CALL 1250714d6  underkeep.exe+0x714d6
+[term-stack] ml660 sp+0b8:   ? 12531bd70  underkeep.exe+0x31bd70
+[term-stack] ml660 sp+0c0: CALL 12500c48f  underkeep.exe+0xc48f
+[span-census] FREE #4 0x7c0d010000+0x1000000 tid=0024 live=2 rev=ml435
+[vfree] ml842 # base=0x7c28410000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #5 0x7c28410000+0x1000000 tid=0024 live=1 rev=ml435
+[vfree] ml842 # base=0x7c06810000 size=0x0 type=0x8000 tid=0024
+[span-census] FREE #6 0x7c06810000+0x1000000 tid=0024 live=0 rev=ml435
+[vfree] ml842 # base=0x16affc000 size=0x0 type=0x8000 tid=0024
+[jit-pool] tail FREE rx=0x16affc000 size=0x4000 -> free-list rev=ml438
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=110600
+[unwind] term ml661 begin rip=14850a16c rsp=702380eb00 window=[702380eb00..702400eb00) max=32
+[unwind] term ml661 #00 pc=14850a16c rsp=702380eb00  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+7f8: CALL 125071dc8  underkeep.exe+0x71dc8
+[term-stack] ml660 sp+868: CALL 71fc178aa9  GalaxySteamWrapper64.dll+0x78aa9
+[term-stack] ml660 sp+8b8: CALL 71fc1356f9  GalaxySteamWrapper64.dll+0x356f9
+[term-stack] ml660 sp+8c8: call* 1252df584  underkeep.exe+0x2df584
+[term-stack] ml660 sp+8e8: call* 12505410f  underkeep.exe+0x5410f
+[term-stack] ml660 sp+928: CALL 125051e61  underkeep.exe+0x51e61
+0024:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1)
+[WineProc] Wine exited with code 1 (caught by longjmp)
+[WineProc] stopping wineserver...
+[07:48:08.600] [INFO] [session] length=44s play=0s frames=0 stalls=0/0s peak=1169MB limit=8191MB thermal=nominal lpm=0 api=D3D11/D3D12/D3D9/OpenGL/Vulkan/64 res=1160x800 cap=60 game=underkeep
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[xp-api-top] 07:48:09.153 135 samples: kernel32.dll+0x26678=2705/s ntdll.dll+0x27cc8=919/s ntdll.dll+0x281ac=561/s kernelbase.dll+0x6a524=306/s kernelbase.dll+0x6c248=306/s kernelbase.dll+0x6d470=306/s ntdll.dll+0x23c0c=306/s ntdll.dll+0x67dcc=306/s ntdll.dll+0x71aac=306/s ntdll.dll+0x680ec=255/s ntdll.dll+0x6886c=255/s ntdll.dll+0x6784c=153/s ntdll.dll+0x668d4=102/s ntdll.dll+0x7e2fc=51/s user32.dll+0x4f604=51/s
+[07:48:10.345] [INFO] Detaching debugger...
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c62c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bf9cba0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=0% RUN pc=Foundation`<redacted>+0x12d0 lr=Madeira`$s7Madeira7LogTailC10flushLines33_021D1B84151237F59396648796200A17LLyyF+0x304 sp=0x16c3fe2c0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x0 cpu=0% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16c3fe4f0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[footprint] rev=ml358 phys=943 MB (peak 1133) internal=302 MB compressed=638 MB external=128 MB reusable=7 MB (cycle=24)
+[thread-sample] ml876 b3 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16bf9cc90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=0% RUN pc=libswiftCore.dylib`<redacted>+0xac lr=libswiftCore.dylib`<redacted>+0xac sp=0x16bd364f0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[footprint] rev=ml358 phys=946 MB (peak 1133) internal=305 MB compressed=638 MB external=138 MB reusable=7 MB (cycle=25)
+[footprint] rev=ml358 phys=944 MB (peak 1133) internal=306 MB compressed=637 MB external=141 MB reusable=7 MB (cycle=26)
+[rip-profile] ml981 gen=2 threads=9 samples=1800 buckets=1 span=0x0 [0x71fe444770..0x71fe444770] top: 0x71fe444740=100%
+[cpu-split] ml1123 gen=2 running samples=0: x64 JIT 0%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[footprint] rev=ml358 phys=944 MB (peak 1133) internal=306 MB compressed=637 MB external=141 MB reusable=7 MB (cycle=27)
+[footprint] rev=ml358 phys=944 MB (peak 1133) internal=306 MB compressed=637 MB external=141 MB reusable=7 MB (cycle=28)
+[xp] 07:48:20.667 +55.00 dt=469 cpu=9 (thr 9) P=0 E=9 run=199 pgw=0.0 GHz P=0.00 E=2.74 Minst=25 IPC=1.03 mJ=2 pin=0 rdKB=0 fpMB=944
+[xp] 07:48:20.993 +55.32 dt=326 cpu=9 (thr 9) P=0 E=9 run=249 pgw=0.0 GHz P=0.00 E=2.80 Minst=23 IPC=0.92 mJ=2 pin=0 rdKB=0 fpMB=944
+[xp] 07:48:21.290 +55.61 dt=289 cpu=8 (thr 7) P=0 E=8 run=43 pgw=0.0 GHz P=0.00 E=2.72 Minst=23 IPC=1.11 mJ=2 pin=0 rdKB=0 fpMB=944
+[xp] 07:48:21.924 +56.25 dt=641 cpu=82 (thr 81) P=28 E=53 run=714 pgw=1.2 GHz P=2.03 E=2.76 Minst=257 IPC=1.26 mJ=43 pin=10 rdKB=212 fpMB=945
+[footprint] rev=ml358 phys=945 MB (peak 1133) internal=306 MB compressed=637 MB external=141 MB reusable=7 MB (cycle=29)
+gw=1.2 GHz P=2.03 E=2.76 Minst=257 IPC=1.26 mJ=43 pin=10 rdKB=212 fpMB=945
+[xp] 07:48:22.644 +56.96 dt=373 cpu=262 (thr 249) P=3 E=259 run=280 pgw=0.3 GHz P=3.83 E=2.75 Minst=2535 IPC=3.51 mJ=176 pin=12 rdKB=228 fpMB=951
+[07:48:22.644] [xp] 07:48:22.644 +56.96 dt=373 cpu=262 (thr 249) P=3 E=259 run=280 pgw=0.3 GHz P=3.83 E=2.75 Minst=2535 IPC=3.51 mJ=176 pin=12 rdKB=228 fpMB=951

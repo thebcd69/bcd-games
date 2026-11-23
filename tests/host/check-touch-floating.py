@@ -92,7 +92,7 @@ check("the session applies it and draws the controls again only when it changes"
       "if BCDTouchFeel.floatingSticks != (current.floatingSticks == true) {" in apply and "BCDTouchFeelModel.shared.colorChanged()" in apply)
 layer = block(controls, "struct BCDTouchLayer: View {")
 old_each = re.sub(r"\s+", " ", "ForEach(items) { item in BCDTouchControl(item: item, screen: screen, layoutScale: layoutScale, opacity: opacity, "
-                  "editing: editing, selected: editing && selected == item.id, input: input, arranging: arranging, look: look) .equatable() }")
+                  "editing: editing, selected: editing && (selected == item.id || selectedIDs.contains(item.id)), input: input, arranging: arranging, look: look) .equatable() }")
 check("off (or editing), the layer draws every control as before; on, the sticks' zones go under every other control",
       "var floatingSticks = false" in layer and "if floatingSticks && !editing {" in layer and old_each in re.sub(r"\s+", " ", layer)
       and layer.index("BCDTouchFloatingStick(") < layer.index("items.filter { !$0.action.isControllerStick }"))

@@ -764,6 +764,29 @@ int winios_input_wake_thread(void)
     return winios_thread_shows_dialog;
 }
 
+/* madeira-bcd (round 707, agent G1 S23; MemeticBox HK9M6K): a click on a decorated game window's frame starts the size/move loop
+ * (defwnd_ios.c sys_command_size_move), whose GetMessage waits without waking the driver in game mode: the button-up, Esc, Return and
+ * Alt+F4 stayed in the app's ring and the game froze for good. The loop marks its thread for as long as it runs, as a thread that shows a
+ * dialog is marked (its waits then wake every 16 ms and drain the ring); the mark it had before comes back after. MADEIRA_GAME_INPUT_WAKE=0
+ * turns this off with the rest. */
+void winios_input_wake_enter( int *saved )
+{
+    static int on = -1;
+
+    *saved = winios_thread_shows_dialog;
+    if (on < 0)
+    {
+        const char *env = getenv( "MADEIRA_GAME_INPUT_WAKE" );
+        on = !(env && *env == '0');
+    }
+    if (on) winios_thread_shows_dialog = 1;
+}
+
+void winios_input_wake_leave( int saved )
+{
+    winios_thread_shows_dialog = saved;
+}
+
 static void winios_note_dialog_thread( HWND hwnd, const RECT *visible )
 {
     static int on = -1;

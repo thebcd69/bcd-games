@@ -150,8 +150,11 @@ baseline = json.loads((root / "tools/farm-baseline.json").read_text())
 check("the committed baseline knows the three farms, each with required files, a minimum and gap lists",
       set(baseline["farms"]) == {"arm64ec-windows", "aarch64-windows", "i386-windows"}
       and all(f["required"] and f["minFiles"] > 50 and "staticGaps" in f and "delayGaps" in f for f in baseline["farms"].values()))
-check("its accepted static gaps are the opt-in modules' (dxdiagn-optin, evr-optin, msi-optin) and the Bluetooth control panel's",
-      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "dxdiagn-optin.dll", "evr-optin.dll", "msi-optin.dll"}
+# icuin-optin.dll (build 708, M1-S10) imports icuuc.dll by its ICU name; the opt-in loader gives it icuuc-optin.dll, as for the others
+check("its accepted static gaps are the opt-in modules' (dxdiagn-optin, evr-optin, icuin-optin, msi-optin) and the Bluetooth control panel's",
+      set(baseline["farms"]["arm64ec-windows"]["staticGaps"]) == {"bthprops.cpl", "dxdiagn-optin.dll", "evr-optin.dll", "icuin-optin.dll",
+                                                                  "msi-optin.dll"}
+      and baseline["farms"]["arm64ec-windows"]["staticGaps"]["icuin-optin.dll"] == ["icuuc.dll"]
       and baseline["farms"]["aarch64-windows"]["staticGaps"] == {} and baseline["farms"]["i386-windows"]["staticGaps"] == {})
 wf = (root / ".github/workflows/build-ipa.yml").read_text()
 step_at = wf.index("      - name: Verify the Windows farms are complete")

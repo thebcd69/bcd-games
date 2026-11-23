@@ -43,6 +43,17 @@ bias = block[block.index("static void *ios_wow_bias_end("):]
 bias = bias[:bias.index("\n}\n")]
 assert bias.index("if (!ios_wow_session_armed()) return end;") < bias.index("ios_wow_candidate_slot()")
 print("PASS: virtual_init and map_view only reach the window code through the lazy gates")
+# build 693 (MADEIRA_WOW_HIGH_SIDE_CAP): map_view bounds the band above the windows, then may search it first, inside the
+# window-exclusion branch and before the range is committed; both only for a furniture request (ceiling_relaxable)
+hs_end = "hi_end = ios_wow_high_side_end( end, hi_end, ceiling_relaxable );"
+hs_call = "ios_wow_high_side( excl_end, hi_end, &wow_hi_start, &wow_hi_end );"
+hs_first = "if (ios_wow_high_side_first( excl_start, excl_end, wow_hi_start, wow_hi_end, view_size, ceiling_relaxable ))"
+assert mv.index("ios_wow_exclude_windows( &excl_start, &excl_end );") < mv.index(hs_end) < mv.index(hs_call) < mv.index(hs_first) \
+    < mv.index("start = excl_start; end = excl_end;"), "the cap's two steps sit between the exclusion and the committed range"
+assert mv.count("ios_wow_high_side_end(") == 1 and mv.count("ios_wow_high_side_first(") == 1
+assert "ios_wow_high_side_cap = ios_wow_env_ulong( \"MADEIRA_WOW_HIGH_SIDE_CAP\", 0 ) == 1;" in \
+    block[block.index("static void ios_wow_session_start(void)"):]
+print("PASS: MADEIRA_WOW_HIGH_SIDE_CAP is read once at the session start and used only in map_view's window-exclusion branch")
 
 harness = r"""
 #include <stdio.h>
@@ -174,7 +185,10 @@ int main( int argc, char **argv ) {
     fake_max = strtoull( argv[2], NULL, 0 );
     add_region( 0x100000000ULL, 0x300000000ULL, 1 );          /* image, malloc zones, shared cache */
     add_region( 0x7000000000ULL, 0x7038000000ULL, 1 );        /* JIT pool RW alias */
-    if (fake_max > IOS_CAGE_BASE + IOS_CAGE_REAL_SIZE && strcmp( mode, "bias" )) { add_region( IOS_CAGE_BASE, IOS_CAGE_BASE + IOS_CAGE_REAL_SIZE, 0 ); ios_cage_holdback_live = 1; }
+    /* "highside": Social Club's layout 2 (MADEIRA_SC_PA_POOLS = 2) as Steam for Windows has it: the floor is the lowest slot and
+     * the [cage] holdback is elsewhere (0x7a00000000), so the band [0x7100000000, ceiling) is the 64-bit programs' whole band */
+    if (!strcmp( mode, "highside" )) ios_usable_va_floor = 0x7100000000ULL;
+    if (fake_max > IOS_CAGE_BASE + IOS_CAGE_REAL_SIZE && strcmp( mode, "bias" ) && strcmp( mode, "highside" )) { add_region( IOS_CAGE_BASE, IOS_CAGE_BASE + IOS_CAGE_REAL_SIZE, 0 ); ios_cage_holdback_live = 1; }
     if (!strcmp( mode, "main-i386" )) ios_main_image_i386 = 1;
     ios_wow_session_start();                                   /* the virtual_init hook */
     printf( "start armed=%d mmap=%d taskinfo=%d windows=%u placeholders=%u\n", ios_wow_session_armed(),
@@ -218,6 +232,23 @@ int main( int argc, char **argv ) {
         run_proc( 0 );                                          /* arms, takes the lowest slot */
         end = ios_wow_bias_end( (void *)0x7038000000ULL, (void *)0x73ffff0000ULL );
         printf( "bias end=%llx\n", (unsigned long long)(ULONG_PTR)end );
+        return 0;
+    }
+    if (!strcmp( mode, "highside" )) {          /* map_view's two steps for a furniture request, as the production code calls them */
+        void *whole = user_space_limit, *ceil = (void *)ios_furniture_ceiling;
+        void *ls = (void *)0x100000000ULL, *le = ceil, *hs = NULL, *he = NULL, *fhs = NULL, *fhe = NULL;
+        ios_wow_exclude_windows( &ls, &le );
+        ios_wow_high_side( le, ios_wow_high_side_end( ceil, whole, 1 ), &hs, &he );
+        ios_wow_high_side( le, ios_wow_high_side_end( ceil, whole, 0 ), &fhs, &fhe );   /* a request with a caller's limit */
+        printf( "low=%llx..%llx high=%llx..%llx first=%d first_big=%d limited=%llx..%llx limited_first=%d\n",
+                (unsigned long long)(ULONG_PTR)ls, (unsigned long long)(ULONG_PTR)le,
+                (unsigned long long)(ULONG_PTR)hs, (unsigned long long)(ULONG_PTR)he,
+                ios_wow_high_side_first( ls, le, hs, he, 0x100000, 1 ),
+                ios_wow_high_side_first( ls, le, hs, he, (size_t)((ULONG_PTR)he - (ULONG_PTR)hs) + 0x10000, 1 ),
+                (unsigned long long)(ULONG_PTR)fhs, (unsigned long long)(ULONG_PTR)fhe,
+                ios_wow_high_side_first( ls, le, fhs, fhe, 0x100000, 0 ) );
+        ios_usable_va_floor = 0x7038000000ULL;                 /* the ordinary floor: the band below has 3.2 GB */
+        printf( "ordinary-floor first=%d\n", ios_wow_high_side_first( (void *)0x100000000ULL, (void *)0x7100000000ULL, hs, he, 0x100000, 1 ) );
         return 0;
     }
     return 2;
@@ -333,3 +364,26 @@ with tempfile.TemporaryDirectory() as t:
     out, err = run(exe, "holdfor", BIG, steam_service, env={"MADEIRA_WOW_HOLD_FOR": game})   # the key without SLOTS reserves nothing to hold
     assert "held placeholder" not in err, out + err
     print("PASS: a program of the game's folder adopts the held window; unknown programs, sibling folders, HOLD_FOR_GAME without a folder, and a 32-bit main image behave as stated")
+
+    # madeira-bcd (branch steam-client, build 693): env.MADEIRA_WOW_HIGH_SIDE_CAP = 1, for Steam for Windows (Social Club's layout 2,
+    # a placeholder for its 32-bit games). Build 691 without it: the band below the held slot was empty, every furniture view
+    # failed a full scan of it, and the band above reached to 0x7bffff0000, the web helper's fourth PartitionAlloc pool.
+    cap = dict(held, MADEIRA_WOW_HIGH_SIDE_CAP="1")
+    out, err = run(exe, "highside", BIG, env=cap)
+    assert "MADEIRA_WOW_HIGH_SIDE_CAP=1: furniture above the 32-bit windows keeps its ceiling (0x73ffff0000)" in err, err
+    assert "start armed=1" in out and "placeholders=1" in out, out + err
+    m = re.search(r"low=(\w+)\.\.(\w+) high=(\w+)\.\.(\w+) first=(\d) first_big=(\d) limited=(\w+)\.\.(\w+) limited_first=(\d)\n", out)
+    assert m, out + err
+    low_s, low_e, hi_s, hi_e, first, first_big, lim_s, lim_e, lim_first = m.groups()
+    assert low_e == "7100000000", out          # the band below ends at the held slot, which is the floor: no room there
+    assert hi_s == "7200004000" and hi_e == "73ffff0000", out   # above the slot and its guard page, up to the furniture ceiling
+    assert first == "1" and first_big == "0", out                 # searched first, only when it can hold the request
+    assert lim_s == "7200004000" and lim_e == "7fffffff0000" and lim_first == "0", out   # a limited request: as before
+    assert "ordinary-floor first=0" in out, out                   # a band below with room above the floor: as before
+    # without the line: the band above reaches the whole map, and nothing is searched first (every other session)
+    out, err = run(exe, "highside", BIG, env=held)
+    m = re.search(r"high=(\w+)\.\.(\w+) first=(\d) first_big=(\d)", out)
+    assert m and m.group(1) == "7200004000" and m.group(2) == "7fffffff0000" and m.group(3) == "0", out + err
+    assert "MADEIRA_WOW_HIGH_SIDE_CAP" not in err, err
+    print("PASS: MADEIRA_WOW_HIGH_SIDE_CAP=1 keeps furniture above the held slot below the furniture ceiling and searches there first "
+          "when the band below is empty (layout 2's floor); without it, and for limited requests, nothing changes")

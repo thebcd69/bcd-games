@@ -1,0 +1,2581 @@
+From: BCD <190844990+thebcd69@users.noreply.github.com>
+Subject: [PATCH] wsi/metal: Apple frame interpolation and Lossless Scaling for a swapchain's presents
+
+madeira-bcd (X-Plane 12, builds 703 to 706): BCD's Apple frame
+interpolation (VideoToolbox's low-latency frame interpolation, iOS 26) and
+Lossless Scaling frame generation live in DXMT's present, so a Windows Vulkan
+game never got them: on 702 X-Plane drew its menu at the screen's own 120
+and its flight at its own 15 with either switched on. With MADEIRA_VT_INTERP=1
+or 3 (the app exports it for a game whose own line `vt-interpolation` asks)
+wsi_common_metal_vti.m makes the pictures for the followed layer. The game
+then never takes the layer's drawables: its swapchain image is copied into
+one of three stand-in textures of the module's own (kk_queue.c does not wait
+for or signal a stand-in as it does a drawable). At each present the device's
+Metal 4 queue signals an event after that copy, a command buffer of the
+module's own queue waits for it and copies the picture into a pixel buffer,
+and once that copy is done on the GPU its completion handler hands the frame
+to a worker thread (in the order of the presents), which lets VideoToolbox
+make one or three pictures between the frame before and this one, presents
+each from a drawable of its own at its own time, and then the game's frame,
+copied as it is; the worker's command buffers go on a second queue of the
+module's own. Build 703 let the game and the worker share the layer's three
+drawables, and the worker's wait for a fourth held X-Plane at 3.6 FPS; with
+the stand-ins only the worker takes drawables. Build 704's worker waited for
+each frame's copy in turn, with three source buffers and its output on the
+queue of the copies: with X-Plane's flight 130-155 ms behind on the GPU, one
+frame in five got its picture; now the worker never waits for the GPU, there
+are six source buffers and nothing it presents queues behind a later frame's
+copy. The game's thread never waits for the model. Pictures are made only
+when the screen can show them and no other frame is ready for the worker; a
+session loads on a background queue; three errors, a format or a size the
+processor refuses stop it with one line in the log ([vt-interp]
+kosmickrisp). The app's in-game menu reaches it through
+madeira_kk_vti_set/status/why/session_ended (exported).
+MADEIRA_KK_VTI_SELFTEST=1 (BCD's host check) reads back the middle row of
+each picture and its two frames and logs where a bright bar is. Without
+MADEIRA_VT_INTERP every swapchain is made, acquired and presented exactly as
+before.
+
+With MADEIRA_LSFG_HOST_CTL (the app's control file of Lossless Scaling's
+frame generation, for a game whose `lossless-scaling` line asks; build 706)
+the same stand-ins and worker carry Lossless Scaling's frames instead:
+wsi_common_metal_lsfg.m runs the frame generation's chain of passes (that of
+BCD's DXMT port, after lsfg-vk 1.0.0) as Metal compute on the worker's queue,
+from the person's own shaders, which the app reads out of their Lossless.dll
+and translates to Metal Shading Language (MADEIRA_LSFG_HOST_MSL); none of
+them is in this library. The frames made are presented before the game's
+frame as the pictures are, the control and status files are DXMT's, and
+VideoToolbox makes no pictures in such a session. wsi_common_metal_lsfg.m is
+GPL-3.0-or-later (its pass chain comes from Porthole's GPL code); the rest of
+this patch is MIT.
+---
+diff --git a/src/kosmickrisp/vulkan/kk_queue.c b/src/kosmickrisp/vulkan/kk_queue.c
+index a884614..178dabc 100644
+--- a/src/kosmickrisp/vulkan/kk_queue.c
++++ b/src/kosmickrisp/vulkan/kk_queue.c
+@@ -22,6 +22,9 @@
+ 
+ #include "vk_cmd_queue.h"
+ 
++/* madeira-bcd: src/vulkan/wsi/wsi_common_metal_vti.m (in the same library) */
++bool wsi_metal_vti_is_stand_in(void *drawable);
++
+ struct kk_commit_data {
+    struct kk_queue *queue;
+    struct kk_cmd_buffer *cmd;
+@@ -248,7 +251,14 @@ kk_queue_submit(struct vk_queue *vk_queue, struct vk_queue_submit *submit)
+       struct kk_cmd_buffer *cmd_buffer =
+          container_of(submit->command_buffers[i], struct kk_cmd_buffer, vk);
+ 
+-      if (cmd_buffer->drawable) {
++      /* madeira-bcd: a stand-in of the WSI's Apple frame interpolation
++       * (wsi_common_metal_vti.m) is a texture of its own, not a drawable: no
++       * drawable to wait for or to signal; the module orders its reads with an
++       * event after this submit. */
++      const bool stand_in = cmd_buffer->drawable &&
++                            wsi_metal_vti_is_stand_in(cmd_buffer->drawable);
++
++      if (cmd_buffer->drawable && !stand_in) {
+          mtl_command_queue_wait_for_drawable(queue->mtl_handle,
+                                              cmd_buffer->drawable);
+       }
+@@ -266,8 +276,9 @@ kk_queue_submit(struct vk_queue *vk_queue, struct vk_queue_submit *submit)
+       cmd_buffer->submitted = true;
+ 
+       if (cmd_buffer->drawable) {
+-         mtl_command_queue_signal_drawable(queue->mtl_handle,
+-                                           cmd_buffer->drawable);
++         if (!stand_in)
++            mtl_command_queue_signal_drawable(queue->mtl_handle,
++                                              cmd_buffer->drawable);
+          mtl_release(cmd_buffer->drawable);
+          cmd_buffer->drawable = NULL;
+          kk_queue_capture_frame(queue, true);
+diff --git a/src/vulkan/meson.build b/src/vulkan/meson.build
+index 261babc..d96dc02 100644
+--- a/src/vulkan/meson.build
++++ b/src/vulkan/meson.build
+@@ -73,7 +73,7 @@ if with_platform_macos
+   vulkan_wsi_list += '-DVK_USE_PLATFORM_METAL_EXT'
+   vulkan_wsi_deps += dependency(
+     'appleframeworks',
+-    modules : ['QuartzCore', 'Metal', 'CoreGraphics']
++    modules : ['QuartzCore', 'Metal', 'CoreGraphics', 'CoreVideo', 'CoreMedia', 'VideoToolbox']
+   )
+ endif
+ 
+diff --git a/src/vulkan/wsi/meson.build b/src/vulkan/wsi/meson.build
+index 80925d1..79bc341 100644
+--- a/src/vulkan/wsi/meson.build
++++ b/src/vulkan/wsi/meson.build
+@@ -35,7 +35,7 @@ else
+ endif
+ 
+ if with_platform_macos
+-  files_vulkan_wsi += files('wsi_common_metal.c', 'wsi_common_metal_layer.m')
++  files_vulkan_wsi += files('wsi_common_metal.c', 'wsi_common_metal_layer.m', 'wsi_common_metal_vti.m', 'wsi_common_metal_lsfg.m')
+ endif
+ 
+ if system_has_kms_drm and not with_platform_android
+diff --git a/src/vulkan/wsi/wsi_common_metal.c b/src/vulkan/wsi/wsi_common_metal.c
+index 81ba62b..fe2d43b 100644
+--- a/src/vulkan/wsi/wsi_common_metal.c
++++ b/src/vulkan/wsi/wsi_common_metal.c
+@@ -15,6 +15,7 @@
+ #include "wsi_common_entrypoints.h"
+ #include "wsi_common_private.h"
+ #include "wsi_common_metal_layer.h"
++#include "wsi_common_metal_vti.h"
+ 
+ #include "vulkan/vulkan_core.h"
+ 
+@@ -388,6 +389,11 @@ struct wsi_metal_swapchain {
+    /* VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR */
+    bool opaque_composition;
+ 
++   /* madeira-bcd: Apple frame interpolation (MADEIRA_VT_INTERP): the game's
++    * images go into stand-ins of wsi_common_metal_vti.m, whose worker alone
++    * takes the layer's drawables. */
++   bool vti;
++
+    struct wsi_metal_image images[0];
+ };
+ VK_DEFINE_NONDISP_HANDLE_CASTS(wsi_metal_swapchain, base.base, VkSwapchainKHR,
+@@ -626,7 +632,19 @@ wsi_metal_swapchain_acquire_next_image(struct wsi_swapchain *wsi_chain,
+ 
+    while (1) {
+       /* Try to acquire an drawable. Unfortunately we might block for up to 1 second. */
+-      CAMetalDrawable *drawable = wsi_metal_layer_acquire_drawable(chain->surface->pLayer);
++      CAMetalDrawable *drawable = NULL;
++      int vti_status = 0;
++      if (chain->vti) {
++         /* madeira-bcd: a stand-in of the interpolation module (it waits up to a
++          * second for one, as nextDrawable does); 0: a drawable as before */
++         void *mtl4_queue = chain->base.wsi->metal.get_mtl4_command_queue ?
++            chain->base.wsi->metal.get_mtl4_command_queue(chain->base.device) : NULL;
++         drawable = wsi_metal_vti_acquire(mtl4_queue, chain->surface->pLayer,
++                                          chain->extent.width, chain->extent.height,
++                                          &vti_status);
++      }
++      if (!drawable && vti_status == 0)
++         drawable = wsi_metal_layer_acquire_drawable(chain->surface->pLayer);
+       if (drawable) {
+          uint32_t i = (chain->current_image_index++) % chain->base.image_count;
+          struct wsi_metal_image *image = &chain->images[i];
+@@ -675,6 +693,7 @@ wsi_metal_swapchain_release_images(struct wsi_swapchain *wsi_chain,
+       }
+ 
+       if (image->drawable) {
++         wsi_metal_vti_unpresented(image->drawable);   /* madeira-bcd: a stand-in goes back to its ring */
+          wsi_metal_release_drawable(image->drawable);
+          image->drawable = NULL;
+       }
+@@ -721,11 +740,19 @@ wsi_metal_swapchain_queue_present(struct wsi_swapchain *wsi_chain,
+ 
+    struct wsi_metal_image *image = &chain->images[image_index];
+ 
++   /* madeira-bcd: a stand-in of the interpolation module is presented by its
++    * worker from a drawable of the layer; the present-wait handler goes with it. */
++   const bool vti_stand_in = !wsi_chain->wsi->sw && wsi_metal_vti_is_stand_in(image->drawable);
++   bool vti_wait = false;
++
+    if (present_id && wsi_chain->present_wait_enabled) {
+       wsi_metal_retain_present_info(chain->present_info);
+-      wsi_metal_layer_add_presented_handler(
+-         image->drawable, wsi_metal_present_complete, chain->present_info,
+-         present_id);
++      if (vti_stand_in)
++         vti_wait = true;
++      else
++         wsi_metal_layer_add_presented_handler(
++            image->drawable, wsi_metal_present_complete, chain->present_info,
++            present_id);
+    }
+ 
+    if (wsi_chain->wsi->sw) {
+@@ -736,7 +763,19 @@ wsi_metal_swapchain_queue_present(struct wsi_swapchain *wsi_chain,
+          image->base.row_pitches[0]);
+    } else {
+       /* Blit is already recorded, just present now */
+-      wsi_metal_layer_present(&image->drawable);
++      if (vti_stand_in) {
++         /* madeira-bcd: the worker presents the frame (after the pictures it
++          * makes); it took a reference of its own. */
++         void *mtl4_queue = chain->base.wsi->metal.get_mtl4_command_queue ?
++            chain->base.wsi->metal.get_mtl4_command_queue(chain->base.device) : NULL;
++         wsi_metal_vti_present(mtl4_queue, image->drawable,
++                               vti_wait ? wsi_metal_present_complete : NULL,
++                               chain->present_info, present_id);
++         wsi_metal_release_drawable(image->drawable);
++         image->drawable = NULL;
++      } else {
++         wsi_metal_layer_present(&image->drawable);
++      }
+    }
+ 
+    uint32_t width = 0u, height = 0u;
+@@ -903,6 +942,7 @@ wsi_metal_swapchain_destroy(struct wsi_swapchain *wsi_chain,
+    for (uint32_t i = 0; i < chain->base.image_count; i++) {
+       struct wsi_metal_image *image = &chain->images[i];
+       if (image->drawable) {
++         wsi_metal_vti_unpresented(image->drawable);   /* madeira-bcd: a stand-in goes back to its ring */
+          wsi_metal_release_drawable(image->drawable);
+          image->drawable = NULL;
+       }
+@@ -963,7 +1003,9 @@ wsi_metal_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+ #else
+    const bool layer_opaque = opaque_composition && wsi_device->sw;
+ #endif
+-   const bool framebuffer_only = !wsi_device->sw;
++   /* madeira-bcd: with Apple frame interpolation asked for (MADEIRA_VT_INTERP),
++    * the drawables are read back for it (wsi_common_metal_vti.m). */
++   const bool framebuffer_only = !wsi_device->sw && !wsi_metal_vti_wanted();
+ 
+    VkResult result = wsi_metal_layer_configure(metal_surface->pLayer,
+       pCreateInfo->imageExtent.width, pCreateInfo->imageExtent.height,
+@@ -1013,6 +1055,7 @@ wsi_metal_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+    chain->surface = metal_surface;
+    chain->current_image_index = 0;
+    chain->opaque_composition = opaque_composition;
++   chain->vti = !wsi_device->sw && wsi_metal_vti_wanted();   /* madeira-bcd: MADEIRA_VT_INTERP (framebufferOnly is off then too) */
+ 
+    chain->present_info = wsi_metal_create_present_info();
+    if (chain->present_info == NULL) {
+diff --git a/src/vulkan/wsi/wsi_common_metal_lsfg.h b/src/vulkan/wsi/wsi_common_metal_lsfg.h
+new file mode 100644
+index 0000000..0712982
+--- /dev/null
++++ b/src/vulkan/wsi/wsi_common_metal_lsfg.h
+@@ -0,0 +1,35 @@
++/*
++ * Copyright (C) 2026 BCD (thebcd69)
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++/* madeira-bcd: Lossless Scaling frame generation for a swapchain's presents
++ * (the stand-ins and the worker of wsi_common_metal_vti.m). Nothing here runs
++ * unless the app set MADEIRA_LSFG_HOST_CTL for the session. See
++ * wsi_common_metal_lsfg.m. */
++
++#ifndef WSI_COMMON_METAL_LSFG_H
++#define WSI_COMMON_METAL_LSFG_H
++
++#import <Metal/Metal.h>
++#include <stdbool.h>
++
++/* MADEIRA_LSFG_HOST_CTL is set (the app's control file for this session; read once). */
++bool wsi_metal_lsfg_wanted(void);
++
++/* On the worker, for one frame of the game in `picture` (done on the GPU): reads the control file (twice a second at most),
++ * builds the passes when needed (on a background queue: a frame meanwhile gets none), and when the screen can show more
++ * frames and no other frame is ready behind this one (`backlog`), runs the passes on `queue`. Returns how many frames were
++ * made (0-3), in out[]; *reads (retained, or nil): the command buffer that reads `picture`, for the stand-in's release.
++ * dt: the game's frame time; hz: the screen's top rate (0: not known), unless the control file says. */
++unsigned wsi_metal_lsfg_run(id<MTLCommandQueue> queue, id<MTLTexture> picture, MTLPixelFormat drawable_format, double dt, int hz,
++                            int backlog, __unsafe_unretained id<MTLTexture> out[3], id<MTLCommandBuffer> *reads);
++
++/* A frame `src` the passes made, drawn into a drawable's texture in `cb` (after the passes, before the next frame's). */
++void wsi_metal_lsfg_show(id<MTLCommandBuffer> cb, id<MTLTexture> src, id<MTLTexture> dst);
++
++/* The game ended: the passes are given back. */
++void wsi_metal_lsfg_session_ended(void);
++
++#endif
+diff --git a/src/vulkan/wsi/wsi_common_metal_lsfg.m b/src/vulkan/wsi/wsi_common_metal_lsfg.m
+new file mode 100644
+index 0000000..e4819ee
+--- /dev/null
++++ b/src/vulkan/wsi/wsi_common_metal_lsfg.m
+@@ -0,0 +1,907 @@
++/*
++ * Copyright (C) 2026 The Porthole authors
++ * Copyright (C) 2026 BCD (thebcd69)
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ *
++ * The chain of passes (what each pass reads and writes, the sizes of the
++ * pictures, the thread groups, the constant buffer, the shader ids) follows
++ * BCD's DXMT port of Lossless Scaling's frame generation (BCD's
++ * tools/patch-dxmt-lsfg.py, d3d11_lsfg.hpp: taken from Porthole, commit
++ * 99ec315, patches 0189 and 0191, GPL-3.0-or-later), whose pass layout follows
++ * lsfg-vk 1.0.0 (MIT, Copyright (c) 2025 lsfg-vk). BCD's: the Metal port
++ * (descriptor tables, fences, barriers), the session around it, November 2026.
++ * See BCD's THIRD-PARTY-NOTICES.md.
++ */
++
++/* madeira-bcd: Lossless Scaling frame generation in KosmicKrisp's present, for a
++ * Vulkan game whose session the app set MADEIRA_LSFG_HOST_CTL for (its
++ * `lossless-scaling` line). The game draws into the stand-ins of
++ * wsi_common_metal_vti.m; on its worker, once a frame is done on the GPU, the
++ * passes run as Metal compute on the module's output queue and the frames they
++ * make are presented, each from a drawable of its own at its time, before the
++ * game's frame. The shaders are the person's own, read out of their
++ * Lossless.dll by the app and translated by it to Metal Shading Language
++ * (vkd3d-shader's MSL target) into MADEIRA_LSFG_HOST_MSL; none of them is in
++ * this library. The app's control file (enabled, generated, flow, performance,
++ * force, measure, hz) and the status file next to it are DXMT's: the in-game
++ * menu works the same. Built without ARC, as Mesa builds Objective-C. */
++
++#include "wsi_common_metal_lsfg.h"
++
++#import <Metal/Metal.h>
++#import <QuartzCore/CABase.h>
++#include <dispatch/dispatch.h>
++#include <fcntl.h>
++#include <float.h>
++#include <math.h>
++#include <pthread.h>
++#include <stdarg.h>
++#include <stdatomic.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++/* ---- the passes ---- */
++
++/* One shader: its Metal Shading Language source (vkd3d-shader's, entry `shader_entry`, the descriptor table at buffer 0)
++ * and its thread group. */
++struct kk_lsfg_shader {
++   const char *msl;
++   unsigned tg[3];
++};
++typedef int (*kk_lsfg_shader_fn)(void *ctx, unsigned id, struct kk_lsfg_shader *out);
++struct kk_lsfg;
++static void kk_lsfg_destroy(struct kk_lsfg *g);
++
++#define KK_LSFG_TABLE 96          /* entries of a descriptor table */
++#define KK_LSFG_SRV 16
++#define KK_LSFG_UAV 48
++#define KK_LSFG_SMP 80
++#define KK_LSFG_MAX_RES 512
++
++struct kk_lsfg_ids {
++   unsigned mip, gen, alpha[4], beta[5], gamma[5], delta[10];
++};
++static const struct kk_lsfg_ids kk_lsfg_quality = { 255, 256, { 267, 268, 269, 270 }, { 275, 276, 277, 278, 279 },
++                                                    { 257, 259, 260, 261, 262 }, { 257, 263, 264, 265, 266, 258, 271, 272, 273, 274 } };
++static const struct kk_lsfg_ids kk_lsfg_performance = { 255, 256, { 290, 291, 292, 293 }, { 298, 299, 300, 301, 302 },
++                                                        { 280, 282, 283, 284, 285 }, { 280, 286, 287, 288, 289, 281, 294, 295, 296, 297 } };
++
++struct kk_lsfg_cb {   /* the shaders' own constant buffer, 48 bytes */
++   uint32_t input_offset[2];
++   uint32_t first_iter, first_iter_s, advanced_color_kind, hdr_support;
++   float resolution_inv_scale, timestamp, ui_threshold;
++   uint32_t pad[3];
++};
++_Static_assert(sizeof(struct kk_lsfg_cb) == 48, "the constant buffer is 48 bytes");
++
++struct kk_lsfg_img {
++   id<MTLTexture> t;
++   unsigned w, h;
++};
++struct kk_lsfg_alpha {
++   struct kk_lsfg_img t1[2], t2[2], t3[4], out[3][4];
++   unsigned hw, hh, qw, qh;
++};
++struct kk_lsfg_beta {
++   struct kk_lsfg_img t1[2], t2[2], out[6];
++   unsigned w, h;
++};
++struct kk_lsfg_gamma {
++   struct kk_lsfg_img t1[4], t2[4], out;
++   unsigned w, h;
++};
++struct kk_lsfg_delta {
++   struct kk_lsfg_img t1[4], t2[4], out1, out2;
++   unsigned w, h;
++};
++struct kk_lsfg_rec {
++   unsigned pso, gx, gy, table;
++};
++
++struct kk_lsfg {
++   id<MTLDevice> dev;
++   const struct kk_lsfg_ids *id;
++   unsigned w, h, n, fw, fh;
++   float flow;
++   bool perf, hdr;
++   MTLPixelFormat fmt, gen_fmt;
++   unsigned a1, a3, n1, n2, nm;
++   struct kk_lsfg_img in[2], gen[3], mip[7], dummy;
++   struct kk_lsfg_alpha alpha[7];
++   struct kk_lsfg_beta beta;
++   struct kk_lsfg_gamma gamma[7];
++   struct kk_lsfg_delta delta[3];
++   id<MTLSamplerState> smp[3];
++   id<MTLComputePipelineState> pso[32];
++   unsigned pso_id[32], pso_tg[32][3], npso;
++   id<MTLBuffer> cb[24];
++   struct kk_lsfg_cb cb_v[24];
++   unsigned ncb;
++   id<MTLBuffer> zero_cb;
++   uint64_t *tables_cpu;
++   unsigned ntables, tables_cap;
++   id<MTLBuffer> tables;
++   struct kk_lsfg_rec *rec[6];
++   unsigned nrec[6], nrec_base[6], rec_cap[6];
++   id<MTLResource> res[KK_LSFG_MAX_RES];
++   unsigned nres;
++   id<MTLFence> fence;
++   uint64_t frame;
++   int history;
++   char *why;
++   int why_cap;
++};
++
++static void kk_lsfg_say(struct kk_lsfg *g, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
++static void kk_lsfg_say(struct kk_lsfg *g, const char *fmt, ...) {
++   va_list ap;
++   if (!g->why || g->why_cap <= 0 || g->why[0]) return;   /* the first reason stays */
++   va_start(ap, fmt);
++   vsnprintf(g->why, (size_t)g->why_cap, fmt, ap);
++   va_end(ap);
++}
++
++static unsigned kk_lsfg_half(unsigned v) { return v + 1 > 2 ? (v + 1) >> 1 : 1; }
++static unsigned kk_lsfg_groups(unsigned v, int shift) { return (v + (1u << shift) - 1) >> shift; }
++static unsigned kk_lsfg_max1(unsigned v) { return v ? v : 1; }
++
++static bool kk_lsfg_img_make(struct kk_lsfg *g, struct kk_lsfg_img *i, unsigned w, unsigned h, MTLPixelFormat f, bool write) {
++   MTLTextureDescriptor *d;
++   w = kk_lsfg_max1(w); h = kk_lsfg_max1(h);
++   d = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:f width:w height:h mipmapped:NO];
++   d.usage = MTLTextureUsageShaderRead | (write ? MTLTextureUsageShaderWrite : 0);
++   d.storageMode = MTLStorageModePrivate;
++   d.hazardTrackingMode = MTLHazardTrackingModeUntracked;   /* the passes order themselves (barriers and a fence) */
++   i->t = [g->dev newTextureWithDescriptor:d];
++   i->w = w; i->h = h;
++   if (!i->t) { kk_lsfg_say(g, "no %ux%u texture (format %lu)", w, h, (unsigned long)f); return false; }
++   if (g->nres >= KK_LSFG_MAX_RES) { kk_lsfg_say(g, "too many textures"); return false; }
++   g->res[g->nres++] = i->t;
++   return true;
++}
++static bool kk_lsfg_work(struct kk_lsfg *g, struct kk_lsfg_img *v, unsigned n, unsigned w, unsigned h, MTLPixelFormat f) {
++   unsigned i;
++   for (i = 0; i < n; i++)
++      if (!kk_lsfg_img_make(g, &v[i], w, h, f, true)) return false;
++   return true;
++}
++
++static bool kk_lsfg_sampler(struct kk_lsfg *g, int kind, MTLSamplerAddressMode mode, MTLSamplerBorderColor border) {
++   MTLSamplerDescriptor *d = [[MTLSamplerDescriptor alloc] init];
++   d.minFilter = d.magFilter = MTLSamplerMinMagFilterLinear;
++   d.mipFilter = MTLSamplerMipFilterLinear;
++   d.sAddressMode = d.tAddressMode = d.rAddressMode = mode;
++   d.borderColor = border;
++   d.lodMaxClamp = FLT_MAX;
++   d.supportArgumentBuffers = YES;
++   g->smp[kind] = [g->dev newSamplerStateWithDescriptor:d];
++   [d release];
++   if (!g->smp[kind]) kk_lsfg_say(g, "no sampler %d", kind);
++   return g->smp[kind] != nil;
++}
++
++/* The constant buffer for one timestamp and the two first-iteration flags (made once, kept). */
++static id<MTLBuffer> kk_lsfg_cbuf(struct kk_lsfg *g, float ts, bool first, bool first_s) {
++   struct kk_lsfg_cb v;
++   unsigned i;
++   memset(&v, 0, sizeof v);
++   v.first_iter = first; v.first_iter_s = first_s;
++   v.advanced_color_kind = g->hdr ? 2u : 0u; v.hdr_support = g->hdr ? 1u : 0u;
++   v.resolution_inv_scale = g->flow; v.timestamp = ts; v.ui_threshold = 0.5f;
++   for (i = 0; i < g->ncb; i++)
++      if (!memcmp(&g->cb_v[i], &v, sizeof v)) return g->cb[i];
++   if (g->ncb >= sizeof g->cb / sizeof g->cb[0] || g->nres >= KK_LSFG_MAX_RES) { kk_lsfg_say(g, "too many constant buffers"); return nil; }
++   g->cb[g->ncb] = [g->dev newBufferWithBytes:&v length:sizeof v options:MTLResourceStorageModeShared | MTLResourceHazardTrackingModeUntracked];
++   if (!g->cb[g->ncb]) { kk_lsfg_say(g, "no constant buffer"); return nil; }
++   g->cb_v[g->ncb] = v;
++   g->res[g->nres++] = g->cb[g->ncb];
++   return g->cb[g->ncb++];
++}
++
++static int kk_lsfg_pso_index(struct kk_lsfg *g, unsigned id) {
++   unsigned i;
++   for (i = 0; i < g->npso; i++)
++      if (g->pso_id[i] == id) return (int)i;
++   return -1;
++}
++static bool kk_lsfg_shader(struct kk_lsfg *g, unsigned sid, kk_lsfg_shader_fn get, void *ctx) {
++   struct kk_lsfg_shader sh;
++   MTLCompileOptions *o;
++   id<MTLLibrary> lib;
++   id<MTLFunction> fn;
++   NSError *err = nil;
++   if (kk_lsfg_pso_index(g, sid) >= 0) return true;
++   memset(&sh, 0, sizeof sh);
++   if (!get(ctx, sid, &sh) || !sh.msl || !sh.tg[0] || !sh.tg[1] || !sh.tg[2]) { kk_lsfg_say(g, "shader %u is not there", sid); return false; }
++   o = [[MTLCompileOptions alloc] init];
++   o.languageVersion = MTLLanguageVersion3_2;   /* the barriers vkd3d-shader writes need 3.2 */
++   lib = [g->dev newLibraryWithSource:[NSString stringWithUTF8String:sh.msl] options:o error:&err];
++   [o release];
++   if (!lib) { kk_lsfg_say(g, "shader %u did not compile: %s", sid, err ? err.localizedDescription.UTF8String : "no reason given"); return false; }
++   fn = [lib newFunctionWithName:@"shader_entry"];
++   [lib release];
++   if (!fn) { kk_lsfg_say(g, "shader %u has no entry", sid); return false; }
++   err = nil;
++   g->pso[g->npso] = [g->dev newComputePipelineStateWithFunction:fn error:&err];
++   [fn release];
++   if (!g->pso[g->npso]) { kk_lsfg_say(g, "shader %u: no pipeline (%s)", sid, err ? err.localizedDescription.UTF8String : "no reason given"); return false; }
++   if ((NSUInteger)(sh.tg[0] * sh.tg[1] * sh.tg[2]) > g->pso[g->npso].maxTotalThreadsPerThreadgroup) {
++      kk_lsfg_say(g, "shader %u: %ux%u threads a group, the pipeline takes %lu", sid, sh.tg[0], sh.tg[1],
++                  (unsigned long)g->pso[g->npso].maxTotalThreadsPerThreadgroup);
++      return false;
++   }
++   g->pso_id[g->npso] = sid;
++   memcpy(g->pso_tg[g->npso], sh.tg, sizeof sh.tg);
++   g->npso++;
++   return true;
++}
++
++/* ---- the records: one dispatch, its shader, its groups and its table ---- */
++
++struct kk_lsfg_list {
++   const struct kk_lsfg_img *v[16];
++   unsigned n;
++};
++static void kk_lsfg_add(struct kk_lsfg_list *l, const struct kk_lsfg_img *i) { if (l->n < 16) l->v[l->n++] = i; }   /* NULL: an empty slot */
++static void kk_lsfg_addv(struct kk_lsfg_list *l, const struct kk_lsfg_img *v, unsigned n) { unsigned i; for (i = 0; i < n; i++) kk_lsfg_add(l, &v[i]); }
++
++static bool kk_lsfg_emit(struct kk_lsfg *g, int phase, unsigned sid, id<MTLBuffer> cb, const int *smp, int nsmp,
++                         const struct kk_lsfg_list *srv, const struct kk_lsfg_list *uav, unsigned gx, unsigned gy) {
++   uint64_t *t;
++   unsigned i;
++   int p = kk_lsfg_pso_index(g, sid);
++   if (p < 0) { kk_lsfg_say(g, "shader %u not built", sid); return false; }
++   if (g->ntables == g->tables_cap) {
++      unsigned cap = g->tables_cap ? g->tables_cap * 2 : 256;
++      uint64_t *nt = realloc(g->tables_cpu, (size_t)cap * KK_LSFG_TABLE * sizeof(uint64_t));
++      if (!nt) { kk_lsfg_say(g, "out of memory"); return false; }
++      g->tables_cpu = nt; g->tables_cap = cap;
++   }
++   if (g->nrec[phase] == g->rec_cap[phase]) {
++      unsigned cap = g->rec_cap[phase] ? g->rec_cap[phase] * 2 : 128;
++      struct kk_lsfg_rec *nr = realloc(g->rec[phase], (size_t)cap * sizeof *nr);
++      if (!nr) { kk_lsfg_say(g, "out of memory"); return false; }
++      g->rec[phase] = nr; g->rec_cap[phase] = cap;
++   }
++   t = g->tables_cpu + (size_t)g->ntables * KK_LSFG_TABLE;
++   memset(t, 0, KK_LSFG_TABLE * sizeof *t);
++   t[0] = (cb ? cb : g->zero_cb).gpuAddress;
++   for (i = 0; i < srv->n; i++) t[KK_LSFG_SRV + i] = (srv->v[i] ? srv->v[i]->t : g->dummy.t).gpuResourceID._impl;
++   for (i = 0; i < uav->n; i++) t[KK_LSFG_UAV + i] = uav->v[i]->t.gpuResourceID._impl;
++   for (i = 0; i < (unsigned)nsmp; i++) t[KK_LSFG_SMP + i] = g->smp[smp[i]].gpuResourceID._impl;
++   g->rec[phase][g->nrec[phase]++] = (struct kk_lsfg_rec){ (unsigned)p, gx, gy, g->ntables++ };
++   return true;
++}
++
++#define L(name) struct kk_lsfg_list name; memset(&name, 0, sizeof name)
++#define SMP(...) (const int[]){ __VA_ARGS__ }, (int)(sizeof((const int[]){ __VA_ARGS__ }) / sizeof(int))
++
++static bool kk_lsfg_mipmaps(struct kk_lsfg *g, int ph, uint64_t f) {
++   unsigned i;
++   L(s); L(u);
++   kk_lsfg_add(&s, &g->in[f % 2]);
++   for (i = 0; i < 7; i++) kk_lsfg_add(&u, &g->mip[i]);
++   return kk_lsfg_emit(g, ph, g->id->mip, kk_lsfg_cbuf(g, 0.0f, false, false), SMP(0), &s, &u, kk_lsfg_groups(g->fw, 6), kk_lsfg_groups(g->fh, 6));
++}
++
++static bool kk_lsfg_alpha(struct kk_lsfg *g, int ph, int lvl, uint64_t f) {
++   struct kk_lsfg_alpha *a = &g->alpha[lvl];
++   unsigned hx = kk_lsfg_groups(a->hw, 3), hy = kk_lsfg_groups(a->hh, 3), qx = kk_lsfg_groups(a->qw, 3), qy = kk_lsfg_groups(a->qh, 3);
++   bool ok = true;
++   { L(s); L(u); kk_lsfg_add(&s, &g->mip[lvl]); kk_lsfg_addv(&u, a->t1, g->a1); ok = ok && kk_lsfg_emit(g, ph, g->id->alpha[0], nil, SMP(0), &s, &u, hx, hy); }
++   { L(s); L(u); kk_lsfg_addv(&s, a->t1, g->a1); kk_lsfg_addv(&u, a->t2, g->a1); ok = ok && kk_lsfg_emit(g, ph, g->id->alpha[1], nil, SMP(0), &s, &u, hx, hy); }
++   { L(s); L(u); kk_lsfg_addv(&s, a->t2, g->a1); kk_lsfg_addv(&u, a->t3, g->a3); ok = ok && kk_lsfg_emit(g, ph, g->id->alpha[2], nil, SMP(0), &s, &u, qx, qy); }
++   { L(s); L(u); kk_lsfg_addv(&s, a->t3, g->a3); kk_lsfg_addv(&u, a->out[f % 3], g->a3); ok = ok && kk_lsfg_emit(g, ph, g->id->alpha[3], nil, SMP(0), &s, &u, qx, qy); }
++   return ok;
++}
++
++static bool kk_lsfg_beta(struct kk_lsfg *g, int ph, uint64_t f) {
++   struct kk_lsfg_beta *b = &g->beta;
++   struct kk_lsfg_img (*hist)[4] = g->alpha[0].out;
++   unsigned i = (unsigned)(f % 3), x = kk_lsfg_groups(b->w, 3), y = kk_lsfg_groups(b->h, 3);
++   bool ok = true;
++   { L(s); L(u); kk_lsfg_addv(&s, hist[(i + 1) % 3], g->a3); kk_lsfg_addv(&s, hist[(i + 2) % 3], g->a3); kk_lsfg_addv(&s, hist[i % 3], g->a3);
++     kk_lsfg_addv(&u, b->t1, 2); ok = ok && kk_lsfg_emit(g, ph, g->id->beta[0], nil, SMP(1), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, b->t1, 2); kk_lsfg_addv(&u, b->t2, 2); ok = ok && kk_lsfg_emit(g, ph, g->id->beta[1], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, b->t2, 2); kk_lsfg_addv(&u, b->t1, 2); ok = ok && kk_lsfg_emit(g, ph, g->id->beta[2], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, b->t1, 2); kk_lsfg_addv(&u, b->t2, 2); ok = ok && kk_lsfg_emit(g, ph, g->id->beta[3], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, b->t2, 2); kk_lsfg_addv(&u, b->out, 6);
++     ok = ok && kk_lsfg_emit(g, ph, g->id->beta[4], kk_lsfg_cbuf(g, 0.5f, false, false), SMP(0), &s, &u, kk_lsfg_groups(b->w, 5), kk_lsfg_groups(b->h, 5)); }
++   return ok;
++}
++
++static float kk_lsfg_stamp(const struct kk_lsfg *g, unsigned p) { return (float)(p + 1) / (float)(g->n + 1); }
++
++static bool kk_lsfg_gamma(struct kk_lsfg *g, int ph, int i, uint64_t f, unsigned p) {
++   struct kk_lsfg_gamma *c = &g->gamma[i];
++   struct kk_lsfg_img (*hist)[4] = g->alpha[6 - i].out;
++   unsigned fi = (unsigned)(f % 3), x = kk_lsfg_groups(c->w, 3), y = kk_lsfg_groups(c->h, 3);
++   const struct kk_lsfg_img *opt = i == 0 ? NULL : &g->gamma[i - 1].out, *in2 = &g->beta.out[6 - i < 5 ? 6 - i : 5];
++   id<MTLBuffer> cb = kk_lsfg_cbuf(g, kk_lsfg_stamp(g, p), i == 0, false);
++   bool ok = cb != nil;
++   { L(s); L(u); kk_lsfg_addv(&s, hist[(fi + 2) % 3], g->a3); kk_lsfg_addv(&s, hist[fi], g->a3); if (opt) kk_lsfg_add(&s, opt);
++     kk_lsfg_addv(&u, c->t1, 3); ok = ok && kk_lsfg_emit(g, ph, g->id->gamma[0], cb, SMP(1, 2), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, c->t1, 3); kk_lsfg_addv(&u, c->t2, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->gamma[1], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, c->t2, g->n2); kk_lsfg_addv(&u, c->t1, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->gamma[2], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, c->t1, g->n2); kk_lsfg_addv(&u, c->t2, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->gamma[3], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, c->t2, g->n2); kk_lsfg_add(&s, opt); kk_lsfg_add(&s, in2);
++     kk_lsfg_add(&u, &c->out); ok = ok && kk_lsfg_emit(g, ph, g->id->gamma[4], cb, SMP(0, 2), &s, &u, x, y); }
++   return ok;
++}
++
++static bool kk_lsfg_delta(struct kk_lsfg *g, int ph, int k, uint64_t f, unsigned p) {
++   struct kk_lsfg_delta *d = &g->delta[k];
++   int i = k + 4;
++   struct kk_lsfg_img (*hist)[4] = g->alpha[6 - i].out;
++   unsigned fi = (unsigned)(f % 3), x = kk_lsfg_groups(d->w, 3), y = kk_lsfg_groups(d->h, 3);
++   const struct kk_lsfg_img *opt1 = k == 0 ? NULL : &g->gamma[i - 1].out, *opt2 = k == 0 ? NULL : &g->delta[k - 1].out1,
++                            *opt3 = k == 0 ? NULL : &g->delta[k - 1].out2, *in2 = &g->beta.out[6 - i];
++   id<MTLBuffer> cb = kk_lsfg_cbuf(g, kk_lsfg_stamp(g, p), false, k == 0);
++   bool ok = cb != nil;
++   { L(s); L(u); kk_lsfg_addv(&s, hist[(fi + 2) % 3], g->a3); kk_lsfg_addv(&s, hist[fi], g->a3); kk_lsfg_add(&s, opt1);
++     kk_lsfg_addv(&u, d->t1, 3); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[0], cb, SMP(1, 2), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t1, 3); kk_lsfg_addv(&u, d->t2, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[1], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t2, g->n2); kk_lsfg_addv(&u, d->t1, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[2], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t1, g->n2); kk_lsfg_addv(&u, d->t2, g->n2); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[3], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t2, g->n2); kk_lsfg_add(&s, opt1); kk_lsfg_add(&s, in2);
++     kk_lsfg_add(&u, &d->out1); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[4], cb, SMP(0, 2), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, hist[(fi + 2) % 3], g->a3); kk_lsfg_addv(&s, hist[fi], g->a3); kk_lsfg_add(&s, opt1); kk_lsfg_add(&s, opt2);
++     kk_lsfg_addv(&u, d->t2, g->nm); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[5], cb, SMP(1, 2), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t2, g->nm); kk_lsfg_addv(&u, d->t1, g->nm); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[6], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t1, g->nm); kk_lsfg_addv(&u, d->t2, g->nm); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[7], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t2, g->nm); kk_lsfg_addv(&u, d->t1, g->nm); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[8], nil, SMP(0), &s, &u, x, y); }
++   { L(s); L(u); kk_lsfg_addv(&s, d->t1, g->nm); kk_lsfg_add(&s, opt3);
++     kk_lsfg_add(&u, &d->out2); ok = ok && kk_lsfg_emit(g, ph, g->id->delta[9], cb, SMP(0, 2), &s, &u, x, y); }
++   return ok;
++}
++
++static bool kk_lsfg_generate(struct kk_lsfg *g, int ph, uint64_t f, unsigned p) {
++   bool even = f % 2 == 0;
++   L(s); L(u);
++   kk_lsfg_add(&s, even ? &g->in[1] : &g->in[0]);
++   kk_lsfg_add(&s, even ? &g->in[0] : &g->in[1]);
++   kk_lsfg_add(&s, &g->gamma[6].out); kk_lsfg_add(&s, &g->delta[2].out1); kk_lsfg_add(&s, &g->delta[2].out2);
++   kk_lsfg_add(&u, &g->gen[p]);
++   return kk_lsfg_emit(g, ph, g->id->gen, kk_lsfg_cbuf(g, kk_lsfg_stamp(g, p), false, false), SMP(0, 2), &s, &u,
++                       kk_lsfg_groups(g->w, 4), kk_lsfg_groups(g->h, 4));
++}
++
++static bool kk_lsfg_build(struct kk_lsfg *g, kk_lsfg_shader_fn get, void *ctx) {
++   const unsigned *ids[6];
++   unsigned counts[6] = { 1, 1, 4, 5, 5, 10 }, i, k, s;
++   int ph;
++   bool srgb = g->fmt == MTLPixelFormatBGRA8Unorm_sRGB || g->fmt == MTLPixelFormatRGBA8Unorm_sRGB;
++   if (g->fmt != MTLPixelFormatBGRA8Unorm && g->fmt != MTLPixelFormatRGBA8Unorm && g->fmt != MTLPixelFormatRGBA16Float && !srgb) {
++      kk_lsfg_say(g, "the frame's format (%lu) is not one the passes take", (unsigned long)g->fmt);
++      return false;
++   }
++   g->hdr = g->fmt == MTLPixelFormatRGBA16Float;
++   /* an sRGB frame is read through its sRGB format, which hands the passes linear light: the frames made are kept in 16-bit floats */
++   g->gen_fmt = srgb || g->hdr ? MTLPixelFormatRGBA16Float : MTLPixelFormatRGBA8Unorm;
++   g->a1 = g->perf ? 1 : 2; g->a3 = g->perf ? 2 : 4;
++   g->n1 = g->perf ? 3 : 4; g->n2 = g->perf ? 2 : 4; g->nm = g->perf ? 1 : 2;
++   if (!kk_lsfg_sampler(g, 0, MTLSamplerAddressModeClampToBorderColor, MTLSamplerBorderColorTransparentBlack)
++       || !kk_lsfg_sampler(g, 1, MTLSamplerAddressModeClampToBorderColor, MTLSamplerBorderColorOpaqueWhite)
++       || !kk_lsfg_sampler(g, 2, MTLSamplerAddressModeClampToEdge, MTLSamplerBorderColorTransparentBlack))
++      return false;
++   {
++      static const uint8_t zero[256];
++      g->zero_cb = [g->dev newBufferWithBytes:zero length:sizeof zero options:MTLResourceStorageModeShared | MTLResourceHazardTrackingModeUntracked];
++      MTLTextureDescriptor *d = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm width:1 height:1 mipmapped:NO];
++      d.usage = MTLTextureUsageShaderRead;
++      d.storageMode = MTLStorageModeShared;
++      d.hazardTrackingMode = MTLHazardTrackingModeUntracked;
++      g->dummy.t = [g->dev newTextureWithDescriptor:d];
++      g->dummy.w = g->dummy.h = 1;
++      if (!g->zero_cb || !g->dummy.t) { kk_lsfg_say(g, "no empty buffer or texture"); return false; }
++      [g->dummy.t replaceRegion:MTLRegionMake2D(0, 0, 1, 1) mipmapLevel:0 withBytes:zero bytesPerRow:4];
++      g->res[g->nres++] = g->zero_cb;
++      g->res[g->nres++] = g->dummy.t;
++   }
++   for (i = 0; i < 2; i++) if (!kk_lsfg_img_make(g, &g->in[i], g->w, g->h, g->fmt, false)) return false;
++   for (i = 0; i < g->n; i++) if (!kk_lsfg_img_make(g, &g->gen[i], g->w, g->h, g->gen_fmt, true)) return false;
++   g->fw = kk_lsfg_max1((unsigned)(g->w / g->flow)); g->fh = kk_lsfg_max1((unsigned)(g->h / g->flow));
++   for (i = 0; i < 7; i++) if (!kk_lsfg_img_make(g, &g->mip[i], g->fw >> i, g->fh >> i, MTLPixelFormatR8Unorm, true)) return false;
++   for (i = 0; i < 7; i++) {
++      struct kk_lsfg_alpha *a = &g->alpha[i];
++      unsigned ew = kk_lsfg_max1(g->fw >> i), eh = kk_lsfg_max1(g->fh >> i);
++      a->hw = kk_lsfg_half(ew); a->hh = kk_lsfg_half(eh); a->qw = kk_lsfg_half(a->hw); a->qh = kk_lsfg_half(a->hh);
++      if (!kk_lsfg_work(g, a->t1, g->a1, a->hw, a->hh, MTLPixelFormatRGBA8Unorm) || !kk_lsfg_work(g, a->t2, g->a1, a->hw, a->hh, MTLPixelFormatRGBA8Unorm)
++          || !kk_lsfg_work(g, a->t3, g->a3, a->qw, a->qh, MTLPixelFormatRGBA8Unorm))
++         return false;
++      for (s = 0; s < 3; s++) if (!kk_lsfg_work(g, a->out[s], g->a3, a->qw, a->qh, MTLPixelFormatRGBA8Unorm)) return false;
++   }
++   g->beta.w = g->alpha[0].qw; g->beta.h = g->alpha[0].qh;
++   if (!kk_lsfg_work(g, g->beta.t1, 2, g->beta.w, g->beta.h, MTLPixelFormatRGBA8Unorm) || !kk_lsfg_work(g, g->beta.t2, 2, g->beta.w, g->beta.h, MTLPixelFormatRGBA8Unorm))
++      return false;
++   for (k = 0; k < 6; k++) if (!kk_lsfg_img_make(g, &g->beta.out[k], g->beta.w >> k, g->beta.h >> k, MTLPixelFormatR8Unorm, true)) return false;
++   for (i = 0; i < 7; i++) {
++      struct kk_lsfg_gamma *c = &g->gamma[i];
++      c->w = g->alpha[6 - i].qw; c->h = g->alpha[6 - i].qh;
++      if (!kk_lsfg_work(g, c->t1, g->n1, c->w, c->h, MTLPixelFormatRGBA8Unorm) || !kk_lsfg_work(g, c->t2, g->n2, c->w, c->h, MTLPixelFormatRGBA8Unorm)
++          || !kk_lsfg_img_make(g, &c->out, c->w, c->h, MTLPixelFormatRGBA16Float, true))
++         return false;
++   }
++   for (k = 0; k < 3; k++) {
++      struct kk_lsfg_delta *d = &g->delta[k];
++      d->w = g->alpha[6 - (k + 4)].qw; d->h = g->alpha[6 - (k + 4)].qh;
++      if (!kk_lsfg_work(g, d->t1, g->n1, d->w, d->h, MTLPixelFormatRGBA8Unorm) || !kk_lsfg_work(g, d->t2, g->n2, d->w, d->h, MTLPixelFormatRGBA8Unorm)
++          || !kk_lsfg_img_make(g, &d->out1, d->w, d->h, MTLPixelFormatRGBA16Float, true) || !kk_lsfg_img_make(g, &d->out2, d->w, d->h, MTLPixelFormatRGBA16Float, true))
++         return false;
++   }
++   /* every shader up front, so a missing or refused one is known before the first frame */
++   ids[0] = &g->id->mip; ids[1] = &g->id->gen; ids[2] = g->id->alpha; ids[3] = g->id->beta; ids[4] = g->id->gamma; ids[5] = g->id->delta;
++   for (i = 0; i < 6; i++)
++      for (k = 0; k < counts[i]; k++)
++         if (!kk_lsfg_shader(g, ids[i][k], get, ctx)) return false;
++   /* the six frames of the history's cycle (the two frames of `in`, the three of alpha's output) */
++   for (ph = 0; ph < 6; ph++) {
++      uint64_t f = (uint64_t)ph;
++      int lvl;
++      unsigned p;
++      if (!kk_lsfg_mipmaps(g, ph, f)) return false;
++      for (lvl = 6; lvl >= 0; lvl--) if (!kk_lsfg_alpha(g, ph, lvl, f)) return false;
++      if (!kk_lsfg_beta(g, ph, f)) return false;
++      g->nrec_base[ph] = g->nrec[ph];
++      for (p = 0; p < g->n; p++) {
++         for (lvl = 0; lvl < 7; lvl++) {
++            if (!kk_lsfg_gamma(g, ph, lvl, f, p)) return false;
++            if (lvl >= 4 && !kk_lsfg_delta(g, ph, lvl - 4, f, p)) return false;
++         }
++         if (!kk_lsfg_generate(g, ph, f, p)) return false;
++      }
++   }
++   g->tables = [g->dev newBufferWithBytes:g->tables_cpu length:(NSUInteger)g->ntables * KK_LSFG_TABLE * sizeof(uint64_t)
++                                  options:MTLResourceStorageModeShared | MTLResourceHazardTrackingModeUntracked];
++   if (!g->tables) { kk_lsfg_say(g, "no buffer for the descriptor tables"); return false; }
++   g->res[g->nres++] = g->tables;
++   g->fence = [g->dev newFence];
++   return g->fence != nil;
++}
++
++static struct kk_lsfg *kk_lsfg_create(id<MTLDevice> dev, unsigned w, unsigned h, MTLPixelFormat format, unsigned generated, float flow,
++                               bool performance, kk_lsfg_shader_fn shaders, void *ctx, char *why, int cap) {
++   struct kk_lsfg *g = calloc(1, sizeof *g);
++   if (why && cap > 0) why[0] = 0;
++   if (!g) return NULL;
++   g->dev = [dev retain];
++   g->w = w; g->h = h; g->fmt = format;
++   g->n = generated < 1 ? 1 : generated > 3 ? 3 : generated;
++   g->flow = flow < 1.0f ? 1.0f : flow > 4.0f ? 4.0f : flow;
++   g->perf = performance;
++   g->id = performance ? &kk_lsfg_performance : &kk_lsfg_quality;
++   g->why = why; g->why_cap = cap;
++   @autoreleasepool {
++      if (!kk_lsfg_build(g, shaders, ctx)) {
++         g->why = NULL;
++         kk_lsfg_destroy(g);
++         return NULL;
++      }
++   }
++   g->why = NULL;
++   return g;
++}
++
++static unsigned kk_lsfg_encode(struct kk_lsfg *g, id<MTLCommandBuffer> cb, id<MTLTexture> frame, bool generate, __unsafe_unretained id<MTLTexture> out[3]) {
++   uint64_t f = g->frame;
++   int ph = (int)(f % 6);
++   bool made = generate && g->history >= 2;
++   unsigned n = made ? g->nrec[ph] : g->nrec_base[ph], i;
++   id<MTLBlitCommandEncoder> blit = [cb blitCommandEncoder];
++   id<MTLComputeCommandEncoder> enc;
++   [blit waitForFence:g->fence];   /* the last frame's passes read the picture this one replaces */
++   [blit copyFromTexture:frame toTexture:g->in[f % 2].t];
++   [blit updateFence:g->fence];
++   [blit endEncoding];
++   enc = [cb computeCommandEncoderWithDispatchType:MTLDispatchTypeSerial];
++   [enc waitForFence:g->fence];
++   [enc useResources:g->res count:g->nres usage:MTLResourceUsageRead | MTLResourceUsageWrite];
++   [enc setBuffer:g->tables offset:0 atIndex:0];
++   for (i = 0; i < n; i++) {
++      const struct kk_lsfg_rec *r = &g->rec[ph][i];
++      const unsigned *tg = g->pso_tg[r->pso];
++      if (i) [enc memoryBarrierWithScope:MTLBarrierScopeTextures];
++      [enc setBufferOffset:(NSUInteger)r->table * KK_LSFG_TABLE * sizeof(uint64_t) atIndex:0];
++      [enc setComputePipelineState:g->pso[r->pso]];
++      [enc dispatchThreadgroups:MTLSizeMake(r->gx, r->gy, 1) threadsPerThreadgroup:MTLSizeMake(tg[0], tg[1], tg[2])];
++   }
++   [enc updateFence:g->fence];
++   [enc endEncoding];
++   g->frame++;
++   if (g->history < 3) g->history++;
++   if (!made) return 0;
++   for (i = 0; i < g->n; i++) out[i] = g->gen[i].t;
++   return g->n;
++}
++
++static id<MTLFence> kk_lsfg_done_fence(struct kk_lsfg *g) { return g->fence; }
++static void kk_lsfg_break_history(struct kk_lsfg *g) { g->history = 0; }
++
++static void kk_lsfg_destroy(struct kk_lsfg *g) {
++   unsigned i;
++   if (!g) return;
++   for (i = 0; i < g->nres; i++) [g->res[i] release];   /* every texture and buffer made is in res, once */
++   for (i = 0; i < 3; i++) [g->smp[i] release];
++   for (i = 0; i < g->npso; i++) [g->pso[i] release];
++   [g->fence release];
++   for (i = 0; i < 6; i++) free(g->rec[i]);
++   free(g->tables_cpu);
++   [g->dev release];
++   free(g);
++}
++
++/* ---- the session: the app's control file, the shaders it wrote, the passes, the status for the menu ---- */
++
++#define KK_LSFG_LOG(...) do { fprintf(stderr, "[lsfg] kosmickrisp " __VA_ARGS__); fflush(stderr); } while (0)
++
++/* The shaders the app translated for this session (MADEIRA_LSFG_HOST_MSL): "LSFM", u32 version 1, u32 count, then for each
++ * u32 id, u32 thread group x, y, z, u32 size and the Metal Shading Language source (size bytes, no terminator). */
++struct kk_lsfg_msl {
++   unsigned id, tg[3];
++   char *text;
++};
++struct kk_lsfg_store {
++   struct kk_lsfg_msl *v;
++   unsigned n;
++};
++static int kk_lsfg_store_load(const char *path, struct kk_lsfg_store *st, char *why, int cap) {
++   FILE *f = path && *path ? fopen(path, "rb") : NULL;
++   unsigned char hdr[12];
++   uint32_t count, i;
++   memset(st, 0, sizeof *st);
++   if (!f) { snprintf(why, (size_t)cap, "the translated shaders are not there (%s)", path && *path ? path : "MADEIRA_LSFG_HOST_MSL not set"); return 0; }
++   if (fread(hdr, 1, 12, f) != 12 || memcmp(hdr, "LSFM", 4) || hdr[4] != 1 || hdr[5] || hdr[6] || hdr[7]) {
++      snprintf(why, (size_t)cap, "the translated shaders' file cannot be read");
++      fclose(f);
++      return 0;
++   }
++   memcpy(&count, hdr + 8, 4);
++   if (count == 0 || count > 256) { snprintf(why, (size_t)cap, "the translated shaders' file has %u shaders", count); fclose(f); return 0; }
++   st->v = calloc(count, sizeof *st->v);
++   for (i = 0; st->v && i < count; i++) {
++      uint32_t w[5];
++      if (fread(w, 4, 5, f) != 5 || w[4] == 0 || w[4] > (8u << 20)) break;
++      st->v[i].id = w[0]; st->v[i].tg[0] = w[1]; st->v[i].tg[1] = w[2]; st->v[i].tg[2] = w[3];
++      st->v[i].text = malloc((size_t)w[4] + 1);
++      if (!st->v[i].text || fread(st->v[i].text, 1, w[4], f) != w[4]) { free(st->v[i].text); st->v[i].text = NULL; break; }
++      st->v[i].text[w[4]] = 0;
++      st->n++;
++   }
++   fclose(f);
++   if (st->n != count) { snprintf(why, (size_t)cap, "the translated shaders' file is cut short (%u of %u)", st->n, count); return 0; }
++   return 1;
++}
++static void kk_lsfg_store_free(struct kk_lsfg_store *st) {
++   unsigned i;
++   for (i = 0; i < st->n; i++) free(st->v[i].text);
++   free(st->v);
++   memset(st, 0, sizeof *st);
++}
++static int kk_lsfg_store_get(void *ctx, unsigned id, struct kk_lsfg_shader *out) {
++   const struct kk_lsfg_store *st = ctx;
++   unsigned i;
++   for (i = 0; i < st->n; i++)
++      if (st->v[i].id == id) { out->msl = st->v[i].text; memcpy(out->tg, st->v[i].tg, sizeof out->tg); return 1; }
++   return 0;
++}
++
++static const char *kk_lsfg_show_msl =
++   "#include <metal_stdlib>\n"
++   "using namespace metal;\n"
++   "struct LsfgOut { float4 pos [[position]]; float2 uv; };\n"
++   "vertex LsfgOut lsfg_vs(uint vid [[vertex_id]]) {\n"
++   "  LsfgOut o; float2 p = float2((vid << 1) & 2, vid & 2);\n"
++   "  o.pos = float4(p * float2(2.0, -2.0) + float2(-1.0, 1.0), 0.0, 1.0); o.uv = p; return o;\n"
++   "}\n"
++   "constexpr sampler lsfg_s(coord::normalized, filter::linear, address::clamp_to_edge);\n"
++   "fragment float4 lsfg_show(LsfgOut in [[stage_in]], texture2d<float> t [[texture(0)]]) {\n"
++   "  return float4(t.sample(lsfg_s, in.uv).rgb, 1.0);\n"
++   "}\n";
++
++/* What the passes were built for. */
++struct kk_lsfg_key {
++   unsigned w, h, generated;
++   unsigned long format, drawable;
++   float flow;
++   bool performance;
++};
++
++static struct {
++   pthread_mutex_t mu;
++   _Atomic int want;                  /* -1 until read; 0 or 1 */
++   char ctl[1024], status[1100];
++   /* the control file as last read (the worker) */
++   bool seen, enabled, force, measure, performance;
++   unsigned generated;
++   float flow;
++   double hz, polled;
++   struct timespec mtime;
++   off_t size;
++   /* the passes: g, show, key, building, want_key, dead, dead_key, why under mu; the worker alone drops them */
++   struct kk_lsfg *g;
++   id<MTLRenderPipelineState> show;
++   struct kk_lsfg_key key, want_key, dead_key;
++   bool building, dead;
++   char why[300];
++   id<MTLCommandBuffer> last;         /* the worker: the last command buffer of the passes */
++   /* the status (the worker) */
++   double stat_t, cost_ms;
++   unsigned long long frames, made, fast;
++   bool said_off, said_start;
++} g_kk_lsfg = { .mu = PTHREAD_MUTEX_INITIALIZER, .want = -1, .generated = 1, .flow = 1.0f };
++
++bool wsi_metal_lsfg_wanted(void) {
++   int w = atomic_load_explicit(&g_kk_lsfg.want, memory_order_relaxed);
++   if (w < 0) {
++      const char *c = getenv("MADEIRA_LSFG_HOST_CTL");
++      w = c && *c && strlen(c) < sizeof g_kk_lsfg.ctl - 1;
++      if (w) {
++         pthread_mutex_lock(&g_kk_lsfg.mu);
++         snprintf(g_kk_lsfg.ctl, sizeof g_kk_lsfg.ctl, "%s", c);
++         snprintf(g_kk_lsfg.status, sizeof g_kk_lsfg.status, "%s.status", c);
++         pthread_mutex_unlock(&g_kk_lsfg.mu);
++         KK_LSFG_LOG("asked for by the app (control file %s): the game draws into stand-ins\n", c);
++      }
++      atomic_store_explicit(&g_kk_lsfg.want, w, memory_order_relaxed);
++   }
++   return w > 0;
++}
++
++static void kk_lsfg_status(const char *text) {
++   int fd = open(g_kk_lsfg.status, O_WRONLY | O_CREAT | O_TRUNC, 0644);
++   if (fd < 0) return;
++   if (write(fd, text, strlen(text)) < 0) { /* the menu shows nothing new */ }
++   close(fd);
++}
++
++/* The control file the app rewrites when the in-game menu changes something: "enabled=1", "generated=2", "flow=1.5", "force=1",
++ * "performance=1", "measure=1", "hz=120" (as DXMT reads it). Looked at twice a second at most, read again when it changed. */
++static void kk_lsfg_poll(void) {
++   double now = CACurrentMediaTime();
++   struct stat sb;
++   char buf[2048], *line, *save = NULL;
++   bool en, fc, ms, pf;
++   unsigned gen;
++   float fl;
++   double hz;
++   int fd;
++   ssize_t got;
++   if (g_kk_lsfg.polled && now - g_kk_lsfg.polled < 0.5) return;
++   g_kk_lsfg.polled = now;
++   if (stat(g_kk_lsfg.ctl, &sb) != 0) {
++      if (g_kk_lsfg.seen) { g_kk_lsfg.seen = false; g_kk_lsfg.enabled = false; }
++      return;
++   }
++   if (g_kk_lsfg.seen && sb.st_size == g_kk_lsfg.size && sb.st_mtimespec.tv_sec == g_kk_lsfg.mtime.tv_sec
++       && sb.st_mtimespec.tv_nsec == g_kk_lsfg.mtime.tv_nsec)
++      return;
++   fd = open(g_kk_lsfg.ctl, O_RDONLY);
++   if (fd < 0) return;
++   got = read(fd, buf, sizeof buf - 1);
++   close(fd);
++   if (got < 0) return;
++   buf[got] = 0;
++   g_kk_lsfg.size = sb.st_size; g_kk_lsfg.mtime = sb.st_mtimespec;
++   en = g_kk_lsfg.enabled; fc = g_kk_lsfg.force; ms = g_kk_lsfg.measure; pf = g_kk_lsfg.performance;
++   gen = g_kk_lsfg.generated; fl = g_kk_lsfg.flow; hz = g_kk_lsfg.hz;
++   for (line = strtok_r(buf, "\r\n", &save); line; line = strtok_r(NULL, "\r\n", &save)) {
++      char *eq = strchr(line, '=');
++      const char *k = line, *v;
++      if (!eq) continue;
++      *eq = 0; v = eq + 1;
++      if (!strcmp(k, "enabled")) en = atoi(v) != 0;
++      else if (!strcmp(k, "force")) fc = atoi(v) != 0;
++      else if (!strcmp(k, "measure")) ms = atoi(v) != 0;
++      else if (!strcmp(k, "performance")) pf = atoi(v) != 0;
++      else if (!strcmp(k, "generated")) { int g = atoi(v); gen = g < 1 ? 1 : g > 3 ? 3 : (unsigned)g; }
++      else if (!strcmp(k, "flow")) { float f = (float)atof(v); fl = f < 1.0f ? 1.0f : f > 4.0f ? 4.0f : f; }
++      else if (!strcmp(k, "hz")) hz = atof(v);
++   }
++   if (!g_kk_lsfg.seen || en != g_kk_lsfg.enabled || gen != g_kk_lsfg.generated || fl != g_kk_lsfg.flow || pf != g_kk_lsfg.performance
++       || fc != g_kk_lsfg.force || ms != g_kk_lsfg.measure) {
++      KK_LSFG_LOG("control: %s, %u made a frame, flow 1/%.2g, %s passes%s%s\n", en ? "on" : "off", gen, (double)fl, pf ? "lighter" : "quality",
++                  fc ? ", always" : "", ms ? ", measure only" : "");
++   }
++   g_kk_lsfg.seen = true;
++   g_kk_lsfg.enabled = en; g_kk_lsfg.force = fc; g_kk_lsfg.measure = ms; g_kk_lsfg.performance = pf;
++   g_kk_lsfg.generated = gen; g_kk_lsfg.flow = fl; g_kk_lsfg.hz = hz;
++}
++
++/* The passes are given up (the worker): destroyed once the GPU is done with the last frame that used them. */
++static void kk_lsfg_drop(void) {
++   struct kk_lsfg *g;
++   id<MTLRenderPipelineState> show;
++   id<MTLCommandBuffer> last = g_kk_lsfg.last;
++   pthread_mutex_lock(&g_kk_lsfg.mu);
++   g = g_kk_lsfg.g; show = g_kk_lsfg.show;
++   g_kk_lsfg.g = NULL; g_kk_lsfg.show = nil;
++   pthread_mutex_unlock(&g_kk_lsfg.mu);
++   g_kk_lsfg.last = nil;
++   if (!g && !show) { [last release]; return; }
++   dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
++      if (last) [last waitUntilCompleted];
++      [last release];
++      [show release];
++      kk_lsfg_destroy(g);
++   });
++}
++
++/* Builds the passes for `key` on a background queue (the shaders compile: seconds). */
++static void kk_lsfg_kick(id<MTLDevice> dev, struct kk_lsfg_key key) {
++   const char *e = getenv("MADEIRA_LSFG_HOST_MSL");
++   char *msl_path = strdup(e ? e : "");
++   pthread_mutex_lock(&g_kk_lsfg.mu);
++   g_kk_lsfg.building = true;
++   g_kk_lsfg.want_key = key;
++   pthread_mutex_unlock(&g_kk_lsfg.mu);
++   [dev retain];
++   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
++      @autoreleasepool {
++         struct kk_lsfg_store st;
++         struct kk_lsfg *g = NULL;
++         id<MTLRenderPipelineState> show = nil;
++         char why[300] = "";
++         double t0 = CACurrentMediaTime();
++         if (kk_lsfg_store_load(msl_path, &st, why, sizeof why))
++            g = kk_lsfg_create(dev, key.w, key.h, (MTLPixelFormat)key.format, key.generated, key.flow, key.performance, kk_lsfg_store_get, &st,
++                               why, sizeof why);
++         kk_lsfg_store_free(&st);
++         free(msl_path);
++         if (g) {
++            NSError *err = nil;
++            id<MTLLibrary> lib = [dev newLibraryWithSource:[NSString stringWithUTF8String:kk_lsfg_show_msl] options:nil error:&err];
++            id<MTLFunction> vs = [lib newFunctionWithName:@"lsfg_vs"], fs = [lib newFunctionWithName:@"lsfg_show"];
++            MTLRenderPipelineDescriptor *d = [[MTLRenderPipelineDescriptor alloc] init];
++            d.vertexFunction = vs; d.fragmentFunction = fs;
++            d.colorAttachments[0].pixelFormat = (MTLPixelFormat)key.drawable;
++            show = vs && fs ? [dev newRenderPipelineStateWithDescriptor:d error:&err] : nil;
++            [d release]; [vs release]; [fs release]; [lib release];
++            if (!show) {
++               snprintf(why, sizeof why, "no pipeline to show the frames made (%s)", err ? err.localizedDescription.UTF8String : "no reason given");
++               kk_lsfg_destroy(g);
++               g = NULL;
++            }
++         }
++         pthread_mutex_lock(&g_kk_lsfg.mu);
++         g_kk_lsfg.building = false;
++         if (g && !memcmp(&key, &g_kk_lsfg.want_key, sizeof key) && !g_kk_lsfg.g) {
++            g_kk_lsfg.g = g; g_kk_lsfg.show = show; g_kk_lsfg.key = key;
++            g = NULL; show = nil;
++            KK_LSFG_LOG("ready in %.0f ms: %ux%u Metal format %lu, %s passes, motion search %ux%u, %u made a frame\n", (CACurrentMediaTime() - t0) * 1000.0,
++                        key.w, key.h, key.format, key.performance ? "lighter" : "quality", (unsigned)(key.w / key.flow), (unsigned)(key.h / key.flow), key.generated);
++         } else if (!g && !memcmp(&key, &g_kk_lsfg.want_key, sizeof key)) {
++            g_kk_lsfg.dead = true;
++            g_kk_lsfg.dead_key = key;
++            snprintf(g_kk_lsfg.why, sizeof g_kk_lsfg.why, "%s", why[0] ? why : "the passes could not be built");
++            KK_LSFG_LOG("could not be set up: %s\n", g_kk_lsfg.why);
++         }
++         pthread_mutex_unlock(&g_kk_lsfg.mu);
++         [show release];
++         kk_lsfg_destroy(g);   /* built for settings that changed meanwhile */
++         [dev release];
++      }
++   });
++}
++
++unsigned wsi_metal_lsfg_run(id<MTLCommandQueue> queue, id<MTLTexture> picture, MTLPixelFormat drawable_format, double dt, int hz,
++                            int backlog, __unsafe_unretained id<MTLTexture> out[3], id<MTLCommandBuffer> *reads) {
++   double now = CACurrentMediaTime(), screen, secs;
++   struct kk_lsfg_key key;
++   struct kk_lsfg *g;
++   unsigned made = 0;
++   bool can;
++   char text[600];
++   *reads = nil;
++   if (!wsi_metal_lsfg_wanted()) return 0;
++   kk_lsfg_poll();
++   if (!g_kk_lsfg.enabled) {
++      if (g_kk_lsfg.g) kk_lsfg_drop();
++      if (!g_kk_lsfg.said_off) { kk_lsfg_status("state=off\n"); g_kk_lsfg.said_off = true; }
++      g_kk_lsfg.said_start = false;
++      g_kk_lsfg.frames = g_kk_lsfg.made = g_kk_lsfg.fast = 0; g_kk_lsfg.stat_t = 0; g_kk_lsfg.cost_ms = 0;
++      return 0;
++   }
++   g_kk_lsfg.said_off = false;
++   memset(&key, 0, sizeof key);   /* compared with memcmp: no stray bytes */
++   key.w = (unsigned)picture.width; key.h = (unsigned)picture.height; key.generated = g_kk_lsfg.generated;
++   key.format = (unsigned long)picture.pixelFormat; key.drawable = (unsigned long)drawable_format;
++   key.flow = g_kk_lsfg.flow; key.performance = g_kk_lsfg.performance;
++   {
++      bool stale, dead, building;
++      pthread_mutex_lock(&g_kk_lsfg.mu);
++      g = g_kk_lsfg.g;
++      stale = g && memcmp(&g_kk_lsfg.key, &key, sizeof key) != 0;   /* another size, format or setting: built again */
++      dead = g_kk_lsfg.dead && !memcmp(&g_kk_lsfg.dead_key, &key, sizeof key);
++      building = g_kk_lsfg.building;
++      if (g_kk_lsfg.dead && !dead) g_kk_lsfg.dead = false;   /* the settings changed since it failed: try again */
++      pthread_mutex_unlock(&g_kk_lsfg.mu);
++      if (stale) { kk_lsfg_drop(); g = NULL; g_kk_lsfg.said_start = false; }
++      if (dead) {
++         if (!(g_kk_lsfg.stat_t > 0) || now - g_kk_lsfg.stat_t >= 2.0) {
++            g_kk_lsfg.stat_t = now;
++            snprintf(text, sizeof text, "state=error\nmessage=%s\n", g_kk_lsfg.why);
++            kk_lsfg_status(text);
++         }
++         return 0;
++      }
++      if (!g) {
++         if (!building) kk_lsfg_kick(picture.device, key);
++         if (!g_kk_lsfg.said_start) { kk_lsfg_status("state=starting\n"); g_kk_lsfg.said_start = true; }
++         g_kk_lsfg.stat_t = 0;
++         return 0;
++      }
++   }
++   g_kk_lsfg.frames++;
++   screen = g_kk_lsfg.hz > 0 ? g_kk_lsfg.hz : hz > 0 ? hz : 60.0;
++   /* the screen has to be able to show the extra frames (a game near the screen's rate gets none and keeps no history),
++    * unless asked for anyway; a worker with another frame ready behind this one is behind and makes none */
++   can = dt > 0 && dt <= 0.16 && backlog == 0 && (g_kk_lsfg.force || dt >= ((double)key.generated + 0.9) / screen);
++   if (!can) {
++      kk_lsfg_break_history(g);
++      g_kk_lsfg.fast++;
++   } else {
++      id<MTLCommandBuffer> cb = [queue commandBuffer];
++      double c0 = CACurrentMediaTime();
++      if (cb) {
++         made = kk_lsfg_encode(g, cb, picture, true, out);
++         [cb commit];
++         *reads = [cb retain];
++         [g_kk_lsfg.last release];
++         g_kk_lsfg.last = [cb retain];
++      }
++      g_kk_lsfg.cost_ms += (CACurrentMediaTime() - c0) * 1000.0;
++      g_kk_lsfg.made += made;
++      if (g_kk_lsfg.measure) made = 0;   /* "measure only": the passes ran, nothing extra is shown */
++   }
++   secs = now - g_kk_lsfg.stat_t;
++   if (g_kk_lsfg.stat_t > 0 && secs >= 2.0) {
++      double passes = g_kk_lsfg.frames > g_kk_lsfg.fast ? g_kk_lsfg.cost_ms / (double)(g_kk_lsfg.frames - g_kk_lsfg.fast) : 0.0;
++      KK_LSFG_LOG("%.1f s: game %.1f fps (frame %.1f ms), generated %.1f/s, frames without (%llu: screen %.0f Hz cannot show more, or the "
++                  "worker was behind), passes cost %.2f ms on the worker per frame\n",
++                  secs, g_kk_lsfg.frames / secs, dt * 1000.0, g_kk_lsfg.made / secs, g_kk_lsfg.fast, screen, passes);
++      snprintf(text, sizeof text, "state=%s\ngame=%.1f\ngenerated=%.1f\nwithout=%llu\nframes=%llu\nscreen=%.0f\ncost=%.2f\nsize=%ux%u\nflow=%ux%u\n",
++               g_kk_lsfg.made ? "generating" : "running", g_kk_lsfg.frames / secs, g_kk_lsfg.made / secs, g_kk_lsfg.fast, g_kk_lsfg.frames, screen,
++               passes, key.w, key.h, (unsigned)(key.w / key.flow), (unsigned)(key.h / key.flow));
++      kk_lsfg_status(text);
++      g_kk_lsfg.stat_t = now; g_kk_lsfg.frames = g_kk_lsfg.made = g_kk_lsfg.fast = 0; g_kk_lsfg.cost_ms = 0;
++   } else if (!(g_kk_lsfg.stat_t > 0)) {
++      g_kk_lsfg.stat_t = now;
++      g_kk_lsfg.frames = g_kk_lsfg.made = g_kk_lsfg.fast = 0; g_kk_lsfg.cost_ms = 0;
++   }
++   return made;
++}
++
++void wsi_metal_lsfg_show(id<MTLCommandBuffer> cb, id<MTLTexture> src, id<MTLTexture> dst) {
++   struct kk_lsfg *g = g_kk_lsfg.g;   /* the worker's: only the worker drops it */
++   MTLRenderPassDescriptor *rp = [MTLRenderPassDescriptor renderPassDescriptor];
++   id<MTLRenderCommandEncoder> enc;
++   if (!g || !g_kk_lsfg.show) return;
++   rp.colorAttachments[0].texture = dst;
++   rp.colorAttachments[0].loadAction = MTLLoadActionDontCare;
++   rp.colorAttachments[0].storeAction = MTLStoreActionStore;
++   enc = [cb renderCommandEncoderWithDescriptor:rp];
++   [enc waitForFence:kk_lsfg_done_fence(g) beforeStages:MTLRenderStageFragment];   /* after the passes that made it */
++   [enc setRenderPipelineState:g_kk_lsfg.show];
++   [enc setFragmentTexture:src atIndex:0];
++   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
++   [enc updateFence:kk_lsfg_done_fence(g) afterStages:MTLRenderStageFragment];   /* the next frame's passes write it again after this */
++   [enc endEncoding];
++}
++
++void wsi_metal_lsfg_session_ended(void) {
++   if (atomic_load_explicit(&g_kk_lsfg.want, memory_order_relaxed) > 0) {
++      kk_lsfg_drop();
++      g_kk_lsfg.seen = false; g_kk_lsfg.enabled = false; g_kk_lsfg.polled = 0;
++      g_kk_lsfg.said_off = g_kk_lsfg.said_start = false;
++      pthread_mutex_lock(&g_kk_lsfg.mu);
++      g_kk_lsfg.dead = false;
++      memset(&g_kk_lsfg.want_key, 0, sizeof g_kk_lsfg.want_key);   /* a build still on its way is not installed */
++      pthread_mutex_unlock(&g_kk_lsfg.mu);
++   }
++   atomic_store_explicit(&g_kk_lsfg.want, -1, memory_order_relaxed);   /* the next session reads its own variable */
++}
+diff --git a/src/vulkan/wsi/wsi_common_metal_vti.h b/src/vulkan/wsi/wsi_common_metal_vti.h
+new file mode 100644
+index 0000000..c55c98b
+--- /dev/null
++++ b/src/vulkan/wsi/wsi_common_metal_vti.h
+@@ -0,0 +1,57 @@
++/*
++ * Copyright 2026 BCD (thebcd69)
++ *
++ * SPDX-License-Identifier: MIT
++ */
++
++/* madeira-bcd: Apple's VideoToolbox low-latency frame interpolation for the
++ * presents of a swapchain (MADEIRA_VT_INTERP = 1 or 3). Nothing here runs
++ * without that variable: wsi_metal_vti_wanted() is false and
++ * wsi_metal_vti_present() returns false at once. See wsi_common_metal_vti.m. */
++
++#ifndef WSI_COMMON_METAL_VTI_H
++#define WSI_COMMON_METAL_VTI_H
++
++#include <stdbool.h>
++#include <stdint.h>
++
++/* MADEIRA_VT_INTERP asks for pictures between frames and this system has the
++ * processor. Read once per session. A swapchain made while it is true has
++ * drawables that can be read back (framebufferOnly off). */
++bool wsi_metal_vti_wanted(void);
++
++/* With the key the game draws into stand-ins of the module's own, never into
++ * the layer's drawables; only the module's worker takes those (a layer has
++ * three, and a worker that competed with the game for them stalled it).
++ *
++ * wsi_metal_vti_acquire: the next stand-in for this layer (retained, like a
++ * drawable from wsi_metal_layer_acquire_drawable), its `texture` the image the
++ * swapchain's copy writes. *status: 1 a stand-in; 0 none for this layer (the
++ * key is off, the layer is small or not the followed one, the stand-ins could
++ * not be made): acquire a drawable as without the module; -1 all three are
++ * still with the worker after a second: try again (as a nextDrawable timeout). */
++void *wsi_metal_vti_acquire(void *mtl4_queue, const void *metal_layer, unsigned width, unsigned height, int *status);
++
++/* Whether `drawable` is one of the module's stand-ins. */
++bool wsi_metal_vti_is_stand_in(void *drawable);
++
++/* The present of a stand-in whose picture the device's queue has already
++ * committed (mtl4_queue: the device's MTL4CommandQueue, or NULL). The module
++ * takes its own reference and presents the frame (after the pictures it makes)
++ * from a drawable of the layer; the caller drops its own reference. handler
++ * (may be NULL): the present-wait callback, called once the frame is shown or
++ * dropped. */
++void wsi_metal_vti_present(void *mtl4_queue, void *drawable, void (*handler)(void *, uint64_t), void *info, uint64_t present_id);
++
++/* A stand-in given back without a present (images released, swapchain gone). */
++void wsi_metal_vti_unpresented(void *drawable);
++
++/* For the app (dlsym in the app's process), the same contract as winemetal's
++ * madeira_vti_* functions. */
++__attribute__((visibility("default"))) int madeira_kk_vti_set(int on);
++__attribute__((visibility("default"))) int madeira_kk_vti_status(int *width, int *height, double *game_fps,
++                                                                  double *generated_fps, double *pair_ms);
++__attribute__((visibility("default"))) int madeira_kk_vti_why(char *out, int cap);
++__attribute__((visibility("default"))) void madeira_kk_vti_session_ended(void);
++
++#endif
+diff --git a/src/vulkan/wsi/wsi_common_metal_vti.m b/src/vulkan/wsi/wsi_common_metal_vti.m
+new file mode 100644
+index 0000000..98ac317
+--- /dev/null
++++ b/src/vulkan/wsi/wsi_common_metal_vti.m
+@@ -0,0 +1,1315 @@
++/*
++ * Copyright 2026 BCD (thebcd69)
++ *
++ * SPDX-License-Identifier: MIT
++ */
++
++/* madeira-bcd: Apple's VideoToolbox low-latency frame interpolation (iOS 26)
++ * for the presents of a Vulkan swapchain, the way BCD's winemetal does it for
++ * DirectX games (tools/patch-winemetal-vt-interp.py in BCD's tree): one or
++ * three pictures between every two frames of the game, made from the two
++ * pictures alone on a worker thread.
++ *
++ * Inert unless MADEIRA_VT_INTERP is 1 or 3 (the app exports it for a game
++ * whose own line `vt-interpolation` asks): wsi_metal_vti_wanted() is false,
++ * every swapchain is made as before and wsi_metal_vti_present() returns false
++ * at once.
++ *
++ * With it, for the followed layer (the first whose picture is 640x360 or more):
++ *   - the game never takes the layer's drawables: KosmicKrisp's swapchain image
++ *     is copied into one of three stand-in textures of this module's own
++ *     (wsi_metal_vti_acquire; see "stand-ins" below for why);
++ *   - at each present, on the game's thread: the device's Metal 4 queue signals
++ *     an event after the copy into the stand-in, and a command buffer of this
++ *     module's own queue waits for that event and copies the picture into a
++ *     pixel buffer (BGRA, or two planes of 8-bit 4:2:0, whichever the
++ *     processor takes). The stand-in goes to the worker; the game's thread
++ *     never waits for the model or for a drawable;
++ *   - on the worker, once that copy has completed on the GPU (its completion
++ *     handler hands the frame over; frames go in the order of their presents):
++ *     it lets VideoToolbox make the pictures between the frame before and this
++ *     one, presents each from a drawable and a command buffer of its own at its
++ *     own time, and then the game's own frame, copied from the stand-in as it
++ *     is, from a drawable of its own; the stand-in then goes back to the game.
++ *     A game whose GPU is behind has several frames on their way at once (X-Plane
++ *     12 in flight: 130-155 ms from a present to its frame done on the GPU); a
++ *     worker that sat waiting for each one in turn, with three source buffers,
++ *     gave one frame in five its picture (build 704), so the worker never waits
++ *     for the GPU and there are six source buffers.
++ * Pictures are made only when the screen can show them (game frame time x the
++ * screen's top rate: 2 for one, 4 for three) and only while no other frame is
++ * ready for the worker, so a model that is too slow costs the extra pictures,
++ * not the game's frames. A frame-rate limit holds the game's own frames (Wine's
++ * win32u, before the present); the pictures come on top. A session is made on a
++ * background queue (the model takes longer than a frame to load) and frames
++ * present as without the key until it is there. Three errors in a row, a
++ * picture format that is not one of the four 8-bit ones, a size the processor
++ * refuses: one line in the log says why and the game goes on without extra
++ * pictures. madeira_kk_vti_set() is the in-game menu's switch,
++ * madeira_kk_vti_status() its status.
++ *
++ * With MADEIRA_LSFG_HOST_CTL (the app's control file of Lossless Scaling's
++ * frame generation, for a game whose `lossless-scaling` line asks) the same
++ * stand-ins and worker carry Lossless Scaling's frames instead
++ * (wsi_common_metal_lsfg.m): a frame reaches the worker once it is done on the
++ * GPU, the passes run there, and the frames they make are presented as the
++ * pictures are; VideoToolbox makes none in that session. */
++
++#include "wsi_common_metal_vti.h"
++#include "wsi_common_metal_lsfg.h"
++
++#import <Metal/Metal.h>
++#import <QuartzCore/CAMetalLayer.h>
++#import <QuartzCore/CABase.h>
++#import <CoreVideo/CoreVideo.h>
++#import <CoreMedia/CoreMedia.h>
++#import <VideoToolbox/VideoToolbox.h>
++#import <objc/message.h>
++#import <objc/runtime.h>
++#include <TargetConditionals.h>
++#include <dispatch/dispatch.h>
++#include <dlfcn.h>
++#include <errno.h>
++#include <mach/mach_time.h>
++#include <pthread.h>
++#include <stdatomic.h>
++#include <stdarg.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++
++#ifndef KK_VTI_AVAILABLE   /* the host check defines it when it builds with stand-ins */
++#define KK_VTI_AVAILABLE @available(iOS 26.0, macOS 26.0, *)
++#endif
++#if TARGET_OS_SIMULATOR
++#define KK_VTI_BUILT 0     /* VideoToolbox's frame processors are not in the simulator's SDK */
++#else
++#define KK_VTI_BUILT 1
++#endif
++
++#define KK_VTI_LOG(...) do { fprintf(stderr, "[vt-interp] kosmickrisp " __VA_ARGS__); fflush(stderr); } while (0)
++
++/* kkvti-pure-begin: plain C (BCD's tests/host/check-kk-vt-interp.py compiles these on the host) */
++/* MADEIRA_VT_INTERP: how many pictures between two frames. 1 or 3; anything else is off. */
++static int kk_vti_parse(const char *text) {
++   int v = text ? atoi(text) : 0;
++   return v == 1 ? 1 : v == 3 ? 3 : 0;
++}
++/* How many pictures this game frame gets. want: 1 or 3 (what the session was made for). dt: the game's frame time in
++ * seconds. hz: the screen's top rate (0 = not known: 60). backlog: frames waiting behind this one on the worker. The
++ * screen has to be able to show them all (a little slack for a game just above half or a quarter of the rate), and a
++ * worker that is behind makes none, so it catches up. */
++static int kk_vti_count(int want, double dt, int hz, int backlog) {
++   double shown;
++   if (want < 1 || backlog > 0 || !(dt > 0.0)) return 0;
++   if (hz <= 0) hz = 60;
++   shown = dt * (double)hz * 1.05;   /* how many screen refreshes one game frame lasts */
++   if (want >= 3 && shown >= 4.0) return 3;
++   return shown >= 2.0 ? 1 : 0;
++}
++/* When picture i of n (i = 1..n) and the game's own frame (i = n + 1) go to the screen, in seconds after the first. */
++static double kk_vti_offset(int i, int n, double dt) {
++   if (n < 1 || i <= 1) return 0.0;
++   if (i > n + 1) i = n + 1;
++   return dt * (double)(i - 1) / (double)(n + 1);
++}
++#define KK_VTI_BGRA 0x42475241u   /* 'BGRA' */
++#define KK_VTI_420F 0x34323066u   /* '420f': 8-bit 4:2:0, two planes, full range */
++#define KK_VTI_420V 0x34323076u   /* '420v': the same, video range */
++/* The pixel format used, of those the processor takes: BGRA first, then 4:2:0 full range, then video range. 0 = none. */
++static unsigned kk_vti_pick(const unsigned *fourcc, int count) {
++   static const unsigned order[3] = { KK_VTI_BGRA, KK_VTI_420F, KK_VTI_420V };
++   int o, i;
++   for (o = 0; o < 3; o++)
++      for (i = 0; i < count; i++)
++         if (fourcc[i] == order[o]) return order[o];
++   return 0;
++}
++/* The drawable formats handled (Metal's numbers: BGRA8Unorm 80, BGRA8Unorm_sRGB 81, RGBA8Unorm 70, RGBA8Unorm_sRGB 71).
++ * *linear: reading such a texture gives linear values (the picture is stored sRGB-encoded). 0 = not handled. */
++static int kk_vti_layer_format(unsigned long fmt, int *linear) {
++   *linear = fmt == 81 || fmt == 71;
++   return fmt == 80 || fmt == 81 || fmt == 70 || fmt == 71;
++}
++/* A pixel format's four letters for the log. */
++static const char *kk_vti_fourcc(unsigned v, char out[8]) {
++   int i;
++   for (i = 0; i < 4; i++) {
++      unsigned c = (v >> (24 - 8 * i)) & 0xff;
++      out[i] = (c >= 32 && c < 127) ? (char)c : '?';
++   }
++   out[4] = 0;
++   return out;
++}
++/* kkvti-pure-end */
++
++static const char *kk_vti_msl =
++   "#include <metal_stdlib>\n"
++   "using namespace metal;\n"
++   "struct VtiOut { float4 pos [[position]]; float2 uv; };\n"
++   "struct VtiArgs { float lin; float video; };\n"
++   "vertex VtiOut vti_vs(uint vid [[vertex_id]]) {\n"
++   "  VtiOut o; float2 p = float2((vid << 1) & 2, vid & 2);\n"
++   "  o.pos = float4(p * float2(2.0, -2.0) + float2(-1.0, 1.0), 0.0, 1.0); o.uv = p; return o;\n"
++   "}\n"
++   "constexpr sampler vti_s(coord::normalized, filter::linear, address::clamp_to_edge);\n"
++   "static float3 vti_encode(float3 c) { c = saturate(c); return mix(c * 12.92, 1.055 * pow(c, float3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }\n"
++   "static float3 vti_decode(float3 c) { c = saturate(c); return mix(c / 12.92, pow((c + 0.055) / 1.055, float3(2.4)), step(0.04045, c)); }\n"
++   "static float3 vti_stored(texture2d<float> t, float2 uv, float lin) {\n"
++   "  float3 c = t.sample(vti_s, uv).rgb; return lin > 0.5 ? vti_encode(c) : saturate(c);\n"
++   "}\n"
++   "fragment float4 vti_copy(VtiOut in [[stage_in]], texture2d<float> t [[texture(0)]]) {\n"
++   "  return float4(t.sample(vti_s, in.uv).rgb, 1.0);\n"
++   "}\n"
++   "fragment float4 vti_y(VtiOut in [[stage_in]], texture2d<float> t [[texture(0)]], constant VtiArgs &a [[buffer(0)]]) {\n"
++   "  float y = dot(vti_stored(t, in.uv, a.lin), float3(0.2126, 0.7152, 0.0722));\n"
++   "  if (a.video > 0.5) y = (16.0 + 219.0 * y) / 255.0;\n"
++   "  return float4(y, 0.0, 0.0, 1.0);\n"
++   "}\n"
++   "fragment float4 vti_c(VtiOut in [[stage_in]], texture2d<float> t [[texture(0)]], constant VtiArgs &a [[buffer(0)]]) {\n"
++   "  float3 c = vti_stored(t, in.uv, a.lin);\n"
++   "  float y = dot(c, float3(0.2126, 0.7152, 0.0722));\n"
++   "  float2 cc = float2((c.b - y) / 1.8556, (c.r - y) / 1.5748);\n"
++   "  cc = (128.0 + (a.video > 0.5 ? 224.0 : 255.0) * cc) / 255.0;\n"
++   "  return float4(cc, 0.0, 1.0);\n"
++   "}\n"
++   "fragment float4 vti_rgb(VtiOut in [[stage_in]], texture2d<float> ty [[texture(0)]], texture2d<float> tc [[texture(1)]],\n"
++   "                        constant VtiArgs &a [[buffer(0)]]) {\n"
++   "  float y = ty.sample(vti_s, in.uv).r;\n"
++   "  float2 cc = tc.sample(vti_s, in.uv).rg * 255.0 - 128.0;\n"
++   "  if (a.video > 0.5) { y = (y * 255.0 - 16.0) / 219.0; cc = cc / 224.0; } else { cc = cc / 255.0; }\n"
++   "  float3 c = float3(y + 1.5748 * cc.y, y - 0.1873 * cc.x - 0.4681 * cc.y, y + 1.8556 * cc.x);\n"
++   "  return float4(a.lin > 0.5 ? vti_decode(c) : saturate(c), 1.0);\n"
++   "}\n";
++
++/* Source buffers: the frame being made into one and the frames on their way to the worker (at most three, one for each
++ * stand-in), each worker job reading its own and the one before; two to spare. */
++#define KK_VTI_RING 6
++/* One session: a processor made for one size, its pixel buffers and their Metal textures. Everything up to `refs` is set
++ * once by kk_vti_open and only read afterwards. */
++struct kk_vti_session {
++   unsigned w, h, fourcc;
++   unsigned long layer_fmt;
++   int linear, video, planar, frames;   /* frames: 1 or 3, what the configuration was made for */
++   int blit_in, blit_out;               /* the pixel buffer's texture has the drawable's own format: plain copies */
++   id proc, config;                     /* VTFrameProcessor, VTLowLatencyFrameInterpolationConfiguration */
++   CVPixelBufferRef src[KK_VTI_RING], dst[3];
++   id<MTLTexture> src_t[KK_VTI_RING][2], dst_t[3][2];
++   id<MTLRenderPipelineState> p_in, p_y, p_c, p_out;
++   _Atomic int refs;
++   _Atomic int reset;                   /* the worker: a copy failed, the next frame has no frame before it */
++   /* under g_kk_vti_mu, the game's thread: which buffer the last frame went into */
++   int g_last, g_valid;
++   long long g_us;
++   /* the worker */
++   int errors;
++};
++static struct {
++   _Atomic int want;                 /* -1 until MADEIRA_VT_INTERP was read; then 0, 1 or 3 */
++   _Atomic int live;                 /* the menu's switch: -1 = as the game started (on), 0 off, 1 on */
++   _Atomic int state;                /* 0 nothing yet, 1 the model is loading, 2 ready, -1 not possible (why) */
++   _Atomic int outstanding;          /* frames handed to the worker and not presented yet */
++   int backlog;                      /* the worker: frames ready for it behind the one it is on */
++   _Atomic int attempts;
++   _Atomic int hz;                   /* the screen's top rate, 0 until known */
++   _Atomic(void *) layer;            /* the layer followed: compared, never dereferenced */
++   _Atomic unsigned long long layer_abs;
++   _Atomic unsigned w, h;            /* what the session is, or is being, made for */
++   _Atomic unsigned long fmt;
++   struct kk_vti_session *s;         /* under g_kk_vti_mu */
++   uint64_t last_abs;                /* the followed layer's present thread */
++   double dt;
++   double next_free;                 /* the worker: when the last frame it presented is due */
++   char why[220];
++   _Atomic unsigned long long frames, generated, skip_rate, skip_busy, errors, pairs, vt_us, wait_us, waits, no_drawable;
++   /* the worker's one-second report, for the menu */
++   uint64_t stat_abs;
++   unsigned long long stat_frames, stat_generated;
++   volatile double game_fps, generated_fps, pair_ms;
++} g_kk_vti = { .want = -1, .live = -1 };
++static pthread_mutex_t g_kk_vti_mu = PTHREAD_MUTEX_INITIALIZER;
++
++/* The module's own queues and event, made once for the device the drawables come from. `queue` takes the copies into the
++ * source buffers, each waiting for the device's queue; `out` the worker's pictures and frames, so that they never queue
++ * on the GPU behind the copies of later frames still waiting for the game's (a command buffer waits for the ones before
++ * it on its queue). */
++static struct {
++   pthread_mutex_t mu;
++   id<MTLDevice> device;
++   id<MTLCommandQueue> queue, out;
++   id<MTLSharedEvent> event;
++   uint64_t value;                   /* the game's thread */
++} g_kk_vti_gpu = { .mu = PTHREAD_MUTEX_INITIALIZER };
++
++/* The screen's top rate, read once on the main thread (UIKit's UIScreen is in the app's process; the driver does not link
++ * it). MADEIRA_VT_PANEL_HZ names it instead (the host check). Until it is known the count takes 60. */
++static void kk_vti_learn_hz(void) {
++   static dispatch_once_t once;
++   dispatch_once(&once, ^{
++      const char *e = getenv("MADEIRA_VT_PANEL_HZ");
++      if (e && atoi(e) > 0) {
++         atomic_store_explicit(&g_kk_vti.hz, atoi(e), memory_order_relaxed);
++         return;
++      }
++      dispatch_async(dispatch_get_main_queue(), ^{
++         Class screen = NSClassFromString(@"UIScreen");
++         SEL main_sel = sel_registerName("mainScreen"), fps_sel = sel_registerName("maximumFramesPerSecond");
++         if (!screen || ![screen respondsToSelector:main_sel]) return;
++         id main = ((id (*)(id, SEL))objc_msgSend)(screen, main_sel);
++         if (!main || ![main respondsToSelector:fps_sel]) return;
++         long hz = (long)((NSInteger (*)(id, SEL))objc_msgSend)(main, fps_sel);
++         if (hz > 0 && hz <= 1000) {
++            atomic_store_explicit(&g_kk_vti.hz, (int)hz, memory_order_relaxed);
++            KK_VTI_LOG("the screen's top rate is %ld Hz\n", hz);
++         }
++      });
++   });
++}
++
++static int kk_vti_want(void) {
++   int w = atomic_load_explicit(&g_kk_vti.want, memory_order_relaxed);
++   if (w >= 0) return w;
++   w = kk_vti_parse(getenv("MADEIRA_VT_INTERP"));
++   if (w) {
++      int ok = 0;
++      if (KK_VTI_AVAILABLE) ok = KK_VTI_BUILT;
++      if (!ok) {
++         KK_VTI_LOG("MADEIRA_VT_INTERP=%d: VideoToolbox frame interpolation needs iOS 26 on a device -- off\n", w);
++         w = 0;
++      } else {
++         KK_VTI_LOG("on: up to %d picture(s) between two frames of the Vulkan game, made by VideoToolbox on a worker thread\n", w);
++         kk_vti_learn_hz();
++      }
++   }
++   atomic_store_explicit(&g_kk_vti.want, w, memory_order_relaxed);
++   return w;
++}
++static int kk_vti_on(void) {
++   return kk_vti_want() && atomic_load_explicit(&g_kk_vti.live, memory_order_relaxed) != 0;
++}
++/* A short, bounded wait for the lock (a thread killed with its process can leave it held). */
++static int kk_vti_lock(void) {
++   int i;
++   for (i = 0; i < 20; i++) {
++      if (!pthread_mutex_trylock(&g_kk_vti_mu)) return 1;
++      usleep(250);
++   }
++   return 0;
++}
++static dispatch_queue_t kk_vti_worker(void) {
++   static dispatch_queue_t q;
++   static dispatch_once_t once;
++   dispatch_once(&once, ^{
++      q = dispatch_queue_create("madeira.kk-vt-interp", dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0));
++   });
++   return q;
++}
++static uint64_t kk_vti_abs_ns(uint64_t abs) {
++   static mach_timebase_info_data_t tb;
++   if (!tb.denom) mach_timebase_info(&tb);
++   return abs * tb.numer / tb.denom;
++}
++static long long kk_vti_us_between(struct timespec a, struct timespec b) {
++   return (long long)(b.tv_sec - a.tv_sec) * 1000000ll + (b.tv_nsec - a.tv_nsec) / 1000;
++}
++
++static void kk_vti_close(struct kk_vti_session *s) {
++   int i, p;
++   if (!s) return;
++   @autoreleasepool {
++#if KK_VTI_BUILT
++      if (KK_VTI_AVAILABLE) [(VTFrameProcessor *)s->proc endSession];
++#endif
++      [s->proc release]; [s->config release];
++      for (i = 0; i < KK_VTI_RING; i++) {
++         for (p = 0; p < 2; p++) [s->src_t[i][p] release];
++         if (s->src[i]) CVPixelBufferRelease(s->src[i]);
++      }
++      for (i = 0; i < 3; i++) {
++         for (p = 0; p < 2; p++) [s->dst_t[i][p] release];
++         if (s->dst[i]) CVPixelBufferRelease(s->dst[i]);
++      }
++      [s->p_in release]; [s->p_y release]; [s->p_c release]; [s->p_out release];
++   }
++   KK_VTI_LOG("session for %ux%u closed\n", s->w, s->h);
++   free(s);
++}
++static void kk_vti_release(struct kk_vti_session *s) {
++   if (s && atomic_fetch_sub_explicit(&s->refs, 1, memory_order_acq_rel) == 1)
++      dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{ kk_vti_close(s); });
++}
++/* The session in force is given up (the menu's switch, another size, three errors, the end of the game). Frames already
++ * with the worker keep their own reference. */
++static void kk_vti_drop(int state) {
++   struct kk_vti_session *s = NULL;
++   if (kk_vti_lock()) {
++      s = g_kk_vti.s;
++      g_kk_vti.s = NULL;
++      atomic_store_explicit(&g_kk_vti.state, state, memory_order_relaxed);
++      pthread_mutex_unlock(&g_kk_vti_mu);
++   }
++   kk_vti_release(s);
++}
++
++/* A pixel buffer the processor takes and Metal can draw into. */
++static CVPixelBufferRef kk_vti_buffer(NSDictionary *need, unsigned fourcc, unsigned w, unsigned h) {
++   NSDictionary *mine = @{ (id)kCVPixelBufferPixelFormatTypeKey: @(fourcc), (id)kCVPixelBufferWidthKey: @(w), (id)kCVPixelBufferHeightKey: @(h),
++                           (id)kCVPixelBufferIOSurfacePropertiesKey: @{}, (id)kCVPixelBufferMetalCompatibilityKey: @YES };
++   CFDictionaryRef resolved = NULL;
++   CVPixelBufferRef pb = NULL;
++   if (need && CVPixelBufferCreateResolvedAttributesDictionary(kCFAllocatorDefault, (CFArrayRef)@[need, mine], &resolved) != kCVReturnSuccess) {
++      if (resolved) CFRelease(resolved);
++      resolved = NULL;
++   }
++   if (CVPixelBufferCreate(kCFAllocatorDefault, w, h, fourcc, resolved ? resolved : (CFDictionaryRef)mine, &pb) != kCVReturnSuccess) pb = NULL;
++   if (resolved) CFRelease(resolved);
++   if (pb) {   /* what the numbers in it mean: sRGB-encoded, BT.709 */
++      CVBufferSetAttachment(pb, kCVImageBufferColorPrimariesKey, kCVImageBufferColorPrimaries_ITU_R_709_2, kCVAttachmentMode_ShouldPropagate);
++      CVBufferSetAttachment(pb, kCVImageBufferTransferFunctionKey, kCVImageBufferTransferFunction_sRGB, kCVAttachmentMode_ShouldPropagate);
++      if (fourcc != KK_VTI_BGRA)
++         CVBufferSetAttachment(pb, kCVImageBufferYCbCrMatrixKey, kCVImageBufferYCbCrMatrix_ITU_R_709_2, kCVAttachmentMode_ShouldPropagate);
++   }
++   return pb;
++}
++static id<MTLTexture> kk_vti_plane(id<MTLDevice> dev, CVPixelBufferRef pb, int plane, MTLPixelFormat fmt) {
++   IOSurfaceRef surf = CVPixelBufferGetIOSurface(pb);
++   size_t w = CVPixelBufferIsPlanar(pb) ? CVPixelBufferGetWidthOfPlane(pb, plane) : CVPixelBufferGetWidth(pb);
++   size_t h = CVPixelBufferIsPlanar(pb) ? CVPixelBufferGetHeightOfPlane(pb, plane) : CVPixelBufferGetHeight(pb);
++   MTLTextureDescriptor *d;
++   if (!surf || !w || !h) return nil;
++   d = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:fmt width:w height:h mipmapped:NO];
++   d.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
++   d.storageMode = MTLStorageModeShared;
++   return [dev newTextureWithDescriptor:d iosurface:surf plane:(NSUInteger)plane];
++}
++/* The textures of a pixel buffer's planes: one (BGRA, in the drawable's own encoding) or two (Y, CbCr). 1 = all there. */
++static int kk_vti_planes(id<MTLDevice> dev, CVPixelBufferRef pb, int planar, int linear, id<MTLTexture> t[2]) {
++   if (!pb) return 0;
++   if (!planar) {
++      t[0] = kk_vti_plane(dev, pb, 0, linear ? MTLPixelFormatBGRA8Unorm_sRGB : MTLPixelFormatBGRA8Unorm);
++      return t[0] != nil;
++   }
++   t[0] = kk_vti_plane(dev, pb, 0, MTLPixelFormatR8Unorm);
++   t[1] = kk_vti_plane(dev, pb, 1, MTLPixelFormatRG8Unorm);
++   return t[0] && t[1];
++}
++static id<MTLRenderPipelineState> kk_vti_pipeline(id<MTLDevice> dev, id<MTLLibrary> lib, NSString *fragment, MTLPixelFormat fmt) {
++   MTLRenderPipelineDescriptor *d = [[MTLRenderPipelineDescriptor alloc] init];
++   id<MTLFunction> vs = [lib newFunctionWithName:@"vti_vs"], fs = [lib newFunctionWithName:fragment];
++   id<MTLRenderPipelineState> pso;
++   d.vertexFunction = vs;
++   d.fragmentFunction = fs;
++   d.colorAttachments[0].pixelFormat = fmt;
++   pso = (vs && fs) ? [dev newRenderPipelineStateWithDescriptor:d error:NULL] : nil;
++   [d release]; [vs release]; [fs release];
++   return pso;
++}
++/* One full-picture pass: t0 (and t1) through `pso` into dst. */
++static void kk_vti_pass(id<MTLCommandBuffer> cb, id<MTLRenderPipelineState> pso, id<MTLTexture> t0, id<MTLTexture> t1,
++                        id<MTLTexture> dst, int linear, int video) {
++   struct { float lin, video; } args = { linear ? 1.0f : 0.0f, video ? 1.0f : 0.0f };
++   MTLRenderPassDescriptor *rp = [MTLRenderPassDescriptor renderPassDescriptor];
++   id<MTLRenderCommandEncoder> enc;
++   rp.colorAttachments[0].texture = dst;
++   rp.colorAttachments[0].loadAction = MTLLoadActionDontCare;
++   rp.colorAttachments[0].storeAction = MTLStoreActionStore;
++   enc = [cb renderCommandEncoderWithDescriptor:rp];
++   [enc setRenderPipelineState:pso];
++   [enc setFragmentTexture:t0 atIndex:0];
++   if (t1) [enc setFragmentTexture:t1 atIndex:1];
++   [enc setFragmentBytes:&args length:sizeof args atIndex:0];
++   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
++   [enc endEncoding];
++}
++static void kk_vti_copy(id<MTLCommandBuffer> cb, id<MTLTexture> src, id<MTLTexture> dst) {
++   id<MTLBlitCommandEncoder> blit = [cb blitCommandEncoder];
++   if (src.width == dst.width && src.height == dst.height) {
++      [blit copyFromTexture:src toTexture:dst];
++   } else {   /* a drawable of another size than the swapchain (the app resized the layer): the part both have */
++      NSUInteger w = src.width < dst.width ? src.width : dst.width, h = src.height < dst.height ? src.height : dst.height;
++      [blit copyFromTexture:src sourceSlice:0 sourceLevel:0 sourceOrigin:MTLOriginMake(0, 0, 0) sourceSize:MTLSizeMake(w, h, 1)
++                  toTexture:dst destinationSlice:0 destinationLevel:0 destinationOrigin:MTLOriginMake(0, 0, 0)];
++   }
++   [blit endEncoding];
++}
++/* The game's picture into source buffer `i`. */
++static void kk_vti_encode_in(id<MTLCommandBuffer> cb, struct kk_vti_session *s, id<MTLTexture> picture, int i) {
++   if (s->planar) {
++      kk_vti_pass(cb, s->p_y, picture, nil, s->src_t[i][0], s->linear, s->video);
++      kk_vti_pass(cb, s->p_c, picture, nil, s->src_t[i][1], s->linear, s->video);
++   } else if (s->blit_in) {
++      kk_vti_copy(cb, picture, s->src_t[i][0]);
++   } else {
++      kk_vti_pass(cb, s->p_in, picture, nil, s->src_t[i][0], 0, 0);
++   }
++}
++/* Picture `i` the processor made, into a drawable's texture (the drawable's format). */
++static void kk_vti_encode_out(id<MTLCommandBuffer> cb, struct kk_vti_session *s, int i, id<MTLTexture> target) {
++   if (s->planar) kk_vti_pass(cb, s->p_out, s->dst_t[i][0], s->dst_t[i][1], target, s->linear, s->video);
++   else if (s->blit_out) kk_vti_copy(cb, s->dst_t[i][0], target);
++   else kk_vti_pass(cb, s->p_out, s->dst_t[i][0], nil, target, 0, 0);
++}
++
++/* A session for pictures of w x h in the drawable's format, or NULL and why. Slow (the model loads): never on a game's thread. */
++static struct kk_vti_session *kk_vti_open(id<MTLDevice> dev, unsigned w, unsigned h, unsigned long layer_fmt, int frames,
++                                          char *why, size_t why_n) {
++   struct kk_vti_session *s = NULL;
++   int linear = 0, ok = 0, i;
++   why[0] = 0;
++   if (!kk_vti_layer_format(layer_fmt, &linear)) {
++      snprintf(why, why_n, "the game's picture has Metal format %lu; only 8-bit BGRA and RGBA pictures are handled", layer_fmt);
++      return NULL;
++   }
++#if KK_VTI_BUILT
++   if (KK_VTI_AVAILABLE) {
++      @autoreleasepool {
++         VTLowLatencyFrameInterpolationConfiguration *config = nil;
++         VTFrameProcessor *proc = nil;
++         NSError *err = nil;
++         NSArray<NSNumber *> *formats;
++         unsigned offered[16], fourcc;
++         int count = 0;
++         id<MTLLibrary> lib = nil;
++         struct timespec t0, t1;
++         char four[8];
++         MTLPixelFormat layer_format = (MTLPixelFormat)layer_fmt;
++         do {
++            if (![VTLowLatencyFrameInterpolationConfiguration isSupported]) {
++               snprintf(why, why_n, "VideoToolbox says this device does not support low-latency frame interpolation");
++               break;
++            }
++            config = [[VTLowLatencyFrameInterpolationConfiguration alloc] initWithFrameWidth:w frameHeight:h numberOfInterpolatedFrames:frames >= 3 ? 2 : 1];
++            if (!config) {
++               snprintf(why, why_n, "VideoToolbox takes no pictures of %ux%u for %d frame(s) between two (the size is refused)", w, h, frames);
++               break;
++            }
++            formats = config.frameSupportedPixelFormats;
++            for (NSNumber *f in formats)
++               if (count < 16) offered[count++] = f.unsignedIntValue;
++            fourcc = kk_vti_pick(offered, count);
++            if (!fourcc) {
++               char list[120] = "";
++               for (i = 0; i < count; i++) snprintf(list + strlen(list), sizeof list - strlen(list), "%s'%s'", i ? ", " : "", kk_vti_fourcc(offered[i], four));
++               snprintf(why, why_n, "VideoToolbox takes only the pixel formats %s here; BGRA, 420f and 420v are handled", count ? list : "(none)");
++               break;
++            }
++            proc = [[VTFrameProcessor alloc] init];
++            clock_gettime(CLOCK_MONOTONIC, &t0);
++            if (!proc || ![proc startSessionWithConfiguration:config error:&err]) {
++               snprintf(why, why_n, "the VideoToolbox session for %ux%u did not start: %s", w, h, err ? err.localizedDescription.UTF8String : "no reason given");
++               break;
++            }
++            clock_gettime(CLOCK_MONOTONIC, &t1);
++            s = calloc(1, sizeof *s);
++            if (!s) break;
++            s->w = w; s->h = h; s->fourcc = fourcc; s->layer_fmt = layer_fmt; s->linear = linear; s->frames = frames >= 3 ? 3 : 1;
++            s->planar = fourcc != KK_VTI_BGRA;
++            s->video = fourcc == KK_VTI_420V;
++            s->proc = [proc retain]; s->config = [config retain];
++            s->g_last = -1;
++            atomic_store_explicit(&s->refs, 1, memory_order_relaxed);
++            ok = 1;
++            for (i = 0; i < KK_VTI_RING && ok; i++) {
++               s->src[i] = kk_vti_buffer(config.sourcePixelBufferAttributes, fourcc, w, h);
++               ok = kk_vti_planes(dev, s->src[i], s->planar, linear, s->src_t[i]);
++            }
++            for (i = 0; i < s->frames && ok; i++) {
++               s->dst[i] = kk_vti_buffer(config.destinationPixelBufferAttributes, fourcc, w, h);
++               ok = kk_vti_planes(dev, s->dst[i], s->planar, linear, s->dst_t[i]);
++            }
++            if (!ok) { snprintf(why, why_n, "no pixel buffers of %ux%u '%s' that Metal can draw into", w, h, kk_vti_fourcc(fourcc, four)); break; }
++            /* BGRA with a BGRA drawable: the buffer's texture has the drawable's own format and the picture is copied as it is */
++            s->blit_in = s->blit_out = !s->planar && s->src_t[0][0].pixelFormat == layer_format;
++            if (s->planar || !s->blit_in) {
++               lib = [dev newLibraryWithSource:[NSString stringWithUTF8String:kk_vti_msl] options:nil error:&err];
++               if (lib && s->planar) {
++                  s->p_y = kk_vti_pipeline(dev, lib, @"vti_y", MTLPixelFormatR8Unorm);
++                  s->p_c = kk_vti_pipeline(dev, lib, @"vti_c", MTLPixelFormatRG8Unorm);
++                  s->p_out = kk_vti_pipeline(dev, lib, @"vti_rgb", layer_format);
++                  ok = s->p_y && s->p_c && s->p_out;
++               } else if (lib) {
++                  s->p_in = kk_vti_pipeline(dev, lib, @"vti_copy", s->src_t[0][0].pixelFormat);
++                  s->p_out = kk_vti_pipeline(dev, lib, @"vti_copy", layer_format);
++                  ok = s->p_in && s->p_out;
++               } else ok = 0;
++               [lib release];
++               if (!ok) { snprintf(why, why_n, "the conversion passes did not compile: %s", err ? err.localizedDescription.UTF8String : "no pipeline"); break; }
++            }
++            KK_VTI_LOG("session ready: %ux%u, up to %d picture(s) between two frames, pixel format '%s'%s, the model loaded in %.0f ms\n",
++                       w, h, s->frames, kk_vti_fourcc(fourcc, four),
++                       s->planar ? " (the picture is converted to it and back)" : s->blit_in ? "" : " (the picture is copied through a pass)",
++                       (t1.tv_sec - t0.tv_sec) * 1e3 + (t1.tv_nsec - t0.tv_nsec) / 1e6);
++         } while (0);
++         [proc release]; [config release];
++      }
++   } else
++#endif
++   snprintf(why, why_n, "VideoToolbox frame interpolation needs iOS 26 on a device");
++   (void)dev; (void)w; (void)h; (void)frames; (void)i;
++   if (s && !ok) { kk_vti_close(s); s = NULL; }
++   if (!s && !why[0]) snprintf(why, why_n, "out of memory");
++   return s;
++}
++/* The game's thread: a session for this size is wanted and none is there or being made. */
++static void kk_vti_kick(id<MTLDevice> dev, unsigned w, unsigned h, unsigned long fmt) {
++   int expect = atomic_load_explicit(&g_kk_vti.state, memory_order_relaxed), frames = kk_vti_want();
++   if (expect == 1) return;
++   if (expect != 0 && atomic_load_explicit(&g_kk_vti.w, memory_order_relaxed) == w && atomic_load_explicit(&g_kk_vti.h, memory_order_relaxed) == h &&
++       atomic_load_explicit(&g_kk_vti.fmt, memory_order_relaxed) == fmt)
++      return;   /* ready, or not possible, for this very size */
++   if (atomic_load_explicit(&g_kk_vti.attempts, memory_order_relaxed) >= 6) return;   /* a game that keeps changing its size */
++   if (!atomic_compare_exchange_strong(&g_kk_vti.state, &expect, 1)) return;
++   atomic_fetch_add_explicit(&g_kk_vti.attempts, 1, memory_order_relaxed);
++   atomic_store_explicit(&g_kk_vti.w, w, memory_order_relaxed);
++   atomic_store_explicit(&g_kk_vti.h, h, memory_order_relaxed);
++   atomic_store_explicit(&g_kk_vti.fmt, fmt, memory_order_relaxed);
++   [dev retain];
++   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
++      char why[220];
++      struct kk_vti_session *s = kk_vti_open(dev, w, h, fmt, frames, why, sizeof why), *old = NULL;
++      [dev release];
++      if (!kk_vti_lock()) { kk_vti_release(s); atomic_store_explicit(&g_kk_vti.state, -1, memory_order_relaxed); return; }
++      if (s && atomic_load_explicit(&g_kk_vti.live, memory_order_relaxed) == 0) {   /* switched off while the model loaded */
++         atomic_store_explicit(&g_kk_vti.state, 0, memory_order_relaxed);
++         pthread_mutex_unlock(&g_kk_vti_mu);
++         kk_vti_release(s);
++         return;
++      }
++      old = g_kk_vti.s;
++      g_kk_vti.s = s;
++      if (!s) {
++         snprintf(g_kk_vti.why, sizeof g_kk_vti.why, "%s", why);
++         KK_VTI_LOG("no extra pictures: %s\n", why);
++      }
++      atomic_store_explicit(&g_kk_vti.state, s ? 2 : -1, memory_order_relaxed);
++      pthread_mutex_unlock(&g_kk_vti_mu);
++      kk_vti_release(old);
++   });
++}
++
++/* The worker: the pictures between frame `prev` and frame `src` of the ring. Returns how many (0: none). */
++static int kk_vti_run(struct kk_vti_session *s, int prev, long long prev_us, int src, long long us, int n) {
++   int made = 0;
++#if KK_VTI_BUILT
++   if (KK_VTI_AVAILABLE) {
++      static const double phase1[1] = { 0.5 }, phase3[3] = { 0.25, 0.5, 0.75 };
++      const double *phase = n >= 3 ? phase3 : phase1;
++      NSMutableArray<NSNumber *> *phases = [NSMutableArray array];
++      NSMutableArray<VTFrameProcessorFrame *> *dests = [NSMutableArray array];
++      VTFrameProcessorFrame *sf, *pf;
++      VTLowLatencyFrameInterpolationParameters *params = nil;
++      NSError *err = nil;
++      struct timespec t0, t1;
++      int i, ok;
++      n = n >= 3 ? 3 : 1;
++      if (us <= prev_us + n) us = prev_us + n + 1;   /* times that go forwards, with room for the pictures between */
++      sf = [[[VTFrameProcessorFrame alloc] initWithBuffer:s->src[src] presentationTimeStamp:CMTimeMake(us, 1000000)] autorelease];
++      pf = [[[VTFrameProcessorFrame alloc] initWithBuffer:s->src[prev] presentationTimeStamp:CMTimeMake(prev_us, 1000000)] autorelease];
++      for (i = 0; i < n; i++) {
++         long long at = prev_us + (long long)((double)(us - prev_us) * phase[i]);
++         VTFrameProcessorFrame *df = [[[VTFrameProcessorFrame alloc] initWithBuffer:s->dst[i] presentationTimeStamp:CMTimeMake(at, 1000000)] autorelease];
++         if (df) { [dests addObject:df]; [phases addObject:@((float)phase[i])]; }
++      }
++      if (sf && pf && (int)dests.count == n)
++         params = [[[VTLowLatencyFrameInterpolationParameters alloc] initWithSourceFrame:sf previousFrame:pf interpolationPhase:phases
++                                                                      destinationFrames:dests] autorelease];
++      clock_gettime(CLOCK_MONOTONIC, &t0);
++      ok = params && [(VTFrameProcessor *)s->proc processWithParameters:params error:&err];
++      clock_gettime(CLOCK_MONOTONIC, &t1);
++      if (!ok) {
++         unsigned long long e = atomic_fetch_add_explicit(&g_kk_vti.errors, 1, memory_order_relaxed) + 1;
++         s->errors++;
++         if (e <= 3 || (e % 256) == 0)
++            KK_VTI_LOG("VideoToolbox made no picture (%s; %llu so far)\n",
++                       err ? err.localizedDescription.UTF8String : params ? "no reason given" : "the frames were not accepted", e);
++         return 0;
++      }
++      s->errors = 0;
++      atomic_fetch_add_explicit(&g_kk_vti.pairs, 1, memory_order_relaxed);
++      atomic_fetch_add_explicit(&g_kk_vti.vt_us, (unsigned long long)kk_vti_us_between(t0, t1), memory_order_relaxed);
++      made = n;
++   }
++#endif
++   (void)s; (void)prev; (void)prev_us; (void)src; (void)us;
++   return made;
++}
++/* The worker, once a second: the numbers the menu shows, and a line in the log every ten seconds. */
++static void kk_vti_report(uint64_t now_abs, int generated) {
++   double secs;
++   g_kk_vti.stat_frames++;
++   g_kk_vti.stat_generated += (unsigned long long)generated;
++   if (!g_kk_vti.stat_abs) { g_kk_vti.stat_abs = now_abs; g_kk_vti.stat_frames = 0; g_kk_vti.stat_generated = 0; return; }
++   secs = (double)kk_vti_abs_ns(now_abs - g_kk_vti.stat_abs) / 1e9;
++   if (secs < 1.0) return;
++   {
++      static unsigned long long last_pairs, last_vt, last_wait, last_waits;
++      static unsigned lines;
++      unsigned long long pairs = atomic_load_explicit(&g_kk_vti.pairs, memory_order_relaxed), vt = atomic_load_explicit(&g_kk_vti.vt_us, memory_order_relaxed),
++                         wait = atomic_load_explicit(&g_kk_vti.wait_us, memory_order_relaxed), dp = pairs - last_pairs,
++                         waits = atomic_load_explicit(&g_kk_vti.waits, memory_order_relaxed), dw = waits - last_waits;
++      g_kk_vti.game_fps = g_kk_vti.stat_frames / secs;
++      g_kk_vti.generated_fps = g_kk_vti.stat_generated / secs;
++      g_kk_vti.pair_ms = dp ? (double)(vt - last_vt) / 1000.0 / (double)dp : 0.0;
++      if ((lines++ % 10) == 0)
++         KK_VTI_LOG("%.1f s: game %.1f fps, pictures %.1f/s, VideoToolbox %.1f ms a pair, %.1f ms from a present to its frame done on the GPU, "
++                    "screen %d Hz | so far: %llu pictures, skipped: screen cannot show them %llu, worker busy %llu, no drawable %llu, errors %llu\n",
++                    secs, g_kk_vti.game_fps, g_kk_vti.generated_fps, g_kk_vti.pair_ms, dw ? (double)(wait - last_wait) / 1000.0 / (double)dw : 0.0,
++                    atomic_load_explicit(&g_kk_vti.hz, memory_order_relaxed),
++                    atomic_load_explicit(&g_kk_vti.generated, memory_order_relaxed), atomic_load_explicit(&g_kk_vti.skip_rate, memory_order_relaxed),
++                    atomic_load_explicit(&g_kk_vti.skip_busy, memory_order_relaxed), atomic_load_explicit(&g_kk_vti.no_drawable, memory_order_relaxed),
++                    atomic_load_explicit(&g_kk_vti.errors, memory_order_relaxed));
++      last_pairs = pairs; last_vt = vt; last_wait = wait; last_waits = waits;
++   }
++   g_kk_vti.stat_abs = now_abs; g_kk_vti.stat_frames = 0; g_kk_vti.stat_generated = 0;
++}
++/* MADEIRA_KK_VTI_SELFTEST=1 (BCD's host check only): after each picture the worker reads back the middle row of the two
++ * source frames and of the drawable it drew, finds a bright bar in each and logs where, so the check can tell that the
++ * picture lies between its two frames and that its colours survived the conversions. Nothing of it runs without the
++ * variable. */
++static int kk_vti_selftest(void) {
++   static int on = -1;
++   if (on < 0) { const char *e = getenv("MADEIRA_KK_VTI_SELFTEST"); on = e && e[0] == '1'; }
++   return on;
++}
++/* The centre of the bright run in one row of 8-bit samples `step` bytes apart, or -1; *hi: the brightest sample inside
++ * the run, *lo: the brightest one more than 8 samples away from it (the background, without the bar's soft edges). */
++static double kk_vti_row_bar(const uint8_t *row, unsigned w, unsigned step, unsigned *hi, unsigned *lo) {
++   unsigned x, n = 0, first = 0, last = 0;
++   double sum = 0;
++   *hi = 0; *lo = 0;
++   for (x = 0; x < w; x++) {
++      unsigned v = row[(size_t)x * step];
++      if (v > 128) { if (!n) first = x; last = x; n++; sum += x; if (v > *hi) *hi = v; }
++   }
++   for (x = 0; x < w; x++) {
++      unsigned v = row[(size_t)x * step];
++      if (n && x + 8 >= first && x <= last + 8) continue;
++      if (v > *lo) *lo = v;
++   }
++   return n ? sum / n : -1.0;
++}
++static double kk_vti_buffer_bar(CVPixelBufferRef pb) {
++   unsigned hi, lo;
++   double c = -1;
++   if (CVPixelBufferLockBaseAddress(pb, kCVPixelBufferLock_ReadOnly) != kCVReturnSuccess) return -1;
++   if (CVPixelBufferIsPlanar(pb)) {
++      size_t h = CVPixelBufferGetHeightOfPlane(pb, 0), bpr = CVPixelBufferGetBytesPerRowOfPlane(pb, 0);
++      const uint8_t *base = CVPixelBufferGetBaseAddressOfPlane(pb, 0);
++      if (base) c = kk_vti_row_bar(base + (h / 2) * bpr, (unsigned)CVPixelBufferGetWidthOfPlane(pb, 0), 1, &hi, &lo);
++   } else {
++      size_t h = CVPixelBufferGetHeight(pb), bpr = CVPixelBufferGetBytesPerRow(pb);
++      const uint8_t *base = CVPixelBufferGetBaseAddress(pb);
++      if (base) c = kk_vti_row_bar(base + (h / 2) * bpr + 1, (unsigned)CVPixelBufferGetWidth(pb), 4, &hi, &lo);   /* G */
++   }
++   CVPixelBufferUnlockBaseAddress(pb, kCVPixelBufferLock_ReadOnly);
++   return c;
++}
++static void kk_vti_selftest_drawn(id<MTLCommandQueue> queue, id<MTLTexture> target, struct kk_vti_session *s, int prev, int src, int i, int n) {
++   @autoreleasepool {
++      unsigned w = (unsigned)target.width, h = (unsigned)target.height, hi, lo;
++      MTLTextureDescriptor *td = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:target.pixelFormat width:w height:1 mipmapped:NO];
++      td.storageMode = MTLStorageModeShared;
++      id<MTLTexture> row = [[queue.device newTextureWithDescriptor:td] autorelease];
++      id<MTLCommandBuffer> cb = [queue commandBuffer];
++      id<MTLBlitCommandEncoder> b = [cb blitCommandEncoder];
++      uint8_t *px = malloc((size_t)w * 4);
++      double c;
++      [b copyFromTexture:target sourceSlice:0 sourceLevel:0 sourceOrigin:MTLOriginMake(0, h / 2, 0) sourceSize:MTLSizeMake(w, 1, 1)
++               toTexture:row destinationSlice:0 destinationLevel:0 destinationOrigin:MTLOriginMake(0, 0, 0)];
++      [b endEncoding];
++      [cb commit];
++      [cb waitUntilCompleted];
++      [row getBytes:px bytesPerRow:w * 4 fromRegion:MTLRegionMake2D(0, 0, w, 1) mipmapLevel:0];
++      c = kk_vti_row_bar(px + 1, w, 4, &hi, &lo);
++      free(px);
++      KK_VTI_LOG("selftest: picture %d/%d bar at %.1f between %.1f and %.1f, bar %u, background %u\n",
++                 i + 1, n, c, kk_vti_buffer_bar(s->src[prev]), kk_vti_buffer_bar(s->src[src]), hi, lo);
++   }
++}
++
++/* MADEIRA_KK_VTI_SELFTEST=1 with Lossless Scaling: the middle row of a drawable a frame the passes made was drawn into, its
++ * bright bar and the game's frame it goes before (BCD's host check knows where that frame's bar is). */
++static void kk_vti_selftest_lsfg(id<MTLCommandQueue> queue, id<MTLTexture> target, int i, int n, uint64_t frame) {
++   @autoreleasepool {
++      unsigned w = (unsigned)target.width, h = (unsigned)target.height, hi, lo, x, wide = 0;
++      MTLTextureDescriptor *td = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:target.pixelFormat width:w height:1 mipmapped:NO];
++      td.storageMode = MTLStorageModeShared;
++      id<MTLTexture> row = [[queue.device newTextureWithDescriptor:td] autorelease];
++      id<MTLCommandBuffer> cb = [queue commandBuffer];
++      id<MTLBlitCommandEncoder> b = [cb blitCommandEncoder];
++      uint8_t *px = malloc((size_t)w * 4);
++      double c;
++      [b copyFromTexture:target sourceSlice:0 sourceLevel:0 sourceOrigin:MTLOriginMake(0, h / 2, 0) sourceSize:MTLSizeMake(w, 1, 1)
++               toTexture:row destinationSlice:0 destinationLevel:0 destinationOrigin:MTLOriginMake(0, 0, 0)];
++      [b endEncoding];
++      [cb commit];
++      [cb waitUntilCompleted];
++      [row getBytes:px bytesPerRow:w * 4 fromRegion:MTLRegionMake2D(0, 0, w, 1) mipmapLevel:0];
++      c = kk_vti_row_bar(px + 1, w, 4, &hi, &lo);
++      for (x = 0; x < w; x++) wide += px[(size_t)x * 4 + 1] > 128;   /* a blend of two frames shows two bars, motion one */
++      free(px);
++      KK_VTI_LOG("selftest: lsfg picture %d/%d before frame %llu bar at %.1f, %u wide, bar %u, background %u\n", i + 1, n,
++                 (unsigned long long)frame, c, wide, hi, lo);
++   }
++}
++
++/* ---- stand-ins: while the key is set, the game draws into these, never into the layer's own drawables ----
++ *
++ * A layer has at most three drawables, and one of them is on the screen. A worker that takes another drawable for a
++ * picture while the game holds one and has handed over the next one has to wait for one that is not coming: on the
++ * owner's iPhone (build 703) X-Plane 12 fell from 60 to 3.6 FPS with the pictures on, its frames waiting in
++ * nextDrawable. So with the key the game never takes a drawable: KosmicKrisp's swapchain image is copied into one of
++ * three textures of this module's own (a stand-in, which answers `texture` like a drawable), and only the worker takes
++ * the layer's drawables, one at a time, for each picture and for the game's own frame, which is copied as it is. */
++@interface KKVTIStandIn : NSObject {
++@public
++   id<MTLTexture> _texture;
++   CAMetalLayer *_layer;         /* retained */
++   void *_ring;                  /* the ring it belongs to (a KKVTIRing, retained) */
++   int _slot;
++   _Atomic int _state;           /* 0 free, 1 with the game, 2 with the worker */
++}
++- (id<MTLTexture>)texture;
++@end
++@implementation KKVTIStandIn
++- (id<MTLTexture>)texture { return _texture; }
++- (void)dealloc {
++   [_texture release];
++   [_layer release];
++   [(id)_ring release];
++   [super dealloc];
++}
++@end
++
++/* Three stand-ins for one layer, one size and one format, and the residency set that keeps them resident on the device's
++ * Metal 4 queue. */
++@interface KKVTIRing : NSObject {
++@public
++   void *_layer;                 /* compared, never dereferenced */
++   unsigned _w, _h;
++   unsigned long _fmt;
++   KKVTIStandIn *_slots[3];
++   id _set;                      /* id<MTLResidencySet> */
++   pthread_mutex_t _mu;
++   pthread_cond_t _cv;
++}
++@end
++@implementation KKVTIRing
++- (instancetype)init {
++   if ((self = [super init])) { pthread_mutex_init(&_mu, NULL); pthread_cond_init(&_cv, NULL); }
++   return self;
++}
++- (void)dealloc {
++   [_set release];
++   pthread_cond_destroy(&_cv);
++   pthread_mutex_destroy(&_mu);
++   [super dealloc];
++}
++@end
++
++static pthread_mutex_t g_kk_vti_ring_mu = PTHREAD_MUTEX_INITIALIZER;
++static KKVTIRing *g_kk_vti_ring;   /* the ring of the followed layer (under g_kk_vti_ring_mu) */
++
++static void kk_vti_slot_free(KKVTIStandIn *st) {
++   KKVTIRing *ring = (KKVTIRing *)st->_ring;
++   pthread_mutex_lock(&ring->_mu);
++   atomic_store_explicit(&st->_state, 0, memory_order_release);
++   pthread_cond_broadcast(&ring->_cv);
++   pthread_mutex_unlock(&ring->_mu);
++}
++
++/* A ring for this layer at this size and format, made on the game's thread (three textures, a residency set added to
++ * the Metal 4 queue). NULL when it cannot be made; the reason is logged once. */
++static KKVTIRing *kk_vti_ring_make(id q4, CAMetalLayer *layer, unsigned w, unsigned h, unsigned long fmt) {
++   id<MTLDevice> dev = layer.device;
++   KKVTIRing *ring;
++   int i;
++   if (!dev) return nil;
++   ring = [[KKVTIRing alloc] init];
++   ring->_layer = (void *)layer; ring->_w = w; ring->_h = h; ring->_fmt = fmt;
++   for (i = 0; i < 3; i++) {
++      MTLTextureDescriptor *d = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:(MTLPixelFormat)fmt width:w height:h mipmapped:NO];
++      KKVTIStandIn *st;
++      d.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite | MTLTextureUsageRenderTarget;
++      d.storageMode = MTLStorageModePrivate;
++      st = [[KKVTIStandIn alloc] init];
++      st->_texture = [dev newTextureWithDescriptor:d];
++      st->_layer = [layer retain];
++      st->_ring = [ring retain];
++      st->_slot = i;
++      atomic_store_explicit(&st->_state, 0, memory_order_relaxed);
++      ring->_slots[i] = st;   /* the ring keeps no reference: each stand-in keeps the ring */
++      if (!st->_texture) { KK_VTI_LOG("no texture of %ux%u for a stand-in: the game draws into the layer's drawables\n", w, h); goto fail; }
++   }
++   if (q4) {
++      /* Metal 4 makes nothing resident on its own: the device's queue writes the stand-ins, so they go into a residency set
++       * on it (the layer's drawables have the layer's own set, which KosmicKrisp adds) */
++      SEL add = @selector(addResidencySet:);
++      if (![dev respondsToSelector:@selector(newResidencySetWithDescriptor:error:)] || ![q4 respondsToSelector:add]) {
++         KK_VTI_LOG("no residency sets here: the game draws into the layer's drawables\n");
++         goto fail;
++      }
++      MTLResidencySetDescriptor *rd = [[[MTLResidencySetDescriptor alloc] init] autorelease];
++      NSError *err = nil;
++      id<MTLResidencySet> set;
++      rd.initialCapacity = 3;
++      rd.label = @"madeira kk-vt-interp stand-ins";
++      set = [dev newResidencySetWithDescriptor:rd error:&err];
++      if (!set) { KK_VTI_LOG("no residency set for the stand-ins (%s)\n", err ? err.localizedDescription.UTF8String : "no reason given"); goto fail; }
++      for (i = 0; i < 3; i++) [set addAllocation:ring->_slots[i]->_texture];
++      [set commit];
++      [set requestResidency];
++      ((void (*)(id, SEL, id))objc_msgSend)(q4, add, set);
++      ring->_set = set;
++   }
++   KK_VTI_LOG("stand-ins for layer %p: three %ux%u textures (Metal format %lu); the worker takes the layer's drawables\n", (void *)layer, w, h, fmt);
++   return ring;   /* one reference, the caller's */
++fail:
++   for (i = 0; i < 3; i++) [ring->_slots[i] release];
++   [ring release];
++   return nil;
++}
++
++bool
++wsi_metal_vti_is_stand_in(void *drawable)
++{
++   return drawable && [(id)drawable isKindOfClass:[KKVTIStandIn class]];
++}
++
++void *
++wsi_metal_vti_acquire(void *mtl4_queue, const void *metal_layer, unsigned width, unsigned height, int *status)
++{
++   *status = 0;
++   if (!wsi_metal_vti_wanted() || !metal_layer || width < 640 || height < 360) return NULL;
++   @autoreleasepool {
++      CAMetalLayer *layer = (CAMetalLayer *)metal_layer;
++      unsigned long fmt = (unsigned long)layer.pixelFormat;
++      void *followed = atomic_load_explicit(&g_kk_vti.layer, memory_order_relaxed);
++      uint64_t now = mach_absolute_time();
++      KKVTIRing *ring;
++      KKVTIStandIn *st = nil;
++      struct timespec until;
++      int linear, i;
++      if (layer.framebufferOnly || !kk_vti_layer_format(fmt, &linear)) return NULL;   /* a swapchain made before the key, or a format the passes do not take */
++      if (followed != (void *)layer) {
++         /* one layer is followed: the first with a picture of 640x360 or more, until it has not presented for two seconds */
++         uint64_t seen = atomic_load_explicit(&g_kk_vti.layer_abs, memory_order_relaxed);
++         if (followed && kk_vti_abs_ns(now - seen) < 2000000000ull) return NULL;
++         atomic_store_explicit(&g_kk_vti.layer, (void *)layer, memory_order_relaxed);
++         g_kk_vti.last_abs = 0;
++         KK_VTI_LOG("follows layer %p (%ux%u, Metal format %lu)\n", (void *)layer, width, height, fmt);
++      }
++      atomic_store_explicit(&g_kk_vti.layer_abs, now, memory_order_relaxed);
++      pthread_mutex_lock(&g_kk_vti_ring_mu);
++      ring = g_kk_vti_ring;
++      if (!ring || ring->_layer != (void *)layer || ring->_w != width || ring->_h != height || ring->_fmt != fmt) {
++         static int refused;
++         KKVTIRing *made = refused >= 3 ? nil : kk_vti_ring_make((id)mtl4_queue, layer, width, height, fmt);
++         if (!made) {
++            refused++;
++            pthread_mutex_unlock(&g_kk_vti_ring_mu);
++            return NULL;
++         }
++         if (ring) {   /* the old ring's stand-ins still with the worker keep it; the ring itself goes with its last one */
++            for (i = 0; i < 3; i++) [ring->_slots[i] release];
++            [ring release];
++         }
++         g_kk_vti_ring = ring = made;
++      }
++      [ring retain];
++      pthread_mutex_unlock(&g_kk_vti_ring_mu);
++      /* a free stand-in, waiting at most a second for the worker to give one back (as nextDrawable waits for a drawable) */
++      clock_gettime(CLOCK_REALTIME, &until);
++      until.tv_sec += 1;
++      pthread_mutex_lock(&ring->_mu);
++      for (;;) {
++         for (i = 0; i < 3 && !st; i++) {
++            int expect = 0;
++            if (atomic_compare_exchange_strong(&ring->_slots[i]->_state, &expect, 1)) st = ring->_slots[i];
++         }
++         if (st || pthread_cond_timedwait(&ring->_cv, &ring->_mu, &until) == ETIMEDOUT) break;
++      }
++      pthread_mutex_unlock(&ring->_mu);
++      if (!st) {
++         static unsigned waits;
++         if (++waits <= 4 || (waits % 64) == 0)
++            KK_VTI_LOG("every stand-in is still with the worker after a second (#%u)\n", waits);
++         *status = -1;
++         [ring release];
++         return NULL;
++      }
++      [st retain];
++      [ring release];
++      *status = 1;
++      return st;
++   }
++}
++
++void
++wsi_metal_vti_unpresented(void *drawable)
++{
++   if (!wsi_metal_vti_is_stand_in(drawable)) return;
++   KKVTIStandIn *st = (KKVTIStandIn *)drawable;
++   if (atomic_load_explicit(&st->_state, memory_order_acquire) == 1) kk_vti_slot_free(st);   /* given back without a present */
++}
++
++/* The app's ring of frames made (BCD's BCDFrameRing.c, bcd_frame_made_push_n): the in-game HUD writes them after the game's rate
++ * ("15+15"), apart from its frame times. Looked up in the process once (the app exports it; the driver does not link the app); not
++ * there (a host check, another app), nothing happens. */
++static void kk_vti_made(unsigned n) {
++   static void (*push)(uint32_t);
++   static dispatch_once_t once;
++   dispatch_once(&once, ^{ push = (void (*)(uint32_t))dlsym(RTLD_DEFAULT, "bcd_frame_made_push_n"); });
++   if (n && push) push(n);
++}
++
++/* ---- the hand-over: frames reach the worker once their picture is on the GPU, in the order of their presents ----
++ * A frame with a copy into a source buffer is ready when that copy completed (its completion handler); one without
++ * (no session yet, or the menu's switch is off) is ready at once, as its present waits for the device's queue on the
++ * GPU, and still goes after the frames before it. */
++@interface KKVTIJob : NSObject {
++@public
++   void (^_run)(void);
++   uint64_t _abs;                /* when the game presented it */
++   _Atomic int _ready;
++}
++@end
++@implementation KKVTIJob
++- (void)dealloc {
++   [_run release];
++   [super dealloc];
++}
++@end
++static pthread_mutex_t g_kk_vti_jobs_mu = PTHREAD_MUTEX_INITIALIZER;
++static NSMutableArray *g_kk_vti_jobs;   /* the frames handed over and not yet with the worker, oldest first (under g_kk_vti_jobs_mu) */
++static id<MTLCommandBuffer> g_kk_vti_last_out;   /* the worker: the command buffer of the last picture */
++
++/* On the worker: every frame at the head that is ready, oldest first. */
++static void kk_vti_drain(void) {
++   for (;;) {
++      KKVTIJob *j = nil;
++      int behind = 0;
++      NSUInteger i;
++      pthread_mutex_lock(&g_kk_vti_jobs_mu);
++      if (g_kk_vti_jobs.count && atomic_load_explicit(&((KKVTIJob *)g_kk_vti_jobs[0])->_ready, memory_order_acquire)) {
++         j = [g_kk_vti_jobs[0] retain];
++         [g_kk_vti_jobs removeObjectAtIndex:0];
++         for (i = 0; i < g_kk_vti_jobs.count && atomic_load_explicit(&((KKVTIJob *)g_kk_vti_jobs[i])->_ready, memory_order_acquire); i++)
++            behind++;
++      }
++      pthread_mutex_unlock(&g_kk_vti_jobs_mu);
++      if (!j) return;
++      g_kk_vti.backlog = behind;
++      j->_run();
++      [j release];
++   }
++}
++/* A frame is ready for the worker (any thread). gpu: it waited for its copy, which says how far behind the GPU is. */
++static void kk_vti_ready(KKVTIJob *j, int gpu) {
++   if (gpu) {
++      atomic_fetch_add_explicit(&g_kk_vti.wait_us, kk_vti_abs_ns(mach_absolute_time() - j->_abs) / 1000, memory_order_relaxed);
++      atomic_fetch_add_explicit(&g_kk_vti.waits, 1, memory_order_relaxed);
++   }
++   atomic_store_explicit(&j->_ready, 1, memory_order_release);
++   dispatch_async(kk_vti_worker(), ^{ kk_vti_drain(); });
++}
++
++/* The worker: one frame of the game in stand-in `st`. s (may be NULL), copy, prev..us: what the game's thread prepared for the
++ * pictures; wait_value: the event value after which the stand-in holds the game's picture (0: none to wait for). The game's
++ * frame is always presented here, last, from a drawable of its own, and the stand-in given back. */
++static void kk_vti_job(id<MTLCommandQueue> queue, KKVTIStandIn *st, id<MTLSharedEvent> event, uint64_t wait_value,
++                       struct kk_vti_session *s, id<MTLCommandBuffer> copy, int has_prev, int prev, long long prev_us, int src,
++                       long long us, double dt, void (*handler)(void *, uint64_t), void *info, uint64_t present_id, int lsfg) {
++   @autoreleasepool {
++      CAMetalLayer *layer = st->_layer;
++      int n = 0, made = 0, shown = 0, i;
++      if (s && copy && has_prev) {
++         int backlog = g_kk_vti.backlog;
++         n = kk_vti_count(s->frames, dt, atomic_load_explicit(&g_kk_vti.hz, memory_order_relaxed), backlog);
++         if (!n) atomic_fetch_add_explicit(backlog > 0 ? &g_kk_vti.skip_busy : &g_kk_vti.skip_rate, 1, memory_order_relaxed);
++      }
++      if (n) {
++         [copy waitUntilCompleted];   /* done already: the frame came to the worker from its completion handler */
++         if (g_kk_vti_last_out) [g_kk_vti_last_out waitUntilCompleted];   /* the processor writes the buffers the last pictures were read from */
++         if (copy.status == MTLCommandBufferStatusError) {
++            atomic_store_explicit(&s->reset, 1, memory_order_relaxed);
++         } else {
++            made = kk_vti_run(s, prev, prev_us, src, us, n);
++            if (!made && s->errors >= 3 && atomic_load_explicit(&g_kk_vti.state, memory_order_relaxed) == 2) {
++               if (kk_vti_lock()) {
++                  snprintf(g_kk_vti.why, sizeof g_kk_vti.why, "VideoToolbox failed three times in a row");
++                  pthread_mutex_unlock(&g_kk_vti_mu);
++               }
++               KK_VTI_LOG("three errors in a row: no more extra pictures in this session\n");
++               atomic_store_explicit(&g_kk_vti.attempts, 1000, memory_order_relaxed);
++               kk_vti_drop(-1);
++            }
++         }
++      }
++      {
++         double now = CACurrentMediaTime(), base = now < g_kk_vti.next_free ? g_kk_vti.next_free : now, due;
++         id<CAMetalDrawable> d;
++         id<MTLCommandBuffer> g, reads = nil;
++         __unsafe_unretained id<MTLTexture> lsfg_out[3] = { nil, nil, nil };
++         unsigned pw = s ? s->w : (unsigned)st->_texture.width, ph = s ? s->h : (unsigned)st->_texture.height;
++         if (lsfg)   /* Lossless Scaling's frames instead of VideoToolbox's pictures (reads: the passes' command buffer) */
++            made = (int)wsi_metal_lsfg_run(queue, st->_texture, layer.pixelFormat, dt, atomic_load_explicit(&g_kk_vti.hz, memory_order_relaxed),
++                                           g_kk_vti.backlog, lsfg_out, &reads);
++         /* the pictures, each from a drawable and a command buffer of its own; nothing else takes the layer's drawables */
++         for (i = 0; i < made; i++) {
++            double at = base + kk_vti_offset(i + 1, made, dt);
++            d = [layer nextDrawable];
++            if (!d) { atomic_fetch_add_explicit(&g_kk_vti.no_drawable, 1, memory_order_relaxed); break; }
++            if (d.texture.width != pw || d.texture.height != ph)
++               break;   /* the layer was resized: no pictures until the swapchain is (the unused drawable goes back with the pool) */
++            g = [queue commandBuffer];
++            if (!g) break;
++            if (lsfg) {
++               wsi_metal_lsfg_show(g, lsfg_out[i], d.texture);
++               if (kk_vti_selftest()) {
++                  [g commit];
++                  [g waitUntilCompleted];
++                  kk_vti_selftest_lsfg(queue, d.texture, i, made, present_id);
++                  g = [queue commandBuffer];
++               }
++            } else {
++               kk_vti_encode_out(g, s, i, d.texture);
++               if (kk_vti_selftest()) {   /* read back before it is presented */
++                  [g commit];
++                  [g waitUntilCompleted];
++                  kk_vti_selftest_drawn(queue, d.texture, s, prev, src, i, made);
++                  g = [queue commandBuffer];
++               }
++            }
++            if (at <= CACurrentMediaTime()) [g presentDrawable:d]; else [g presentDrawable:d atTime:at];
++            [g commit];
++            if (!lsfg) {
++               [g_kk_vti_last_out release];
++               g_kk_vti_last_out = [g retain];
++            }
++            shown++;
++         }
++         /* the game's own frame last, copied as it is; never before the frame the worker scheduled last */
++         due = shown ? base + kk_vti_offset(made + 1, made, dt) : base;
++         d = [layer nextDrawable];
++         g = d ? [queue commandBuffer] : nil;
++         if (g) {
++            if (wait_value) [g encodeWaitForEvent:event value:wait_value];   /* reads of the stand-in after the game's copy into it */
++            kk_vti_copy(g, st->_texture, d.texture);
++            if (handler) {
++               [d addPresentedHandler:^(id<MTLDrawable> shown_drawable) { (void)shown_drawable; handler(info, present_id); }];
++               handler = NULL;
++            }
++            if (due > CACurrentMediaTime()) [g presentDrawable:d atTime:due]; else [g presentDrawable:d];
++            [st retain];
++            [copy retain];
++            [reads retain];
++            [g addCompletedHandler:^(id<MTLCommandBuffer> done) {
++               (void)done;
++               if (copy) [copy waitUntilCompleted];   /* the pixel buffer's copy read the stand-in too */
++               if (reads) [reads waitUntilCompleted];   /* and Lossless Scaling's passes */
++               kk_vti_slot_free(st);
++               [copy release];
++               [reads release];
++               [st release];
++            }];
++            [g commit];
++         } else {
++            atomic_fetch_add_explicit(&g_kk_vti.no_drawable, 1, memory_order_relaxed);
++            if (copy) [copy waitUntilCompleted];
++            if (reads) [reads waitUntilCompleted];
++            kk_vti_slot_free(st);   /* the frame is lost; its stand-in goes back */
++         }
++         if (handler) handler(info, present_id);   /* no drawable for the frame: a present wait must not hang */
++         g_kk_vti.next_free = due > CACurrentMediaTime() ? due : 0.0;
++         atomic_fetch_add_explicit(&g_kk_vti.frames, 1, memory_order_relaxed);
++         atomic_fetch_add_explicit(&g_kk_vti.generated, (unsigned long long)shown, memory_order_relaxed);
++         kk_vti_made((unsigned)shown);   /* VideoToolbox's pictures or Lossless Scaling's frames, for the HUD's "+N" */
++         if (!lsfg) kk_vti_report(mach_absolute_time(), shown);   /* Lossless Scaling's passes report on their own */
++         [reads release];
++      }
++      [st release];
++      [copy release];
++      kk_vti_release(s);
++      atomic_fetch_sub_explicit(&g_kk_vti.outstanding, 1, memory_order_release);
++   }
++}
++
++/* The module's queue and event for the device of these drawables (the first device seen; another gets none). */
++static int kk_vti_gpu(id<MTLDevice> dev, id<MTLCommandQueue> *queue, id<MTLCommandQueue> *out, id<MTLSharedEvent> *event) {
++   int ok;
++   pthread_mutex_lock(&g_kk_vti_gpu.mu);
++   if (!g_kk_vti_gpu.device && dev) {
++      g_kk_vti_gpu.device = [dev retain];
++      g_kk_vti_gpu.queue = [dev newCommandQueue];
++      g_kk_vti_gpu.queue.label = @"madeira kk-vt-interp";
++      g_kk_vti_gpu.out = [dev newCommandQueue];
++      g_kk_vti_gpu.out.label = @"madeira kk-vt-interp out";
++      g_kk_vti_gpu.event = [dev newSharedEvent];
++   }
++   ok = g_kk_vti_gpu.device == dev && g_kk_vti_gpu.queue && g_kk_vti_gpu.out && g_kk_vti_gpu.event;
++   *queue = ok ? g_kk_vti_gpu.queue : nil;
++   *out = ok ? g_kk_vti_gpu.out : nil;
++   *event = ok ? g_kk_vti_gpu.event : nil;
++   pthread_mutex_unlock(&g_kk_vti_gpu.mu);
++   return ok;
++}
++
++bool
++wsi_metal_vti_wanted(void)
++{
++   return kk_vti_want() != 0 || wsi_metal_lsfg_wanted();
++}
++
++void
++wsi_metal_vti_present(void *mtl4_queue, void *drawable_ptr, void (*handler)(void *, uint64_t), void *info, uint64_t present_id)
++{
++   @autoreleasepool {
++      KKVTIStandIn *st = (KKVTIStandIn *)drawable_ptr;
++      id<MTLTexture> picture = st->_texture;
++      id<MTLCommandQueue> queue = nil, out = nil;
++      id<MTLSharedEvent> event = nil;
++      struct kk_vti_session *s = NULL;
++      id<MTLCommandBuffer> copy = nil;
++      uint64_t now = mach_absolute_time(), wait_value = 0;
++      unsigned w = (unsigned)picture.width, h = (unsigned)picture.height;
++      unsigned long fmt = (unsigned long)picture.pixelFormat;
++      int on, gen = 0, has_prev = 0, prev = -1, src = -1, stall = 0, expect = 1, lsfg = wsi_metal_lsfg_wanted();
++      long long prev_us = 0, us = (long long)(kk_vti_abs_ns(now) / 1000);
++      double dt;
++      atomic_compare_exchange_strong(&st->_state, &expect, 2);
++      if (!kk_vti_gpu(picture.device, &queue, &out, &event)) {   /* cannot happen with one device; give the frame back unshown */
++         kk_vti_slot_free(st);
++         if (handler) handler(info, present_id);
++         return;
++      }
++      atomic_store_explicit(&g_kk_vti.layer_abs, now, memory_order_relaxed);
++      on = !lsfg && kk_vti_on();   /* Lossless Scaling's frames, or VideoToolbox's pictures: one of them */
++      if (on) kk_vti_kick(picture.device, w, h, fmt);
++      if (lsfg) kk_vti_learn_hz();
++      gen = on && atomic_load_explicit(&g_kk_vti.state, memory_order_relaxed) == 2;
++      /* the game's frame time */
++      dt = g_kk_vti.dt;
++      if (g_kk_vti.last_abs) {
++         double d = (double)kk_vti_abs_ns(now - g_kk_vti.last_abs) / 1e9;
++         if (d < 1.0 / 240.0) d = 1.0 / 240.0;
++         if (d > 0.25) { d = 0.25; stall = 1; }   /* a stall: the frame before is no neighbour of this one */
++         dt = dt > 0 ? dt * 0.8 + d * 0.2 : d;
++      } else stall = 1;
++      g_kk_vti.last_abs = now;
++      g_kk_vti.dt = dt;
++      /* the device's queue has committed the copy of the game's image into the stand-in: an event after it orders every read */
++      if (mtl4_queue && [(id)mtl4_queue respondsToSelector:@selector(signalEvent:value:)]) {
++         wait_value = ++g_kk_vti_gpu.value;
++         ((void (*)(id, SEL, id, uint64_t))objc_msgSend)((id)mtl4_queue, @selector(signalEvent:value:), event, wait_value);
++      }
++      if (gen && kk_vti_lock()) {
++         s = g_kk_vti.s;
++         /* a frame while KK_VTI_RING - 1 are with the worker would be written over a buffer one of them still reads (three
++          * stand-ins keep it to three) */
++         if (s && s->w == w && s->h == h && s->layer_fmt == fmt
++             && atomic_load_explicit(&g_kk_vti.outstanding, memory_order_acquire) <= KK_VTI_RING - 2) {
++            atomic_fetch_add_explicit(&s->refs, 1, memory_order_relaxed);
++            src = (s->g_last + 1) % KK_VTI_RING;
++            has_prev = s->g_valid && !stall && !atomic_exchange_explicit(&s->reset, 0, memory_order_relaxed);
++            prev = s->g_last; prev_us = s->g_us;
++            s->g_last = src; s->g_valid = 1; s->g_us = us;
++         } else {
++            if (s) s->g_valid = 0;
++            s = NULL;
++         }
++         pthread_mutex_unlock(&g_kk_vti_mu);
++      }
++      if (s) {   /* the picture into its buffer, after the device's queue has written the stand-in */
++         copy = [queue commandBuffer];
++         if (copy) {
++            [copy retain];
++            if (wait_value) [copy encodeWaitForEvent:event value:wait_value];
++            kk_vti_encode_in(copy, s, picture, src);
++         } else has_prev = 0;
++      } else if (lsfg) {   /* nothing to copy: the frame goes to the worker once the device's queue is past it */
++         copy = [queue commandBuffer];
++         if (copy) {
++            [copy retain];
++            if (wait_value) [copy encodeWaitForEvent:event value:wait_value];
++         }
++      }
++      atomic_fetch_add_explicit(&g_kk_vti.outstanding, 1, memory_order_acq_rel);
++      [st retain];
++      [out retain];
++      [event retain];
++      {
++         KKVTIJob *job = [[KKVTIJob alloc] init];
++         job->_abs = now;
++         job->_run = [^{
++            kk_vti_job(out, st, event, wait_value, s, copy, has_prev, prev, prev_us, src, us, dt, handler, info, present_id, lsfg);
++            [event release];
++            [out release];
++         } copy];
++         pthread_mutex_lock(&g_kk_vti_jobs_mu);
++         if (!g_kk_vti_jobs) g_kk_vti_jobs = [[NSMutableArray alloc] init];
++         [g_kk_vti_jobs addObject:job];
++         pthread_mutex_unlock(&g_kk_vti_jobs_mu);
++         if (copy) {   /* the worker gets the frame once its copy is done on the GPU: it never sits waiting for it */
++            [copy addCompletedHandler:^(id<MTLCommandBuffer> done) { (void)done; kk_vti_ready(job, 1); }];
++            [copy commit];
++         } else {
++            kk_vti_ready(job, 0);
++         }
++         [job release];
++      }
++   }
++}
++
++/* The in-game menu's switch. on: 1, 0, or -1 for "as the game started". Returns what is in force (1 or 0). */
++int madeira_kk_vti_set(int on) {
++   int v = on > 0 ? 1 : on < 0 ? -1 : 0, was = atomic_exchange_explicit(&g_kk_vti.live, v, memory_order_relaxed);
++   if (v != was && atomic_load_explicit(&g_kk_vti.want, memory_order_relaxed) > 0) {
++      KK_VTI_LOG("live switch: %s\n", v ? "ON" : "OFF (the session is closed; switching on loads the model again)");
++      if (!v) {
++         atomic_store_explicit(&g_kk_vti.attempts, 0, memory_order_relaxed);
++         if (atomic_load_explicit(&g_kk_vti.state, memory_order_relaxed) != 1) kk_vti_drop(0);
++      }
++   }
++   return atomic_load_explicit(&g_kk_vti.want, memory_order_relaxed) > 0 && v != 0;
++}
++/* For the in-game menu: 0 = not asked for or switched off, 1 = the model is loading (or no frame of the game yet), 2 = ready
++ * and waiting (no picture in the last second), 3 = making pictures, 4 = not possible (madeira_kk_vti_why says why). */
++int madeira_kk_vti_status(int *width, int *height, double *game_fps, double *generated_fps, double *pair_ms) {
++   int state = atomic_load_explicit(&g_kk_vti.state, memory_order_relaxed);
++   if (width) *width = (int)atomic_load_explicit(&g_kk_vti.w, memory_order_relaxed);
++   if (height) *height = (int)atomic_load_explicit(&g_kk_vti.h, memory_order_relaxed);
++   if (game_fps) *game_fps = g_kk_vti.game_fps;
++   if (generated_fps) *generated_fps = g_kk_vti.generated_fps;
++   if (pair_ms) *pair_ms = g_kk_vti.pair_ms;
++   if (atomic_load_explicit(&g_kk_vti.want, memory_order_relaxed) <= 0 || atomic_load_explicit(&g_kk_vti.live, memory_order_relaxed) == 0) return 0;
++   /* no swapchain of this driver has presented a picture yet (the game draws through another path): the app asks winemetal */
++   if (state == 0 && !atomic_load_explicit(&g_kk_vti.layer, memory_order_relaxed)) return 0;
++   if (state < 0) return 4;
++   if (state == 2) return g_kk_vti.generated_fps > 0.5 ? 3 : 2;
++   return 1;
++}
++/* Why no pictures can be made (status 4), as a sentence without a full stop. Returns its length. */
++int madeira_kk_vti_why(char *out, int cap) {
++   if (!out || cap <= 0) return 0;
++   out[0] = 0;
++   if (kk_vti_lock()) {
++      snprintf(out, (size_t)cap, "%s", g_kk_vti.why);
++      pthread_mutex_unlock(&g_kk_vti_mu);
++   }
++   return (int)strlen(out);
++}
++/* The game ended: the session and its model are given back. */
++void madeira_kk_vti_session_ended(void) {
++   if (atomic_load_explicit(&g_kk_vti.want, memory_order_relaxed) > 0) {
++      kk_vti_drop(0);
++      atomic_store_explicit(&g_kk_vti.attempts, 0, memory_order_relaxed);
++      atomic_store_explicit(&g_kk_vti.layer, NULL, memory_order_relaxed);
++      atomic_store_explicit(&g_kk_vti.live, -1, memory_order_relaxed);
++   }
++   atomic_store_explicit(&g_kk_vti.want, -1, memory_order_relaxed);   /* the next session reads its own MADEIRA_VT_INTERP */
++   dispatch_async(kk_vti_worker(), ^{ wsi_metal_lsfg_session_ended(); });   /* after the frames still with the worker */
++}

@@ -56,10 +56,25 @@ struct BCDDockComponents: Equatable {
     /// Night round 2026-11-11 (A1 S7): the client files are a Valve build the Dock host does not support (the first 12 hex digits of its SHA-256);
     /// nil for a supported build. Settings then offers "Replace client components".
     var unsupportedBuild: String?
-    /// Round 660 (M139, owner 2026-11-15): the supported build in the client folder (202601, 202609; nil: none or not known), and the one
-    /// Settings chose (202601 unless "Newer Steam client" is on).
+    /// Round 660 (M139, owner 2026-11-15): the supported build in the client folder (202601, 202609, 202611; nil: none or not known), and the
+    /// one Settings chose (202601 unless "Steam client" names another).
     var installedBuild: Int?
     var chosenBuild = 202601
+
+    /// Round 660 (M139, owner 2026-11-15), three since 2026-11-21: the client builds BCD installs, oldest first (SteamRuntimeFiles.builds;
+    /// tests/host/check-dock-client-status.py keeps the two lists equal). `short` is the word on the choice, `detail` what it says when chosen.
+    static let builds: [(id: Int, title: String, short: String, detail: String)] = [
+        (202601, "January 2026", "Jan 2026",
+         "January 2026: the client Dock has been tested with the longest. The one to use unless a game asks for more."),
+        (202609, "September 2026", "Sep 2026",
+         "September 2026: for games that ask for a newer Steam interface than the January client has, such as Grim Dawn, Hades II and "
+            + "Enshrouded. Steam Friends are not available with it."),
+        (202611, "November 2026", "Nov 2026",
+         "November 2026: Valve's current client, for games that ask for a Steam interface neither of the others has. New in BCD and less "
+            + "tested: if a game no longer starts with it, switch back."),
+    ]
+    /// The build with that id; January 2026 for an id BCD does not install.
+    static func build(_ id: Int) -> (id: Int, title: String, short: String, detail: String) { builds.first { $0.id == id } ?? builds[0] }
 }
 
 struct BCDDockSectionState: Equatable {
@@ -86,16 +101,24 @@ struct BCDDockSectionState: Equatable {
     func refresh()
     func downloadComponents()
     /// Night round 2026-11-11 (A1 S7): renames the client folder of an unsupported build aside and installs the pinned one. Round 660 (M139): also
-    /// the change between the two supported builds, to the one Settings chose.
+    /// the change between the supported builds, to the one Settings chose.
     func replaceComponents()
-    /// Round 660 (M139): "Newer Steam client": on chooses the September 2026 build, off the January 2026 one (the default).
-    func setNewerClient(_ on: Bool)
+    /// Round 660 (M139), three builds since 2026-11-21: "Steam client" chooses the build by its id (202601 January 2026, the default; 202609
+    /// September 2026; 202611 November 2026). Nothing is downloaded or moved by choosing; the Download or Switch button does that.
+    func setClientBuild(_ id: Int)
     /// Starts the game through Dock, as the rest of the interface starts a Steam game.
     func start(_ appID: Int)
     func setCompactPool(_ on: Bool)
     func setRunsInstalls(_ appID: Int, _ run: Bool)
     /// Saves a request for the game's next Dock start; nil cancels the saved one.
     func setRequest(_ appID: Int, _ request: BCDDockRequest?)
+    /// Branch steam-client (2026-11-21, M1): what a copy of BCD draws under the Dock's own cards: Steam for Windows' card
+    /// (BCDSteamDesktop.swift), which BCDDockLive brings. Empty where a copy has none.
+    var extraCards: AnyView { get }
+}
+
+extension BCDDockBackend {
+    var extraCards: AnyView { AnyView(EmptyView()) }
 }
 
 // MARK: - The section
@@ -138,6 +161,7 @@ struct BCDDockSection<Backend: BCDDockBackend>: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
+                backend.extraCards
             }
         }
         .modifier(BCDSectionKit.Buttons(focus: focus, key: asking, inner: closeQuestion, back: back, hook: backHook))
@@ -203,15 +227,20 @@ struct BCDDockSection<Backend: BCDDockBackend>: View {
 
     // MARK: Valve's client files
 
-    /// Round 660 (M139, owner 2026-11-15): the two client builds BCD installs.
-    static func buildTitle(_ id: Int) -> String { id == 202609 ? "September 2026" : "January 2026" }
+    static func buildTitle(_ id: Int) -> String { BCDDockComponents.build(id).title }
 
-    private func newerClientSwitch(_ parts: BCDDockComponents) -> some View {
-        BCDSectionKit.SwitchRow(title: "Newer Steam client (September 2026)",
-                                detail: "For games that ask for a newer Steam interface than the January 2026 client has, such as Grim Dawn, "
-                                    + "Hades II and Enshrouded. Off: the January 2026 client, the one Dock has been tested with.",
-                                isOn: parts.chosenBuild == 202609, id: Self.prefix + "newer-client",
-                                enabled: !parts.working) { backend.setNewerClient($0) }
+    /// The choice of client build: one of three, and a line about the chosen one. Choosing changes nothing on the device by itself.
+    private func clientBuildChoice(_ parts: BCDDockComponents) -> some View {
+        let chosen = BCDDockComponents.build(parts.chosenBuild)
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("Steam client").bcdFont(.label, 16).foregroundStyle(BCDStyle.text)
+            BCDSectionKit.Segments(options: BCDDockComponents.builds.map { (value: $0.id, title: $0.short) }, selected: chosen.id,
+                                   idPrefix: Self.prefix + "client-build.") { if !parts.working { backend.setClientBuild($0) } }
+                .disabled(parts.working)
+                .opacity(parts.working ? 0.45 : 1)
+            Text(chosen.detail).bcdFont(.body, 13).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 6)
     }
 
     @ViewBuilder private var componentsCard: some View {
@@ -235,7 +264,7 @@ struct BCDDockSection<Backend: BCDDockBackend>: View {
                                        symbol: "checkmark.circle.fill", tone: .good)
                     Text("Dock uses only the client builds it knows; any other build is refused.")
                         .bcdFont(.body, 13).foregroundStyle(BCDStyle.textSoft).fixedSize(horizontal: false, vertical: true)
-                    newerClientSwitch(parts)
+                    clientBuildChoice(parts)
                     if let installed = parts.installedBuild, installed != parts.chosenBuild {
                         // Round 660 (M139): the chosen build is not the one in the folder: the change is one tap, nothing is deleted.
                         Text("BCD renames the current client folder (nothing is deleted) and moves your games, saves and settings into the new one.")
@@ -259,7 +288,7 @@ struct BCDDockSection<Backend: BCDDockBackend>: View {
                     Text("About \(BCDFormat.bytes(parts.downloadBytes)) from Valve's own update servers, once. Every file is checked against a fixed SHA-256 before BCD uses it.")
                         .bcdFont(.body, 14).foregroundStyle(BCDStyle.textSoft)
                         .fixedSize(horizontal: false, vertical: true)
-                    newerClientSwitch(parts)
+                    clientBuildChoice(parts)
                     if let error = parts.error {
                         BCDSectionKit.Note(text: error, symbol: "exclamationmark.triangle.fill", tone: .bad)
                     }

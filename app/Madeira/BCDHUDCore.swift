@@ -635,6 +635,38 @@ enum BCDHUDRules {
         }
     }
 
+    /// Round 707 (A2 F12): with a fixed frame cap as well (env.MADEIRA_FPS_CAP, 10 to 120 fps, Settings › Graphics › Frame cap, now with 20 and
+    /// 25), the game is held to the lower of the two; a cap outside 10...120 is none, as the engine reads it.
+    static func cap(fpsMode: Int, frameCap: Int?) -> Double? {
+        let fixed = frameCap.flatMap { (10...120).contains($0) ? Double($0) : nil }
+        switch (cap(fpsMode: fpsMode), fixed) {
+        case let (limit?, fixed?): return min(limit, fixed)
+        case let (limit, fixed): return limit ?? fixed
+        }
+    }
+
+    /// What reaches the screen a second: the game's frames and those frame generation adds (under half a frame a second: none).
+    static func shownFps(_ d: BCDHUDData) -> Double { d.fps > 0 ? d.fps + (d.madeFps >= 0.5 ? d.madeFps : 0) : 0 }
+
+    /// The game's rate as the HUD writes it, the frames frame generation adds after a plus: "15+15" (15 of the game's, 15 made), "60" when
+    /// none are made, "–" before the first frame.
+    static func rate(_ d: BCDHUDData) -> String {
+        guard d.fps > 0 else { return "–" }
+        let made = d.madeFps.rounded()
+        return made >= 1 ? String(format: "%.0f+%.0f", d.fps, made) : String(format: "%.0f", d.fps)
+    }
+
+    /// The rate's colour: every frame shown against the limit, so a game the limit holds at 60 with 60 made is green.
+    static func rateTone(_ d: BCDHUDData) -> BCDHUDTone { fpsTone(shownFps(d), cap: d.cap) }
+
+    /// The rate in words, for VoiceOver.
+    static func rateSpoken(_ d: BCDHUDData) -> String {
+        guard d.fps > 0 else { return "No frames yet" }
+        let made = d.madeFps.rounded()
+        return made >= 1 ? String(format: "%.0f frames a second, and %.0f more made by frame generation", d.fps, made)
+            : String(format: "%.0f frames a second", d.fps)
+    }
+
     /// Green when the game keeps its limit (a locked 30 is green), amber from 60% of it, red below. With no limit to judge by,
     /// green from 50, amber from 30, as the old overlay did; grey before the first frame.
     static func fpsTone(_ fps: Double, cap: Double?) -> BCDHUDTone {
@@ -677,6 +709,9 @@ enum BCDHUDRules {
 /// Everything the HUD can show, as the live side measured it. A nil is "not measured (yet)": the item then says nothing, or a dash.
 struct BCDHUDData: Equatable {
     var fps = 0.0
+    /// Frames a second frame generation adds besides the game's own (Apple interpolation, Lossless Scaling, MetalFX frame
+    /// interpolation; BCDFrameRing.h): written after the game's rate as "+N", never mixed into its frame times or lows.
+    var madeFps = 0.0
     var cap: Double?
     var frameMs: Double?
     var low1: Double?
@@ -790,19 +825,19 @@ enum BCDHUDRows {
     // MARK: Layout 1 - Pulse
 
     private static func pulse(_ d: BCDHUDData) -> BCDHUDPlan {
-        let number = BCDHUDSegment(text: d.fps > 0 ? String(format: "%.0f", d.fps) : "–", tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))
+        let number = BCDHUDSegment(text: BCDHUDRules.rate(d), tone: BCDHUDRules.rateTone(d))
         var plan = BCDHUDPlan(layout: .pulse, rows: [.pulse(number: number, caption: "fps", dot: d.warning)])
         plan.background = 0.45
         plan.capsule = true
         plan.maxWidth = 120
-        plan.spoken = d.fps > 0 ? String(format: "%.0f frames a second", d.fps) : "No frames yet"
+        plan.spoken = BCDHUDRules.rateSpoken(d)
         return plan
     }
 
     // MARK: Layout 2 - Strip
 
     private static func strip(_ d: BCDHUDData, width: CGFloat) -> BCDHUDPlan {
-        var parts = [BCDHUDSegment(text: d.fps > 0 ? String(format: "%.0f FPS", d.fps) : "– FPS", tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))]
+        var parts = [BCDHUDSegment(text: BCDHUDRules.rate(d) + " FPS", tone: BCDHUDRules.rateTone(d))]
         parts.append(BCDHUDSegment(text: d.frameMs.map { String(format: "%.1f ms", $0) } ?? "– ms"))
         if let used = d.footprintMB, let limit = d.limitMB {
             parts.append(BCDHUDSegment(text: gigabytes(used) + "/" + gigabytes(limit) + " GB", tone: BCDHUDRules.memoryTone(freeMB: d.freeMB)))
@@ -820,7 +855,7 @@ enum BCDHUDRows {
     // MARK: Layout 3 - Tune
 
     private static func tune(_ d: BCDHUDData) -> BCDHUDPlan {
-        let fps = BCDHUDSegment(text: d.fps > 0 ? String(format: "%.0f FPS", d.fps) : "– FPS", tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))
+        let fps = BCDHUDSegment(text: BCDHUDRules.rate(d) + " FPS", tone: BCDHUDRules.rateTone(d))
         var first = [fps]
         if let low = d.low1 { first.append(BCDHUDSegment(text: String(format: "1%% %.0f", low))) }
         first.append(BCDHUDSegment(text: d.frameMs.map { String(format: "%.1f ms", $0) } ?? "– ms", tone: .soft))
@@ -834,7 +869,7 @@ enum BCDHUDRows {
         let heat = BCDHUDRules.heat(d.thermal)
         third.append(BCDHUDSegment(text: heat.word, tone: heat.tone))
         var rows: [BCDHUDRow] = [.line(first), .line(second), .line(third)]
-        rows.append(.graph(BCDHUDGraph(values: BCDFrameMath.squeeze(d.graph, to: 60), tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap),
+        rows.append(.graph(BCDHUDGraph(values: BCDFrameMath.squeeze(d.graph, to: 60), tone: BCDHUDRules.rateTone(d),
                                        width: 150, height: 28)))
         var plan = BCDHUDPlan(layout: .tune, rows: rows)
         plan.separator = "  "
@@ -859,13 +894,13 @@ enum BCDHUDRows {
         if let cap = d.cap { pipeline.append("cap " + String(format: "%.0f", cap)) }
         if !pipeline.isEmpty { rows.append(.line([BCDHUDSegment(text: pipeline.joined(separator: "  "), tone: .soft)])) }
         // 2. The speed.
-        var speed = [BCDHUDSegment(text: d.fps > 0 ? String(format: "%.0f FPS", d.fps) : "– FPS", tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))]
+        var speed = [BCDHUDSegment(text: BCDHUDRules.rate(d) + " FPS", tone: BCDHUDRules.rateTone(d))]
         if let ms = d.frameMs { speed.append(BCDHUDSegment(text: String(format: "avg %.1f", ms))) }
         if let low = d.low1 { speed.append(BCDHUDSegment(text: String(format: "1%% %.0f", low))) }
         if let low = d.low01 { speed.append(BCDHUDSegment(text: String(format: "0.1%% %.0f", low))) }
         rows.append(.line(speed))
         // 3. The graph.
-        rows.append(.graph(BCDHUDGraph(values: BCDFrameMath.squeeze(d.graph, to: 120), tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap),
+        rows.append(.graph(BCDHUDGraph(values: BCDFrameMath.squeeze(d.graph, to: 120), tone: BCDHUDRules.rateTone(d),
                                        width: 200, height: 30)))
         // 4. Load.
         var load = [BCDHUDSegment(text: d.cpuTotal.map { cpu in
@@ -945,7 +980,7 @@ enum BCDHUDRows {
                 rows += pack(pending)
                 pending = []
                 let values = BCDFrameMath.squeeze(Array(d.graph.suffix(c.graphSeconds * 4)), to: 120)
-                rows.append(.graph(BCDHUDGraph(values: values, tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap),
+                rows.append(.graph(BCDHUDGraph(values: values, tone: BCDHUDRules.rateTone(d),
                                                width: 120 * c.size.graphScale, height: 28 * c.size.graphScale)))
             } else if let segment = segment(item, d) {
                 pending.append(segment)
@@ -968,10 +1003,10 @@ enum BCDHUDRows {
     static func segment(_ item: BCDHUDItem, _ d: BCDHUDData) -> BCDHUDSegment? {
         switch item {
         case .fps:
-            return BCDHUDSegment(text: String(format: "%.0f FPS", d.fps), tone: BCDHUDRules.fpsTone(d.fps, cap: d.cap))
+            return BCDHUDSegment(text: (d.fps > 0 ? BCDHUDRules.rate(d) : "0") + " FPS", tone: BCDHUDRules.rateTone(d))
         case .fpsCap:
             guard let cap = d.cap else { return nil }
-            return BCDHUDSegment(text: String(format: "%.0f/%.0f", d.fps, cap), tone: BCDHUDRules.fpsTone(d.fps, cap: cap))
+            return BCDHUDSegment(text: (d.fps > 0 ? BCDHUDRules.rate(d) : "0") + String(format: "/%.0f", cap), tone: BCDHUDRules.rateTone(d))
         case .frameMs:
             return BCDHUDSegment(text: d.frameMs.map { String(format: "%.1f ms", $0) } ?? "– ms")
         case .frameGraph:

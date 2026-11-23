@@ -9,6 +9,7 @@
   tools/patch-wine-loader-import-appdir.py  round 669 (B S7, Doki Doki Literature Club): [import-miss] (log only) and the keyed application-folder search
   tools/patch-wine-msgbox-timeout.py        round 660 M106: MessageBoxTimeoutA/W honour the timeout (keyless)
   tools/patch-wine-wintrust-diag.py         round 660 M072: [wintrust] (log only)
+  tools/patch-wine-wintrust-root-pin.py     round 707 M3 S18: env.MADEIRA_CODESIGN_ROOTS, one pinned code-signing root for wintrust's own chains (MGSV)
   tools/patch-wine-wow64-token-null-sid.py  source form of tools/patch-wow64-token-null-sid.py (Garry's Mod)
 
 For each: it applies to the file as pinned (read with git show, so a tree an earlier step patched does not matter), once ("patched"/"applied", then "already"), a file
@@ -59,6 +60,7 @@ SCRIPTS = {
     "patch-wine-loader-import-appdir.py": ["dlls/ntdll/loader.c"],
     "patch-wine-msgbox-timeout.py": ["dlls/user32/msgbox.c"],
     "patch-wine-wintrust-diag.py": ["dlls/wintrust/wintrust_main.c", "dlls/wintrust/softpub.c"],
+    "patch-wine-wintrust-root-pin.py": ["dlls/wintrust/softpub.c"],
     "patch-wine-wow64-token-null-sid.py": ["dlls/wow64/security.c"],
 }
 # a text of each script's anchor that the "moved" variant of the file breaks (one edit that keeps the file valid C)
@@ -69,6 +71,8 @@ MOVE = {
                                            "    if (!status) status = load_dll(  load_path, buffer, 0, &wmImp, system );"),
     "patch-wine-msgbox-timeout.py": ("dlls/user32/msgbox.c", "INT WINAPI MessageBoxTimeoutA( HWND hWnd,", "INT WINAPI MessageBoxTimeoutA(  HWND hWnd,"),
     "patch-wine-wintrust-diag.py": ("dlls/wintrust/softpub.c", "static DWORD WINTRUST_CopyChain(CRYPT_PROVIDER_DATA *data, DWORD signerIdx)", "static DWORD WINTRUST_CopyChain( CRYPT_PROVIDER_DATA *data, DWORD signerIdx)"),
+    "patch-wine-wintrust-root-pin.py": ("dlls/wintrust/softpub.c", "                if (data->pasSigners[signer].pChainContext->cChain != 1)",
+                                        "                if (data->pasSigners[signer].pChainContext->cChain  != 1)"),
     "patch-wine-wow64-token-null-sid.py": ("dlls/wow64/security.c", "        sid = owner->Owner;\n", "        sid = owner->Owner ;\n"),
 }
 

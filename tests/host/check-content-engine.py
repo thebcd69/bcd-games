@@ -26,6 +26,8 @@ one and one that refuses addresses until they are renewed:
   - a download killed (SIGKILL) and resumed fetches none of the journaled chunks again;
   - pause (cancel) keeps the journal; resume completes without refetching it;
   - not enough space is refused before anything is fetched;
+  - an external drive (log FCS8QA): its figure is read through the drive_c/External link as Steam reads it; files that
+    already hold their room (exFAT) are not asked for it again; the device's rule is as before; a refusal logs its figures;
   - a dropped connection continues with a Range request; refused addresses are renewed once;
   - whole-file checks: a file that keeps failing its check fails the job after one refetch;
   - the queue: a job to the end, a game session pausing and resuming it, waiting for another
@@ -120,6 +122,37 @@ check("request.strategy = .fail" in background and "BGContinuedProcessingTaskReq
 queue_src = code((CONTENT / "BCDContentQueue.swift").read_text())
 check("guard active == nil, !inSession, !otherDownloadActive(), let key = order.first" in queue_src,
       "the queue starts nothing during a session or while another downloader works")
+
+# Log FCS8QA (build 686): an external drive's figure is read as Steam's URL.freeSpace reads it (Steam installs on these
+# drives and was not refused): the same steps in the same order. The drive's "is internal" answer decides nothing.
+engine_src = code((CONTENT / "BCDContentEngine.swift").read_text())
+steam_src = code((APP / "SwiftSteam/Content/DepotDownloader.swift").read_text())
+
+
+def body_after(src, head):
+    start = src.find(head)
+    if start < 0:
+        return ""
+    end = src.find("\n    }\n", start)
+    return src[start:end if end > 0 else len(src)]
+
+
+def space_steps(body):
+    return re.findall(r"resolvingSymlinksInPath|volumeAvailableCapacityForImportantUsage\b|volumeAvailableCapacity\b"
+                      r"|statfs\(|return nil", body)
+
+
+drive_steps = space_steps(body_after(engine_src, "static func driveFreeSpace(_ url: URL) -> Int64? {"))
+check(len(drive_steps) >= 6 and drive_steps == space_steps(body_after(steam_src, "public var freeSpace: Int64? {")),
+      "an external drive's free space takes the steps of Steam's URL.freeSpace", drive_steps)
+check("volumeIsInternal" not in engine_src, "no volume's \"is internal\" answer decides the room")
+device_branch = body_after(engine_src, "static func freeSpace(_ url: URL) -> Int64? {")
+check(re.search(r"if onDevice\(probe\) \{\s*return \(try\? probe\.resourceValues\(forKeys: "
+                r"\[\.volumeAvailableCapacityForImportantUsageKey\]\)\)\?\s*\.volumeAvailableCapacityForImportantUsage\s*\}",
+                device_branch) is not None,
+      "on the device the figure is the important-usage one alone, as before")
+check(engine_src.count("options.onDevice(stage)") == 2 and engine_src.count("device ? remaining : min(remaining") == 2,
+      "both room checks keep the device's rule and count a drive's files' held room")
 
 # ---- fixtures -----------------------------------------------------------------------------
 rng = random.Random(20261018)
@@ -569,6 +602,80 @@ func space(_ fx: Fixture) async {
     } catch { check(false, "space: \(error)") }
 }
 
+/// Log FCS8QA (2026-11-20, build 686): every Epic install on a tester's external drive was refused for space at once. The
+/// drive's figure is now read as Steam reads it, through the link; on a drive without sparse files (exFAT) the room the files
+/// already hold is not asked for again. The device's rule is as before.
+func spaceDrive(_ fx: Fixture) async {
+    do {
+        let fm = FileManager.default
+        let base = folder(fx, "space-volume")
+        try fm.createDirectory(at: base, withIntermediateDirectories: true)
+        check(BCDContentEngine.onDevice(base.appendingPathComponent("not/made/yet")), "a folder on the app's own volume is on the device")
+        let important = (try? base.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?.volumeAvailableCapacityForImportantUsage
+        let deviceFree = BCDContentEngine.freeSpace(base.appendingPathComponent("not/made/yet"))
+        check((important == nil) == (deviceFree == nil) && abs((important ?? 0) - (deviceFree ?? 0)) < 1 << 30,
+              "on the device the figure is the important-usage one, as before")
+        // Another volume of the host stands in for the drive: drive_c/External/<name> is a link to it.
+        let other = ["/System/Volumes/VM", "/System/Volumes/Preboot"].first { path in
+            var a = stat(), b = stat()
+            return stat(path, &a) == 0 && stat(base.path, &b) == 0 && a.st_dev != b.st_dev
+        }
+        if let other {
+            let link = base.appendingPathComponent("drive")
+            try? fm.removeItem(at: link)
+            try fm.createSymbolicLink(atPath: link.path, withDestinationPath: other)
+            let stage = link.appendingPathComponent("Epic Games/.bcd-stage/test.space")
+            check(!BCDContentEngine.onDevice(stage), "a folder through a link to another volume is on a drive")
+            var info = statfs()
+            let real: Int64 = statfs(other, &info) == 0 ? Int64(info.f_bavail) * Int64(info.f_bsize) : -1
+            let free = BCDContentEngine.freeSpace(stage) ?? 0
+            check(free > 0 && abs(free - real) < 1 << 30, "a drive's figure is read through the link (\(free), statfs \(real))")
+        } else {
+            print("skip: no second volume on this host")
+        }
+
+        let plan = try makePlan(fx.plans["main"]!, id: "space-drive")
+        func room(device: Bool) -> BCDContentOptions {
+            var o = options()
+            o.onDevice = { _ in device }
+            o.spaceMargin = 100
+            o.freeSpace = { _ in 1000 }
+            return o
+        }
+        // Files that hold their whole room already, as an exFAT drive gives them when they are created at their final size.
+        func held(_ name: String) throws {
+            let stage = folder(fx, name).appendingPathComponent("stage")
+            for d in plan.directories { try fm.createDirectory(at: stage.appendingPathComponent(d), withIntermediateDirectories: true) }
+            for f in plan.files {
+                let url = stage.appendingPathComponent(f.path)
+                try fm.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try Data(count: Int(f.size)).write(to: url)
+            }
+            check(BCDContentEngine.growthBytes(plan, stage: stage) == 0, "files written at their final size hold all their room")
+        }
+        check(BCDContentEngine.growthBytes(plan, stage: folder(fx, "space-none")) == plan.totalBytes,
+              "files not made yet still need all their room")
+
+        await expectError("a drive whose files hold no room yet still needs all of it", {
+            try await download(fx, plan: plan, name: "space-sparse", hosts: [fx.base + "/good5"], opts: room(device: false))
+        }) { error in
+            if case BCDContentError.notEnoughSpace(let needed, let available) = error { return needed == plan.totalBytes + 100 && available == 1000 }
+            return false
+        }
+        try held("space-full")
+        try await download(fx, plan: plan, name: "space-full", hosts: [fx.base + "/good6"], opts: room(device: false))
+        try commit(fx, plan: plan, name: "space-full")
+        check(true, "on a drive whose files hold their room the download is not refused, and finishes")
+        try held("space-device")
+        await expectError("on the device the rule is as before: the bytes still to be written", {
+            try await download(fx, plan: plan, name: "space-device", hosts: [fx.base + "/good7"], opts: room(device: true))
+        }) { error in
+            if case BCDContentError.notEnoughSpace(let needed, let available) = error { return needed == plan.totalBytes + 100 && available == 1000 }
+            return false
+        }
+    } catch { check(false, "space-drive: \(error)") }
+}
+
 func range(_ fx: Fixture) async {
     do {
         let plan = try makePlan(fx.plans["range"]!, id: "range")
@@ -763,6 +870,7 @@ final class Flag: @unchecked Sendable { var on = false }
         case "resume": await resume(fx)
         case "pause": await pause(fx)
         case "space": await space(fx)
+        case "space-drive": await spaceDrive(fx)
         case "range": await range(fx)
         case "auth": await auth(fx)
         case "verify": await verify(fx)
@@ -903,6 +1011,15 @@ try:
     # not enough space
     _, out = run("space"); all_logs.append(out)
     check(not requests("good4"), "nothing was fetched when the space was missing")
+
+    # an external drive's room (log FCS8QA)
+    _, out = run("space-drive"); all_logs.append(out)
+    check(not requests("good5") and not requests("good7"), "nothing was fetched when a drive or the device lacked the room")
+    check(requests("good6") and tree(data / "space-full/root/Game") == main_expect,
+          "the install on a drive whose files hold their room is complete and correct")
+    check(re.search(r"\[content\] space needed-mb=\d+ free-mb=\d+ volume=drive", out)
+          and re.search(r"\[content\] space needed-mb=\d+ free-mb=\d+ volume=device", out),
+          "a refusal for space logs the figures and the volume", out[-1500:])
 
     # a dropped connection, continued with Range
     _, out = run("range"); all_logs.append(out)

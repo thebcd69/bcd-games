@@ -55,7 +55,17 @@ check("kk_retry.m: the compile census (2026-11-20, X-Plane 12): BCD's change mar
       and "dispatch_source_set_timer(kkr_timer, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC), 10 * NSEC_PER_SEC, NSEC_PER_SEC);" in m
       and "kkr_dump(d, late[i].secs, YES);" in m and "if (dt > 10 && !named && [desc isKindOfClass:[MTL4LibraryDescriptor class]]) kkr_dump(desc, dt, NO);" in m
       and 'KKR_BODY(o_rps(self, s, desc, opt, &err), "render pipeline", KKR_RPS)' in m and 'KKR_BODY(o_cps(self, s, desc, opt, &err), "compute pipeline", KKR_CPS)' in m)
+check("kk_retry.m: a library request without MSL (2026-11-22, X-Plane 12): BCD's change marked; refused with an error before the gate,"
+      " so it never reaches Metal's compiler; counted in the census; the first four named with their caller; another descriptor class goes on",
+      "// Modified by BCD (thebcd69), 2026-11-22: a library request without MSL" in m
+      and "if ([desc isKindOfClass:[MTL4LibraryDescriptor class]] && ((MTL4LibraryDescriptor *)desc).source.length == 0) {\n        kkr_no_source(desc);" in m
+      and m.index("kkr_no_source(desc);") < m.index("KKR_BODY_EXPR(o_lib(self, s, desc, &err)")
+      and "return nil;\n    }\n    if (![desc isKindOfClass:[MTL4LibraryDescriptor class]]) kkr_other_class(desc);" in m
+      and 'if (refused) n += snprintf(line + n, sizeof line - n, "; %ld without MSL refused", refused);' in m
+      and "if (n > 4) return;" in m)
 t = (K / "test_mac.m").read_text()
+check("test_mac.m: the no-MSL cases (nil and empty source refused at once with the shim's error, counted in the census)",
+      'printf("no-MSL case' in t and 'strstr(line, "; 2 without MSL refused")' in t and "took < 0.5" in t)
 check("test_mac.m: the census cases (quiet when idle, a running compile named, the finished one counted); its dumps go to the temporary folder",
       'printf("census when idle' in t and "in flight 1 (oldest " in t and 'strstr(line, "library 1 (avg ")' in t
       and "NSTemporaryDirectory()" in m)

@@ -1135,6 +1135,10 @@ static void contexts_from_server( CONTEXT *context, struct context_data server_c
  * TSD slot (40..49, libobjc's __PTK_FRAMEWORK_OBJC_KEYn range) that went from NULL to non-NULL is the key; exactly one such slot or the
  * mitigation stays off ("[exit-pool] key not found"). libobjc's functions are looked up with dlsym (they are not in the SDK headers). */
 static volatile int ios_exit_pool_key = -1;   /* >= 40: the TSD slot of libobjc's autorelease pool; -1: not looked for yet; -2: not found */
+/* madeira-bcd (2026-11-17): bit k = direct slot 40+k, where libobjc keeps a pool's first objects instead of a page. On the
+ * macos-15 runner an autorelease left the pool's slot (43) at 0x1, the empty-pool placeholder, and put the object in 44 and 45; clearing 43
+ * alone left the destructor the freed object there (check-exit-pool, CI 44102470041). */
+static volatile unsigned ios_exit_pool_more;
 
 static int ios_exit_pool_diag_on( void )
 {
@@ -1170,6 +1174,7 @@ static void ios_exit_pool_find_key( void )
     uintptr_t tsd_base;
     void *before[10], *token;
     int k, found = -1, n = 0;
+    unsigned more = 0;
 
     if (ios_exit_pool_key != -1 || (!ios_exit_pool_diag_on() && !ios_exit_pool_skip_on())) return;
     if (__sync_add_and_fetch( &tries, 1 ) > 8) { ios_exit_pool_key = -2; return; }
@@ -1187,11 +1192,29 @@ static void ios_exit_pool_find_key( void )
     token = push();
     for (k = 0; k < 10; k++)
         if (!before[k] && tsd[40 + k]) { found = 40 + k; n++; }
+    {   /* madeira-bcd: one autoreleased object, to see the slots libobjc fills for a pool's first objects (see ios_exit_pool_more) */
+        void *(*autorel)( void * ) = (void *(*)( void * ))dlsym( RTLD_DEFAULT, "objc_autorelease" );
+        void *(*get_class)( const char * ) = (void *(*)( const char * ))dlsym( RTLD_DEFAULT, "objc_getClass" );
+        void *(*create)( void *, size_t ) = (void *(*)( void *, size_t ))dlsym( RTLD_DEFAULT, "class_createInstance" );
+        void *cls = get_class ? get_class( "NSObject" ) : NULL;
+        void *probe = create && cls ? create( cls, 0 ) : NULL;
+
+        if (autorel && probe)
+        {
+            autorel( probe );   /* the pop below releases it */
+            for (k = 0; k < 10; k++)
+                if (40 + k != found && !before[k] && tsd[40 + k]) more |= 1u << k;
+        }
+    }
     pop( token );
+    for (k = 0; k < 10; k++)
+        if (((more >> k) & 1) && tsd[40 + k]) more &= ~(1u << k);   /* only the slots the pop gave back */
     if (n == 1 && !tsd[found])
     {
         ios_exit_pool_key = found;
-        dprintf( 2, "[exit-pool] key=%d: libobjc's autorelease pool lives in direct TSD slot %d (MADEIRA_EXIT_POOL_*)\n", found, found );
+        ios_exit_pool_more = more;
+        dprintf( 2, "[exit-pool] key=%d: libobjc's autorelease pool lives in direct TSD slot %d, its first objects in slot mask 0x%x of 40..49 "
+                    "(MADEIRA_EXIT_POOL_*)\n", found, found, more );
     }
     else if (n == 0 && tries < 8) { /* the thread already had a pool: try the next one */ }
     else
@@ -1234,6 +1257,13 @@ static void ios_exit_pool_at_exit( void )
             dprintf( 2, "[exit-pool] tid=%04x clears libobjc's autorelease-pool slot %d (%p) so its thread-exit destructor does not walk the pool; "
                         "the pool's pages leak (#%u, MADEIRA_EXIT_POOL_SKIP)\n", tid, key, tsd[key], n );
         tsd[key] = NULL;
+        {   /* madeira-bcd: and the slots of the pool's first objects (ios_exit_pool_more) */
+            unsigned more = ios_exit_pool_more;
+            int k;
+
+            for (k = 0; k < 10; k++)
+                if ((more >> k) & 1) tsd[40 + k] = NULL;
+        }
     }
 }
 

@@ -12206,6 +12206,41 @@ static void ios_wow_high_side( void *start, void *end, void **hs, void **he )
     if (lo < hi) { *hs = (void *)lo; *he = (void *)hi; }
 }
 
+/* madeira-bcd (branch steam-client, build 693; Steam for Windows, iPhone18,2, 2026-11-21): env.MADEIRA_WOW_HIGH_SIDE_CAP = 1.
+ * Off unless set; ios_wow_session_start reads it once per session.
+ *
+ * The session it is for: Valve's 64-bit client with Social Club's layout 2 (MADEIRA_SC_PA_POOLS = 2), a placeholder
+ * (MADEIRA_WOW_PLACEHOLDER_SLOTS = 1) for the 32-bit games it starts. Layout 2 puts the furniture floor at 0x7100000000
+ * (ios_usable_va_floor_get), the lowest slot, which the placeholder takes. Build 691 (log steam.exe-2026-11-21_22-32-07):
+ *  - the band below the windows is then empty, and every furniture view first failed a full scan of it
+ *    ("[va-scan] FAILED window=0x100000000..0x7100000000", about 1400 tries each);
+ *  - the band above them reached to the top of the map (the Ghost of Tsushima rule below), and a top-down view landed at
+ *    0x7bffff0000, the start of the web helper's fourth 16 GB PartitionAlloc pool. The pool's reservation failed, the helper
+ *    stopped on a breakpoint (0x80000003), and Steam started it again every 10 s; no window ever showed.
+ *
+ * With the line, for a furniture request (ceiling_relaxable: the furniture ceiling is its only bound):
+ *  - the band above the windows ends at the request's own ceiling, as the band would without any window
+ *    (ios_wow_high_side_end);
+ *  - when the band below has no room above the floor, the band above is searched first (ios_wow_high_side_first).
+ * A request with a caller's limit, one too big for the ceiling, and every session without the line are unchanged. When the
+ * band above is full too, map_view's own fallback relaxes the ceiling as before. */
+static int ios_wow_high_side_cap;
+
+static void *ios_wow_high_side_end( void *own_end, void *whole_end, int furniture )
+{
+    return (furniture && ios_wow_high_side_cap) ? own_end : whole_end;
+}
+
+static int ios_wow_high_side_first( void *low_start, void *low_end, void *hs, void *he, size_t need, int furniture )
+{
+    ULONG_PTR lo = (ULONG_PTR)low_start, hi = (ULONG_PTR)low_end;
+
+    if (!furniture || !ios_wow_high_side_cap || !hs || (ULONG_PTR)he <= (ULONG_PTR)hs) return 0;
+    if (lo < ios_usable_va_floor) lo = ios_usable_va_floor;
+    if (hi > lo && hi - lo >= need) return 0;                      /* the band below still has room: as before */
+    return (ULONG_PTR)he - (ULONG_PTR)hs >= need;                  /* only when the band above can hold it */
+}
+
 /* Keep an UNCONSTRAINED kernel-pick placement out of every guest window and
  * placeholder.  A window is a Wine reserved area, so without this the ordinary
  * furniture search would hand out addresses inside a 32-bit process's window. */
@@ -12921,6 +12956,11 @@ static void ios_wow_session_start(void)
     unsigned want;
     unsigned long slots = ios_wow_env_ulong( "MADEIRA_WOW_PLACEHOLDER_SLOTS", 0 );
 
+    /* madeira-bcd (branch steam-client, build 693): see ios_wow_high_side_cap; read once, logged only when on */
+    ios_wow_high_side_cap = ios_wow_env_ulong( "MADEIRA_WOW_HIGH_SIDE_CAP", 0 ) == 1;
+    if (ios_wow_high_side_cap)
+        dprintf( 2, "[wow-window] MADEIRA_WOW_HIGH_SIDE_CAP=1: furniture above the 32-bit windows keeps its ceiling (%p) and goes "
+                    "there first when the band below has no room rev=b693\n", (void *)ios_furniture_ceiling );
     if (ios_wow_env_ulong( "MADEIRA_WOW_PLACEHOLDERS", 0 ) == 1) want = IOS_WOW_MAX_WINDOWS;
     else if (ios_main_image_i386) want = 1;
     else if (slots) want = slots > 2 ? 2 : (unsigned)slots;
@@ -20445,6 +20485,49 @@ static int ios_x64_image_copy_can_never_fit( size_t total_size )
     return pool && total_size > pool;
 }
 
+/* madeira-bcd (round 707, agent S1 S1; Sheepy 4FQ5KV: nw.dll 200 MB, Cyberpunk 2077 CN37WR: libxess_fg.dll and libxess.dll, and 87 more
+ * archive logs of about 66 games): a pure-x64 image that fits an EMPTY pool, but not what is left of it now, was copied anyway and the copy
+ * was refused ("[jit-pool] EXHAUSTED ... FAILING the load"): the program never started. When no free place of the pool can hold the copy
+ * (the largest free run, the main pool's untouched part, the low pool's part for images, whichever is largest, counted generously: a
+ * place that is not contiguous counts whole), the image runs from its PE VA, as MADEIRA_X64_IMAGE_NOCOPY runs it (proved on RDR2, GTA IV/V,
+ * Spider-Man, MSFS 2024). An image that may fit keeps its copy, so nothing that starts today changes. The same switch as the rule above:
+ * MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off. Returns the room it found in *room. Called under virtual_mutex, as the pool's allocator
+ * takes ios_pool_lock (mprotect_exec). */
+static int ios_x64_image_copy_cannot_fit_now( size_t total_size, size_t *room )
+{
+    static int off = -1;
+    const size_t code_reserve = 4u * 1024 * 1024, slack = 0x10000;   /* the trampolines' share of an image is far below 64 KB */
+    size_t largest = 0, main_virgin = 0, c_virgin, c_image_virgin, hole, avail;
+    int i;
+
+    *room = 0;
+    if (off < 0)
+    {
+        const char *s = getenv( "MADEIRA_X64_IMAGE_NOCOPY_AUTO" );
+        off = (s && s[0] == '0' && !s[1]) ? 1 : 0;
+    }
+    if (off || !ios_jit_pool_size_global) return 0;   /* the pool is not up yet: as before */
+    pthread_mutex_lock( &ios_pool_lock );
+    for (i = 0; i < (int)ios_pool_free_count; i++)
+        if (ios_pool_freelist[i].size > largest) largest = ios_pool_freelist[i].size;
+    hole = ios_pool_holes_between( ios_jit_pool_size_global, jit_pool_offset, ios_jit_tail_reserved,
+                                   ios_jit_hole_off_eff, ios_jit_hole_end_eff, ios_jit_hole2_off, ios_jit_hole2_end );
+    if (jit_pool_offset <= ios_jit_pool_size_global && ios_jit_tail_reserved <= ios_jit_pool_size_global - jit_pool_offset &&
+        hole <= ios_jit_pool_size_global - jit_pool_offset - ios_jit_tail_reserved)
+        main_virgin = ios_jit_pool_size_global - jit_pool_offset - ios_jit_tail_reserved - hole;
+    c_virgin = ios_jit_low_reserved < ios_jit_low_size_global ? ios_jit_low_size_global - ios_jit_low_reserved : 0;
+    c_image_virgin = c_virgin > code_reserve ? c_virgin - code_reserve : 0;
+    avail = largest;
+    if (main_virgin > avail) avail = main_virgin;
+    if (c_image_virgin > avail) avail = c_image_virgin;
+    /* the big-image slot (MADEIRA_POOL_BIG_SLOT_MB, off by default) for an image of IOS_POOL_BIG_MIN or more, when it is free or will be */
+    if (ios_pool_big_size && total_size >= IOS_POOL_BIG_MIN && (!ios_pool_big_taken || ios_pool_big_freed_at) && ios_pool_big_size > avail)
+        avail = ios_pool_big_size;
+    pthread_mutex_unlock( &ios_pool_lock );
+    *room = avail;
+    return total_size + slack > avail;
+}
+
 static int ios_x64_image_is_host_data( const void *base, size_t size )
 {
 #ifdef WINE_IOS
@@ -25056,7 +25139,22 @@ static NTSTATUS map_view( struct file_view **view_ret, void *base, size_t size,
                      * fallback never placed anything there); a caller's own limit_high
                      * still bounds it */
                     void *hi_end = limit_high ? end : (void *)min( user_space_limit, host_addr_space_limit );
+                    /* madeira-bcd (branch steam-client, build 693): with env.MADEIRA_WOW_HIGH_SIDE_CAP = 1 a furniture request
+                     * keeps its own ceiling above the windows too (ios_wow_high_side_cap); unchanged otherwise */
+                    hi_end = ios_wow_high_side_end( end, hi_end, ceiling_relaxable );
                     ios_wow_high_side( excl_end, hi_end, &wow_hi_start, &wow_hi_end );
+                    /* ...and goes there first when the band below has no room above the floor (layout 2's floor is the
+                     * placeholder's own slot), instead of failing a full scan of it each time */
+                    if (ios_wow_high_side_first( excl_start, excl_end, wow_hi_start, wow_hi_end, view_size, ceiling_relaxable ))
+                    {
+                        static unsigned long first_n;
+
+                        if (++first_n <= 4 || !(first_n % 1024))
+                            dprintf( 2, "[wow-window] #%lu nothing below the 32-bit windows: 0x%lx bytes searched above them first in %p..%p "
+                                        "(MADEIRA_WOW_HIGH_SIDE_CAP)\n", first_n, (unsigned long)size, wow_hi_start, wow_hi_end );
+                        excl_start = wow_hi_start; excl_end = wow_hi_end;
+                        wow_hi_start = wow_hi_end = NULL;
+                    }
                 }
                 start = excl_start; end = excl_end;
             }
@@ -29735,6 +29833,21 @@ static NTSTATUS map_image_into_view( struct file_view *view, const UNICODE_STRIN
                                           : (size_t)strtoull( getenv( "WINE_IOS_JIT_SIZE" ) ? getenv( "WINE_IOS_JIT_SIZE" ) : "0", NULL, 16 )) >> 20),
                          (unsigned long)(total_size >> 20) );
         }
+        else
+        {
+            size_t room;
+
+            if (ios_x64_image_copy_cannot_fit_now( total_size, &room ))   /* round 707 (S1 S1): see ios_x64_image_copy_cannot_fit_now */
+            {
+                view->protect |= VPROT_X64DATA;
+                if (ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_note( (uintptr_t)ptr, total_size );
+                if (x64_images++ < 64)
+                    dprintf( 2, "[x64-image] %s %p+0x%lx: the JIT pool has %lu MB free for the %lu MB copy: running it from the loaded image "
+                                "(NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off)\n",
+                             debugstr_us(nt_name), ptr, (unsigned long)total_size, (unsigned long)(room >> 20),
+                             (unsigned long)(total_size >> 20) );
+            }
+        }
     }
     ios_fft_arena_patch( ptr, nt, sec, total_size, nt_name );   /* upstream ml1299, bcd.cfg fft-arena-patch (off); FFT_classic/FFT_enhanced only */
     ios_oversize_scan( ptr, nt, sec, total_size, nt_name );   /* madeira-bcd (K7R, build 663): bcd.cfg oversize-scan (off), log only */
@@ -33036,6 +33149,40 @@ static NTSTATUS grow_thread_stack( char *page, struct thread_stack_info *stack_i
 }
 
 
+/* madeira-bcd (round 707, agent M4 S7; Half-Life 2 J17QEB, JSJ8EP, C6Z5YZ = round 660's M074): env.MADEIRA_GUARD_NEIGHBOUR_PASS = 1, default off,
+ * per game. A host page is 16 KB, a guest page 4 KB, and get_host_page_vprot ORs the four guest bytes: a guard bit on ONE committed guest page
+ * (HL2: vprot 0x23,0x31,0x27,0x27, page 1 READ|GUARD|COMMITTED) makes the whole host page PROT_NONE, and a store to page 0, which has no guard,
+ * was taken for the guard page's: STATUS_GUARD_PAGE_VIOLATION (0x80000001) at tier0, 7-9 s in, every start. When the guest page touched is
+ * itself committed and has no guard bit, Windows lets the access through (the guard is the neighbour's): drop the bit on the host page (the
+ * neighbour loses its one-shot notification, as it does today after the violation) and let the guest retry. A thread stack's guard is handled
+ * before this (stack growth) and is untouched. dprintf only: the Mach path runs on the exception thread, which has no TEB. */
+static int ios_guard_neighbour_on( void )
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_GUARD_NEIGHBOUR_PASS" );
+        on = e && e[0] == '1' && !e[1];
+    }
+    return on;
+}
+
+static int ios_guard_neighbour_pass( void *addr, char *host_page )
+{
+    static unsigned said;
+    BYTE own;
+
+    if (!ios_guard_neighbour_on()) return 0;
+    own = get_page_vprot( addr );   /* the guest page touched, not the host page's ORed byte */
+    if ((own & VPROT_GUARD) || !(own & VPROT_COMMITTED)) return 0;   /* its own guard, or nothing committed: the normal path */
+    set_page_vprot_bits( host_page, host_page_size, 0, VPROT_GUARD );
+    mprotect_range( host_page, host_page_size, 0, 0 );
+    if (said++ < 16)
+        dprintf( 2, "[guard-neighbour] r708 touched %p (vprot 0x%02x) beside a guard page in its 16 KB host page %p: passed, no "
+                 "STATUS_GUARD_PAGE_VIOLATION (env.MADEIRA_GUARD_NEIGHBOUR_PASS=1)\n", addr, own, host_page );
+    return 1;
+}
+
 /***********************************************************************
  *           virtual_handle_fault
  */
@@ -33064,9 +33211,13 @@ NTSTATUS virtual_handle_fault( EXCEPTION_RECORD *rec, void *stack )
         struct thread_stack_info stack_info;
         if (!is_inside_thread_stack( page, &stack_info ))
         {
-            set_page_vprot_bits( page, host_page_size, 0, VPROT_GUARD );
-            mprotect_range( page, host_page_size, 0, 0 );
-            ret = STATUS_GUARD_PAGE_VIOLATION;
+            if (ios_guard_neighbour_pass( addr, page )) ret = STATUS_SUCCESS;   /* madeira-bcd (round 707, M4 S7): the guard was the neighbour's */
+            else
+            {
+                set_page_vprot_bits( page, host_page_size, 0, VPROT_GUARD );
+                mprotect_range( page, host_page_size, 0, 0 );
+                ret = STATUS_GUARD_PAGE_VIOLATION;
+            }
         }
         else ret = grow_thread_stack( page, &stack_info );
     }
@@ -33633,9 +33784,13 @@ NTSTATUS ios_virtual_handle_fault_for_thread( EXCEPTION_RECORD *rec, TEB *teb )
         struct thread_stack_info stack_info;
         if (!is_inside_thread_stack_teb( page, &stack_info, teb ))
         {
-            set_page_vprot_bits( page, host_page_size, 0, VPROT_GUARD );
-            mprotect_range( page, host_page_size, 0, 0 );
-            ret = STATUS_GUARD_PAGE_VIOLATION;
+            if (ios_guard_neighbour_pass( addr, page )) ret = STATUS_SUCCESS;   /* madeira-bcd (round 707, M4 S7): the guard was the neighbour's */
+            else
+            {
+                set_page_vprot_bits( page, host_page_size, 0, VPROT_GUARD );
+                mprotect_range( page, host_page_size, 0, 0 );
+                ret = STATUS_GUARD_PAGE_VIOLATION;
+            }
         }
         else ret = grow_thread_stack_teb( page, &stack_info, teb );
     }
@@ -38107,6 +38262,77 @@ static int ios_big_hint_query( const void *addr, MEMORY_BASIC_INFORMATION *info 
 }
 #endif /* WINE_IOS */
 
+#ifdef WINE_IOS
+/* madeira-bcd (round 707, agents S1 S12 and G2 S15; The Binding of Isaac: Repentance 12PA5Y, 1519AX, JJXR3Z, ZAKA1A, 7CFX2D): a 32-bit program's
+ * own request comes with its 4 GB ceiling: wow64's NtAllocateVirtualMemory passes its default zero_bits (0x7fffffff or more), whose limit is never
+ * 0, and its VirtualAlloc2 (mimalloc's aligned reserve) a HighestEndingAddress of the guest's. The two branches of MADEIRA_WOW_JUMBO_INSIDE asked
+ * for "no limit" (!limit), so for a 32-bit program they never ran: no log of the archive has a [jumbo-wow] r666 line, though the key was on and the
+ * reserve outside the window in five of six Isaac logs. A limit at or below 4 GB is the guest's own; the emulator's requests carry none or a
+ * 64-bit one and stay out (a request with no limit at all is never the guest's: wow64 always sets one). */
+static int ios_wow_guest_limit( ULONG_PTR limit_low, ULONG_PTR limit_high )
+{
+    return !limit_low && limit_high && limit_high <= 0xffffffffULL;
+}
+
+/* round 707 (G2 S15 a2; Isaac 12PA5Y: "the fault address 0x2ec00000 lies at the low 32 bits of the OUTSIDE placement out #6624 (host 0x702ec00000+
+ * 0x400000)"): env.MADEIRA_WOW_ALLOC_INSIDE = 1 (default off, per game): a 32-bit program's request with no address of its own whose placement lies
+ * outside its 4 GB window is asked again inside the window; if the window has no room it is released and answered STATUS_NO_MEMORY. A pointer
+ * outside the window is cut to its low 32 bits for the program and cannot work, whatever the size. Read at every such placement (rare: the window
+ * normally holds them), so one game's line never carries into the next session of the same app run. */
+static int ios_wow_alloc_inside_on( void )
+{
+    const char *e = getenv( "MADEIRA_WOW_ALLOC_INSIDE" );
+    return e && e[0] == '1' && !e[1];
+}
+
+/* The placement *ret (size *size_ptr) of a 32-bit program lies outside its window: ask for `want` bytes again with the window as range, keeping the
+ * outside one until then. 1: *ret and *size_ptr now name a placement inside (the outside one released); 0: the window has no room, *ret unchanged. */
+static int ios_wow_reask_inside( void **ret, SIZE_T *size_ptr, SIZE_T want, ULONG type, ULONG protect, ULONG_PTR align, ULONG attributes )
+{
+    void *inside = NULL, *outside = *ret;
+    SIZE_T in_size = want, fs = 0;
+    NTSTATUS ist = allocate_virtual_memory( &inside, &in_size, type, protect, 0, IOS_WOW_WINDOW_SIZE - 1, align, attributes );
+
+    if (!ist && !ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)inside, in_size ))
+    {
+        NtFreeVirtualMemory( NtCurrentProcess(), &outside, &fs, MEM_RELEASE );
+        *ret = inside;
+        *size_ptr = in_size;
+        return 1;
+    }
+    if (!ist) { void *again = inside; SIZE_T afs = 0; NtFreeVirtualMemory( NtCurrentProcess(), &again, &afs, MEM_RELEASE ); }
+    return 0;
+}
+
+/* MADEIRA_WOW_ALLOC_INSIDE for one placement; `path` names the entry point in the log. Returns the request's status. */
+static NTSTATUS ios_wow_alloc_inside( void **ret, SIZE_T *size_ptr, SIZE_T want, ULONG type, ULONG protect, ULONG_PTR align, ULONG attributes,
+                                      const char *path )
+{
+    static unsigned said;
+    void *was = *ret;
+
+    if (ios_wow_reask_inside( ret, size_ptr, want, type, protect, align, attributes ))
+    {
+        if (said++ < 32)
+            dprintf( 2, "[wow-inside] r708 MADEIRA_WOW_ALLOC_INSIDE=1 (%s): 0x%lx bytes of this 32-bit program were placed at %p, outside its window "
+                        "[0x%lx,0x%lx); placed again inside at %p (guest 0x%08x)\n", path, (unsigned long)want, was, (unsigned long)ios_wow_base(),
+                     (unsigned long)(ios_wow_base() + IOS_WOW_WINDOW_SIZE), *ret, (unsigned)(ULONG)((ULONG_PTR)*ret - ios_wow_base()) );
+        return STATUS_SUCCESS;
+    }
+    {
+        void *outside = *ret;
+        SIZE_T fs = 0;
+        NtFreeVirtualMemory( NtCurrentProcess(), &outside, &fs, MEM_RELEASE );
+    }
+    if (said++ < 32)
+        dprintf( 2, "[wow-inside] r708 MADEIRA_WOW_ALLOC_INSIDE=1 (%s): 0x%lx bytes of this 32-bit program were placed at %p, outside its window, and "
+                    "the window has no room: released, STATUS_NO_MEMORY\n", path, (unsigned long)want, was );
+    *ret = NULL;
+    *size_ptr = want;
+    return STATUS_NO_MEMORY;
+}
+#endif
+
 static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirtualMemory( HANDLE process, PVOID *ret, ULONG_PTR zero_bits,
                                          SIZE_T *size_ptr, ULONG type, ULONG protect )
 {
@@ -39184,9 +39410,9 @@ static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirt
         if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL : *ret, (unsigned)st );
         /* madeira-bcd (night round 2026-11-11, G6 S7): env.MADEIRA_WOW_JUMBO_INSIDE = 1, see ios_wow_jumbo_inside_on. After the census, which
          * has just said where the request was placed. */
-        if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 2 && ios_wow_base() &&
+        if (is_jumbo && !st && !jumbo_hint && ios_wow_guest_limit( 0, limit ) && ios_wow_jumbo_inside_on() == 2 && ios_wow_base() &&
             ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)*ret, *size_ptr ))
-        {   /* build 666 (issue #53): MADEIRA_WOW_JUMBO_INSIDE = 2, see ios_wow_jumbo_inside_on */
+        {   /* build 666 (issue #53): MADEIRA_WOW_JUMBO_INSIDE = 2, see ios_wow_jumbo_inside_on; round 707: a 32-bit program's own limit (ios_wow_guest_limit) */
             void *inside = NULL, *outside = *ret;
             SIZE_T in_size = jumbo_size, fs = 0;
             NTSTATUS ist = allocate_virtual_memory( &inside, &in_size, type, protect, 0, IOS_WOW_WINDOW_SIZE - 1, 0, 0 );
@@ -39209,7 +39435,7 @@ static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirt
                          (unsigned long)(jumbo_size >> 20), *ret, (unsigned)ist, inside );
             }
         }
-        if (is_jumbo && !st && !jumbo_hint && !limit && ios_wow_jumbo_inside_on() == 1 && ios_wow_base() &&
+        if (is_jumbo && !st && !jumbo_hint && ios_wow_guest_limit( 0, limit ) && ios_wow_jumbo_inside_on() == 1 && ios_wow_base() &&
             ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)*ret, *size_ptr ))
         {
             void *outside = *ret;
@@ -39223,6 +39449,10 @@ static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirt
             *size_ptr = jumbo_size;
             st = STATUS_NO_MEMORY;
         }
+        /* round 707 (G2 S15 a2): env.MADEIRA_WOW_ALLOC_INSIDE = 1, any size (ios_wow_alloc_inside) */
+        if (!st && !jumbo_hint && ios_wow_base() && ios_wow_guest_limit( 0, limit ) &&
+            ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)*ret, *size_ptr ) && ios_wow_alloc_inside_on())
+            st = ios_wow_alloc_inside( ret, size_ptr, jumbo_size, type, protect, 0, 0, "VirtualAlloc" );
         /* madeira-bcd: remember a helper's large reservation for ios_sc_reap_dead */
         if (is_jumbo && !st && ios_sc_cef_enabled() && ios_sc_current_is_helper()) ios_sc_grant_note( *ret, *size_ptr );
         if (!st && *size_ptr >= 0x10000000 && *size_ptr < 0x40000000 && (type & MEM_RESERVE))
@@ -40884,6 +41114,39 @@ retry_code_carve_reuse:
         if (st && (type & MEM_COMMIT) && jumbo_hint) ios_oversize_commit_failed( jumbo_hint, jumbo_size, st );
 
         if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL : *ret, (unsigned)st );
+        /* round 707 (G2 S15 a1; Isaac: mimalloc reserves its arenas through VirtualAlloc2): MADEIRA_WOW_JUMBO_INSIDE in this entry point too, for a
+         * 32-bit program's own request only (its HighestEndingAddress is the guest's: ios_wow_guest_limit); the emulator's requests stay out. */
+        if (!st && !jumbo_hint && ios_wow_base() && limit_high && ios_wow_guest_limit( limit_low, limit_high ) &&
+            ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)*ret, *size_ptr ))
+        {
+            int key = is_jumbo ? ios_wow_jumbo_inside_on() : 0;
+            void *outside = *ret;
+
+            if (key == 2)
+            {
+                if (ios_wow_reask_inside( ret, size_ptr, jumbo_size, type, protect, align, attributes ))
+                    dprintf( 2, "[jumbo-wow] r666 MADEIRA_WOW_JUMBO_INSIDE=2 (VirtualAlloc2): the %lu MB reserve of this 32-bit program was placed at %p, "
+                                "outside its window [0x%lx,0x%lx); placed again inside at %p (guest 0x%08x), the outside one released\n",
+                             (unsigned long)(jumbo_size >> 20), outside, (unsigned long)ios_wow_base(), (unsigned long)(ios_wow_base() + IOS_WOW_WINDOW_SIZE),
+                             *ret, (unsigned)(ULONG)((ULONG_PTR)*ret - ios_wow_base()) );
+                else
+                    dprintf( 2, "[jumbo-wow] r666 MADEIRA_WOW_JUMBO_INSIDE=2 (VirtualAlloc2): the %lu MB reserve of this 32-bit program was placed at %p, "
+                                "outside its window, and its window has no room for it: the program keeps the outside one, as without the key\n",
+                             (unsigned long)(jumbo_size >> 20), outside );
+            }
+            else if (key == 1)
+            {
+                SIZE_T fs = 0;
+                NtFreeVirtualMemory( NtCurrentProcess(), &outside, &fs, MEM_RELEASE );
+                dprintf( 2, "[jumbo-wow] r652 MADEIRA_WOW_JUMBO_INSIDE=1 (VirtualAlloc2): the %lu MB reserve of this 32-bit program was placed at %p, outside "
+                            "its window: released, the program is answered STATUS_NO_MEMORY\n", (unsigned long)(jumbo_size >> 20), *ret );
+                *ret = jumbo_hint;
+                *size_ptr = jumbo_size;
+                st = STATUS_NO_MEMORY;
+            }
+            if (!st && ios_wow_jumbo_outside( ios_wow_base(), (ULONG_PTR)*ret, *size_ptr ) && ios_wow_alloc_inside_on())
+                st = ios_wow_alloc_inside( ret, size_ptr, jumbo_size, type, protect, align, attributes, "VirtualAlloc2" );
+        }
         if (!st && *size_ptr >= 0x10000000 && *size_ptr < 0x40000000 && (type & MEM_RESERVE))
             ios_bigres_note( *ret, *size_ptr );
         if (!st) ios_sc_tbl_note( *ret, *size_ptr, type );   /* round 631 (R4 S1): the helper's V8 reservations */

@@ -34,6 +34,10 @@
 
 static _Atomic uint64_t g_ring[RING_SIZE];
 static _Atomic uint64_t g_head;          // presents taken, ever
+/// The frames made by frame generation: the same kind of ring, apart (BCDFrameRing.h).
+static _Atomic uint64_t g_made_ring[RING_SIZE];
+static _Atomic uint64_t g_made_head;
+static _Atomic uint64_t g_made_newest;   // the newest timestamp handed out: each one is later than the one before
 static _Atomic uint64_t g_prev;          // the newest present's timestamp this session (0: none yet)
 static _Atomic uint32_t g_hist[BUCKETS];
 static _Atomic uint64_t g_active_us, g_stalls, g_stall_us;
@@ -140,16 +144,17 @@ bcd_frame_reader bcd_frame_reader_start(void) {
     return r;
 }
 
-uint32_t bcd_frame_ring_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t max, uint64_t *lost) {
+static uint32_t ring_drain(_Atomic uint64_t *ring, _Atomic uint64_t *head_p, bcd_frame_reader *reader, uint64_t *out, uint32_t max,
+                           uint64_t *lost) {
     uint64_t gone = 0;
     uint32_t n = 0;
     if (!reader || !out) { if (lost) *lost = 0; return 0; }
-    uint64_t head = atomic_load_explicit(&g_head, memory_order_acquire);
+    uint64_t head = atomic_load_explicit(head_p, memory_order_acquire);
     uint64_t end = head > 0 ? head - 1 : 0;
     uint64_t oldest = end > RING_SAFE ? end - RING_SAFE : 0;
     if (reader->cursor < oldest) { gone = oldest - reader->cursor; reader->cursor = oldest; }
     while (reader->cursor < end && n < max) {
-        uint64_t t = atomic_load_explicit(&g_ring[reader->cursor & RING_MASK], memory_order_relaxed);
+        uint64_t t = atomic_load_explicit(&ring[reader->cursor & RING_MASK], memory_order_relaxed);
         reader->cursor++;
         if (t == 0 || t <= reader->last) continue;   // not stored yet (first lap) or out of order
         out[n++] = t;
@@ -157,6 +162,46 @@ uint32_t bcd_frame_ring_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t 
     }
     if (lost) *lost = gone;
     return n;
+}
+
+uint32_t bcd_frame_ring_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t max, uint64_t *lost) {
+    return ring_drain(g_ring, &g_head, reader, out, max, lost);
+}
+
+// MARK: Frames made by frame generation
+
+#define BCD_FR_EXPORT __attribute__((used, visibility("default")))
+
+BCD_FR_EXPORT void bcd_frame_made_push_at(uint64_t t) {
+    uint64_t slot = atomic_fetch_add_explicit(&g_made_head, 1, memory_order_relaxed);
+    atomic_store_explicit(&g_made_ring[slot & RING_MASK], t, memory_order_relaxed);
+}
+
+BCD_FR_EXPORT void bcd_frame_made_push_n(uint32_t count) {
+    // Each timestamp later than the one before (the reader hands out only newer ones, and two calls can read the same tick):
+    // the clock, or one tick past the newest, for several at once one tick apart.
+    if (count == 0) return;
+    if (count > 8u) count = 8u;
+    uint64_t now = bcd_frame_now_ticks(), prev = atomic_load_explicit(&g_made_newest, memory_order_relaxed), t;
+    do {
+        t = now > prev ? now : prev + 1;
+    } while (!atomic_compare_exchange_weak_explicit(&g_made_newest, &prev, t + count - 1, memory_order_relaxed, memory_order_relaxed));
+    for (uint32_t i = 0; i < count; i++) bcd_frame_made_push_at(t + i);
+}
+
+bcd_frame_reader bcd_frame_made_reader_start(void) {
+    bcd_frame_reader r;
+    r.cursor = atomic_load_explicit(&g_made_head, memory_order_acquire);
+    r.last = 0;
+    return r;
+}
+
+uint32_t bcd_frame_made_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t max, uint64_t *lost) {
+    return ring_drain(g_made_ring, &g_made_head, reader, out, max, lost);
+}
+
+uint64_t bcd_frame_made_count(void) {
+    return atomic_load_explicit(&g_made_head, memory_order_acquire);
 }
 
 void bcd_frame_stats_begin(void) {

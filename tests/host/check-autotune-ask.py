@@ -62,7 +62,8 @@ check("nothing waits while it is off, and the layer is then auto-tune's own",
       "guard on, let next = state.candidate, !next.isEmpty else { return [] }" in ask
       and "waiting(state, windowsPath).isEmpty ? state.layerLines : AutoTuneState.merge(state.kept, [])" in ask)
 check("the launch file gets AutoTuneAsk.layer (auto-tune's layer while off), and the start says when a fix waits",
-      "let lines = AutoTuneAsk.layer(s, path).filter { !blocked.contains(AutoTuneRules.key($0)) }" in glue
+      # round 707 (agent M1 S6): the layer is named first, so a start that gets none can say what held it back
+      "let layer = AutoTuneAsk.layer(s, path)\n        let lines = layer.filter { !blocked.contains(AutoTuneRules.key($0)) }" in glue
       and "waits for the player's yes (Ask before trying a fix); this start runs without it" in glue)
 check("the session's marker records what the start really got, only while the switch is on",
       "if AutoTuneAsk.on { m.layer = AutoTuneAsk.layer(state(entry.windowsPath), entry.windowsPath)" in glue)

@@ -262,7 +262,13 @@ launch = live[live.index("    nonisolated static func launch() -> String? {"):li
 check("a session's start: without the game's line nothing is exported (the files an earlier session left are removed, the variables unset)",
       launch.index("BCDLosslessFiles.removeSessionFiles()") < launch.index('unsetenv("MADEIRA_LSFG_CTL")')
       < launch.index("guard let generated = BCDLossless.generated(MadeiraConfig.gameValue(BCDLossless.key) ?? MadeiraConfig.get(BCDLossless.key)) else { return nil }")
-      < launch.index('        setenv("MADEIRA_LSFG_CTL"') and len(re.findall(r"(?<!un)setenv\(", launch)) == 3
+      < launch.index('        setenv("MADEIRA_LSFG_CTL"') and len(re.findall(r"(?<!un)setenv\(", launch)) == 5
+      and launch.index('unsetenv("MADEIRA_LSFG_HOST_CTL")') < launch.index("guard let generated = BCDLossless.generated(")
+      and launch.index('unsetenv("MADEIRA_LSFG_HOST_MSL")') < launch.index("guard let generated = BCDLossless.generated(")
+      # build 706: the driver's host paths only for a `vulkan = kosmickrisp` game, and only once its shaders were translated
+      and launch.index("if MadeiraConfig.gameValue(BCDVTInterp.vulkanKey) == BCDVTInterp.kosmickrispValue {")
+      < launch.index("if let file, (try? file.write(to: BCDLosslessFiles.mslFileURL, options: [.atomic])) != nil {")
+      < launch.index('                setenv("MADEIRA_LSFG_HOST_CTL"')
       and "if let line = BCDLosslessLive.launch() { logStore.log(line) }" in content)
 check("with the line: only when the purchase check is valid and the sealed file opens; the game then runs on d3d11-src.dll and MetalFX's generator is off",
       launch.index("guard BCDLosslessFiles.prepareForGame() else {") < launch.index('        setenv("MADEIRA_LSFG_CTL"')
@@ -276,9 +282,12 @@ check("the file comes from Steam with the account's own licence and from nowhere
 check("the shaders stay in the prefix only for the session; the DLL is never written in the clear",
       "BCDLosslessFiles.removeSessionFiles()" in live[live.index("    func sessionEnded() {"):] and "BCDLosslessLive.shared.sessionEnded()" in (APP / "BCDMenuMore.swift").read_text()
       and live.count("box.write(to: shaderFileURL") == 1
-      # every file this code writes: the receipt, the sealed DLL, the shader container, the control file
+      # every file this code writes: the receipt, the sealed DLL, the shader container, the control file, the shaders translated for a
+      # Vulkan game's driver (build 706; in the prefix too, and removed with the others)
+      and "try? fm.removeItem(at: mslFileURL)" in live[live.index("    static func removeSessionFiles() {"):]
       and sorted(re.findall(r"(\w+(?:\.text\(hz: hz\))?)\.write\(to: (\w+(?:\.\w+)?)", live))
-          == [("box", "shaderFileURL"), ("control.text(hz: hz)", "controlFileURL"), ("data", "receiptURL"), ("sealed", "BCDLosslessFiles.sealedURL")])
+          == [("box", "shaderFileURL"), ("control.text(hz: hz)", "controlFileURL"), ("data", "receiptURL"), ("file", "BCDLosslessFiles.mslFileURL"),
+              ("sealed", "BCDLosslessFiles.sealedURL")])
 steam = (APP / "SteamOwnedLibrary.swift").read_text()
 check("Steam: the licence is read from the account's list, and the download is refused while a game runs or another download is active",
       "fetcher.forgetOwnedApps()\n        return try await fetcher.ownedAppIDs().contains(appID)" in steam

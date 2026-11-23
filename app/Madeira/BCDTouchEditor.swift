@@ -28,6 +28,7 @@ import UIKit
 struct BCDTouchEditorState: Equatable {
     var items: [BCDTouchItem] = []
     var selected: UUID?
+    var selectedIDs: Set<UUID> = []
     var layoutScale = 1.0
     var layouts = BCDTouchLayouts()
     /// The controls' opacity in play, and its range (a library game's own, or the shared one).
@@ -47,6 +48,7 @@ struct BCDTouchEditorState: Equatable {
     func remove(_ id: UUID)
     func setAction(_ id: UUID, _ action: BCDTouchAction)
     func setScale(_ id: UUID, _ scale: Double)
+    func setGroupAverageScale(_ ids: Set<UUID>, _ average: Double)
     /// A locked control cannot be moved, resized or removed until it is unlocked.
     func setLocked(_ id: UUID, _ locked: Bool)
     /// build 666 (issue #45): one press holds the control's key or button, the next lets go (BCDTouchItem.latch).
@@ -67,6 +69,12 @@ struct BCDTouchEditorState: Equatable {
     func revert()
     /// Ends the edit (edits to a layout of the player's own are kept in it).
     func done()
+}
+
+extension BCDTouchEditorActions {
+    func setGroupAverageScale(_ ids: Set<UUID>, _ average: Double) {
+        ids.forEach { setScale($0, average) }
+    }
 }
 
 // MARK: - The editor
@@ -102,7 +110,14 @@ struct BCDTouchEditor: View {
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            if let item = selectedItem, typing == item.id {
+            if state.selectedIDs.count > 1 {
+                let rect = dock(avoiding: nil)
+                groupInspector
+                    .frame(width: rect.width)
+                    .background(BCDTouchPanelBackground())
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .position(x: rect.midX, y: rect.minY + 55)
+            } else if let item = selectedItem, typing == item.id {
                 textCard(item)
             } else if let item = selectedItem {
                 let rect = dock(avoiding: frame(of: item))
@@ -129,12 +144,37 @@ struct BCDTouchEditor: View {
                 .padding(.top, max(insets.top, 6) + 6)
         }
         .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+        .onChange(of: state.selectedIDs) { _, ids in
+            if !ids.isEmpty { layoutsOpen = false }
+        }
         .onChange(of: state.selected) { _, id in
             tab = nil
             typing = nil
             if id != nil { layoutsOpen = false }
         }
         .transaction { $0.animation = nil }
+    }
+
+    private var groupInspector: some View {
+        let chosen = state.items.filter { state.selectedIDs.contains($0.id) }
+        let editable = chosen.filter { !$0.locked }
+        let average = editable.isEmpty ? 1.0 : editable.map(\.scale).reduce(0, +) / Double(editable.count)
+        return VStack(spacing: 10) {
+            HStack {
+                Text("\(chosen.count) selected")
+                    .font(BCDStyle.heading(roomy ? 19 : 16))
+                    .foregroundStyle(BCDStyle.text)
+                Spacer()
+                BCDTouchCloseButton { actions.select(nil) }
+            }
+            BCDTouchSliderRow(title: "Size", value: average, range: BCDTouchGeometry.scaleRange,
+                              text: String(format: "%.1f\u{00D7}", average)) {
+                actions.setGroupAverageScale(state.selectedIDs, $0)
+            }
+            .disabled(editable.isEmpty)
+            .opacity(editable.isEmpty ? 0.45 : 1)
+        }
+        .padding(12)
     }
 
     /// The card the selected control's words are typed in: under the bar, across the middle of the screen, above where the

@@ -26,6 +26,9 @@ GL_LINE = re.compile(r'gl-backend\s*=\s*(zink|gles)\s*$', re.I)
 # (WineProcessBridge.m: a game that lists dbgcore gets dbgcore.dll -> arm64ec-windows/dbghelp.dll). For these the shipped
 # target is what must be in DIR.
 LINKED = {'dbgcore': 'dbghelp.dll'}
+# M1-S10 (build 708): icuin.dll, which BCD builds, imports icuuc.dll (Qt6Core.dll imports both, and Windows' own pair is the same); a list or rule that names
+# icuin without icuuc still needs both files in DIR, whether or not the app also links icuuc for it (WineProcessBridge.m: icuin brings icuuc, as evr brings dxva2).
+IMPLIES = {'icuin': ('icuuc',)}
 
 
 def wanted(recs_path, rules_path):
@@ -41,6 +44,8 @@ def wanted(recs_path, rules_path):
                     n = n[:-4]
                 if n:
                     names.setdefault(n, set()).add(who)
+                    for implied in IMPLIES.get(n, ()):
+                        names.setdefault(implied, set()).add(who + ' (%s imports %s.dll)' % (n, implied))
 
     recs = json.loads(Path(recs_path).read_text())
     for r in recs['rules']:

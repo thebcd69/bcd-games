@@ -201,6 +201,10 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
     /// Madeira Dock holds the account: from before its sign-in transfer is
     /// written until its session ended (or its start failed).
     private(set) var heldForDock = false
+    /// Branch steam-client (2026-11-21, M1): a Steam for Windows session holds the account the same way: Valve's own client signs in
+    /// in its window, some time after the session began, and may stay signed in until it ends. From before that session starts until
+    /// it has ended (or its start failed); nothing else sets it.
+    private(set) var heldForDesktopClient = false
     private var closing: Task<Void, Never>?
 
     /// `close` logs the app's connection off and returns once its socket is
@@ -229,6 +233,16 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
 
     /// Madeira Dock's session ended, or its start failed.
     func releaseDock() { heldForDock = false }
+
+    /// A Steam for Windows session is about to start: returns only once the app's connection is logged off and closed. Until
+    /// `releaseDesktopClient()` the connection stays closed whatever else happens.
+    func holdForDesktopClient() async {
+        heldForDesktopClient = true
+        await close().value
+    }
+
+    /// The Steam for Windows session ended, or its start failed.
+    func releaseDesktopClient() { heldForDesktopClient = false }
 
     /// Round 630 (agent A1 S17; Muv-Luv photonflowers PYVTE8, build 625): runs `work` and answers true when it ends within `seconds`,
     /// false when the time runs out first. Nothing is cancelled: the work goes on by itself either way.
@@ -262,10 +276,10 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
         reopenConnection()
     }
 
-    /// Lets the app's connection back when no game session runs and Dock does
-    /// not hold the account. Returns whether it reopened.
+    /// Lets the app's connection back when no game session runs and neither Dock nor a
+    /// Steam for Windows session holds the account. Returns whether it reopened.
     @discardableResult func reopen(sessionRunning: Bool) -> Bool {
-        guard !open, !sessionRunning, !heldForDock else { return false }
+        guard !open, !sessionRunning, !heldForDock, !heldForDesktopClient else { return false }
         open = true
         closing = nil
         reopenConnection()
@@ -1133,6 +1147,37 @@ final class SteamOwnedLibrary: ObservableObject {
     func dockEnded() {
         guard gate.heldForDock else { return }
         gate.releaseDock()
+        reconcileSession()
+    }
+
+    /// Branch steam-client (2026-11-21, M1): before a Steam for Windows session starts (BCDSteamDesktopLive.preLaunch): downloads
+    /// stop, and the app's own connection logs off and its socket closes, as before a Dock start. Valve's client signs in by itself,
+    /// in its own window; nothing of BCD's sign-in is handed to it. The connection stays closed until `desktopClientEnded()` and the
+    /// end of the session. Each wait is held to `dockStepLimit`, as prepareDock's.
+    func prepareDesktopClient() async {
+        let running = active?.task
+        let begin = Date()
+        sessionChanged(active: true)
+        if let running {
+            if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await running.value }) {
+                SteamLog.event(String(format: "[steam-depot] prepareDesktopClient: the stopped download ended after %.1f s", Date().timeIntervalSince(begin)))
+            } else {
+                SteamLog.event("[steam-depot] prepareDesktopClient: the stopped download did not end in \(Int(Self.dockStepLimit)) s; going on")
+            }
+        }
+        let gate = self.gate
+        if await SteamConnectionGate.endsWithin(seconds: Self.dockStepLimit, { await gate.holdForDesktopClient() }) {
+            SteamLog.event("[steam-library] connection closed for Steam for Windows")
+        } else {
+            SteamLog.event("[steam-library] the connection's close did not end in \(Int(Self.dockStepLimit)) s; Steam for Windows goes on")
+        }
+    }
+
+    /// The Steam for Windows session ended, or its start failed (LibraryModel.finish, BCDSteamDesktopLive): the connection comes
+    /// back once no session runs.
+    func desktopClientEnded() {
+        guard gate.heldForDesktopClient else { return }
+        gate.releaseDesktopClient()
         reconcileSession()
     }
 

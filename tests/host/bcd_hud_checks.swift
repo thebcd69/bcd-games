@@ -161,6 +161,11 @@ func texts(_ plan: BCDHUDPlan?) -> [[String]] {
               && BCDHUDRules.fpsTone(49, cap: nil) == .warm && BCDHUDRules.fpsTone(29, cap: nil) == .hot && BCDHUDRules.fpsTone(0, cap: nil) == .soft)
         check("the limit is 60, 30 or 40 for the modes that have one", BCDHUDRules.cap(fpsMode: 1) == 60 && BCDHUDRules.cap(fpsMode: 3) == 30
               && BCDHUDRules.cap(fpsMode: 4) == 40 && BCDHUDRules.cap(fpsMode: 0) == nil && BCDHUDRules.cap(fpsMode: 2) == nil)
+        // Round 707 (A2 F12): the fixed frame cap counts too; the lower of the two holds the game.
+        check("a frame cap of 25 under the 30 FPS limit is the target; 25 alone; the limit alone; a cap outside 10...120 is none",
+              BCDHUDRules.cap(fpsMode: 3, frameCap: 25) == 25 && BCDHUDRules.cap(fpsMode: 0, frameCap: 25) == 25
+              && BCDHUDRules.cap(fpsMode: 4, frameCap: 60) == 40 && BCDHUDRules.cap(fpsMode: 1, frameCap: nil) == 60
+              && BCDHUDRules.cap(fpsMode: 0, frameCap: 5) == nil && BCDHUDRules.cap(fpsMode: 0, frameCap: nil) == nil)
         check("memory: over 768 MB left is green, over 128 amber, less red", BCDHUDRules.memoryTone(freeMB: 900) == .good && BCDHUDRules.memoryTone(freeMB: 300) == .warm
               && BCDHUDRules.memoryTone(freeMB: 100) == .hot && BCDHUDRules.memoryTone(freeMB: nil) == .soft)
         check("heat words", BCDHUDRules.heat(0).word == "Cool" && BCDHUDRules.heat(1).word == "Warm" && BCDHUDRules.heat(2).word == "Hot" && BCDHUDRules.heat(3).word == "Too hot")
@@ -186,6 +191,26 @@ func texts(_ plan: BCDHUDPlan?) -> [[String]] {
         if case .pulse(let number, _, let dot)? = BCDHUDRows.plan(layout: .pulse, custom: .default, data: warn, width: 400)?.rows.first {
             check("layout 1: 41 of 60 is amber and the dot shows", number.tone == .warm && dot == .warm)
         }
+        // build 707: the frames frame generation adds come after the game's rate, "15+15", in every layout
+        var gen = d; gen.fps = 15.2; gen.madeFps = 15.4
+        check("frames made are written after the game's rate: 15+15; none made (or under half a frame a second): the rate alone; – before a frame",
+              BCDHUDRules.rate(gen) == "15+15" && BCDHUDRules.rate(d) == "60" && { var x = d; x.madeFps = 0.4; return BCDHUDRules.rate(x) == "60" }()
+              && { var x = d; x.fps = 0; x.madeFps = 30; return BCDHUDRules.rate(x) == "–" && BCDHUDRules.shownFps(x) == 0 }(), BCDHUDRules.rate(gen))
+        check("the colour is every frame shown against the limit: 60+60 of 60 green, 15+15 of 60 red, 25+25 of 60 amber",
+              { var x = d; x.madeFps = 60; return BCDHUDRules.rateTone(x) == .good }() && BCDHUDRules.rateTone(gen) == .hot
+              && { var x = d; x.fps = 25; x.madeFps = 25; return BCDHUDRules.rateTone(x) == .warm }())
+        check("layouts 1 to 4 and a Custom list write 15+15 (and 15+15/60 for the rate against the limit)", {
+            let one = texts(BCDHUDRows.plan(layout: .pulse, custom: .default, data: gen, width: 400)).first ?? []
+            let two = texts(BCDHUDRows.plan(layout: .strip, custom: .default, data: gen, width: 400)).first ?? []
+            let three = texts(BCDHUDRows.plan(layout: .tune, custom: .default, data: gen, width: 400)).first ?? []
+            let four = texts(BCDHUDRows.plan(layout: .report, custom: .default, data: gen, width: 400))
+            var c = BCDHUDCustom.default; c.items = [.fps, .fpsCap]
+            let custom = texts(BCDHUDRows.plan(layout: .custom, custom: c, data: gen, width: 400)).flatMap { $0 }
+            return one == ["15+15", "fps"] && two.first == "15+15 FPS" && three.first == "15+15 FPS" && four.count > 1 && four[1].first == "15+15 FPS"
+                && custom.contains("15+15 FPS") && custom.contains("15+15/60")
+        }())
+        check("VoiceOver says the frames made too", BCDHUDRules.rateSpoken(gen) == "15 frames a second, and 15 more made by frame generation"
+              && BCDHUDRules.rateSpoken(d) == "60 frames a second" && BCDHUDRules.rateSpoken(BCDHUDData()) == "No frames yet")
         let p2 = BCDHUDRows.plan(layout: .strip, custom: .default, data: d, width: 400)
         check("layout 2 is one line: frame rate | frame time | memory against the limit | heat", texts(p2) == [["60 FPS", "16.6 ms", "3.1/5.8 GB", "Cool"]], "\(texts(p2))")
         check("layout 2 colours: the rate green, the memory green, the heat green", {

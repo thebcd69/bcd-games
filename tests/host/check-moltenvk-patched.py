@@ -202,8 +202,14 @@ for rid in rule_ids:
     i = at.index(f'"id": "{rid}"')
     bodies[rid] = at[i:at.index('"reason"', i)]
 check("auto-tune: the four rules that propose `vulkan = moltenvk` also treat a moltenvk-patched session as one that already had Vulkan on (and so does the generated file)",
-      all(guard in b for b in bodies.values()) and (R / "app/Madeira/AutoTuneRules.generated.swift").read_text().count("vulkan=moltenvk-patched: Vulkan is on for this session") == 4,
-      {k: v[-200:] for k, v in bodies.items()})
+      all(guard in b for b in bodies.values()) and (R / "app/Madeira/AutoTuneRules.generated.swift").read_text().count("vulkan=moltenvk-patched: Vulkan is on for this session") == 5,
+      {k: v[-200:] for k, v in bodies.items()})   # 5: the four, and (round 707) vulkan-required-box-no-suitable-gpu below
+# round 707 (agent M3 S5): the rule that proposes `vulkan = kosmickrisp` for a Vulkan-only game's box treats a session on either MoltenVK
+# (and on KosmicKrisp) as one that already had Vulkan on, as the four do
+_i = at.index('"id": "vulkan-required-box-no-suitable-gpu"')
+_kk = at[_i:at.index('"reason"', _i)]
+check("auto-tune: the KosmicKrisp rule (round 707) also leaves a session alone that had Vulkan on (either MoltenVK, or KosmicKrisp)",
+      guard in _kk and 's("vulkan=kosmickrisp: Vulkan is on for this session")' in _kk and '"lines": ["vulkan = kosmickrisp"]' in _kk, _kk[-300:])
 shipped = (R / "tools/check-vulkan-shipped.py").read_text()
 check("the packaging check: the patched library is optional, and whole when there (name, arm64, install name, entry points, not the plain library's bytes, its version file, no .tmp)",
       "libMoltenVK_patched.dylib" in shipped and "@rpath/libMoltenVK_patched.dylib" in shipped and '"_vkGetInstanceProcAddr", "_vkGetDeviceProcAddr"' in shipped

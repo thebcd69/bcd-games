@@ -129,6 +129,28 @@ import Foundation
         }
     }
 
+    /// Branch steam-client (2026-11-22): the DLC with files the account owns, for each game in `appIDs`, for Steam for Windows'
+    /// records (SteamDesktopDLC, BCDSteamDesktopLive.preLaunch). A report read in this run is used as it is; the others are looked
+    /// up now, one after another, as `load` does, and no new lookup starts once `seconds` have passed (each request has its own
+    /// time limit). A game that was not looked up is left out of the answer. Nothing is looked up when the account may not connect.
+    func ownedWithContent(_ appIDs: [Int], seconds: Double) async -> [Int: Set<UInt32>] {
+        var out: [Int: Set<UInt32>] = [:]
+        var missing: [Int] = []
+        for id in appIDs where id > 0 && id <= Int(UInt32.max) {
+            if let report = reports[id] { out[id] = Set(report.owned.map(\.appID)) } else { missing.append(id) }
+        }
+        guard !missing.isEmpty, canConnect() else { return out }
+        let deadline = Date().addingTimeInterval(seconds)
+        for id in missing {
+            guard Date() < deadline else { break }
+            guard let report = try? await fetcher.dlcReport(appID: UInt32(id)) else { continue }
+            reports[id] = report
+            loadedAt[id] = Date()
+            out[id] = Set(report.owned.map(\.appID))
+        }
+        return out
+    }
+
     // MARK: The player's choice
 
     /// A toggle on an installed game's page.

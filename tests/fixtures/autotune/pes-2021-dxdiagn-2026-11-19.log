@@ -1,0 +1,433 @@
+[02:52:14.182] [INFO] Checking entitlements...
+[02:52:14.183] [INFO] [build] v0.1.665 (665)
+[02:52:14.184] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 27.2.1 (Build 24B156) ram=7655MB available=6120MB cores=6
+[02:52:14.184] [INFO] [device] address-map=[0x102f28000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[02:52:14.185] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[02:52:14.205] [INFO] [device] settings: low-power=0 thermal=fair screen=1290x2796@3.0x max-fps=120 utc-offset=+03:00 free-disk=114GB stikdebug-url=0
+[02:52:14.209] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[02:52:16.144] [INFO] Requesting JIT with Built-in StikJIT...
+[02:52:52.372] [INFO] [bcd-ui] play local
+[02:52:52.386] [INFO] [bcd] library launch PES2021.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[02:52:52.406] [INFO] Running full Wine sequence...
+[02:52:52.406] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102f28000,0x8000000000) 512GB available=6091MB low-power=0 thermal=fair
+[02:52:52.407] [INFO] [game-cfg] env.MADEIRA_X64_IMAGE_NOCOPY=1 exe-window-mb=512
+[02:52:52.414] [INFO] Allocating 1152MB JIT pool (BRK will suspend process)...
+[02:52:52.414] [INFO] Allocating 1152MB JIT pool via debugger...
+[02:52:52.414] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[02:52:52.415] [INFO] [jit-debugger] attached=1 at the pool request
+[02:52:52.415] [INFO] [jit-age] attach age=34s source=enable-jit method=builtin thermal=1
+[02:52:52.415] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[02:52:52.416] [OK] [exe-window] executable window widened to [0x140000000,+512MB) for this game (exe-window-mb)
+[02:52:52.417] [ERR] ml1036: no hole fits a 1152MB pool — SHRINKING to 400MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[02:52:52.417] [ERR] ⚠️ SMALL JIT POOL (400MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[02:52:53.021] [INFO] RX pool at 0x126e00000
+[02:52:53.033] [OK] JIT pool ready (debugger still attached).
+[02:52:53.034] [INFO] BRK suspension lasted 0.62s
+[02:52:53.036] [INFO] Detaching debugger...
+[02:52:53.040] [OK] Debugger detached.
+[02:52:53.042] [OK] [early-detach] rev=ml524 took 6 ms
+[02:52:53.050] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.665s rev=ml526
+[02:52:53.079] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   exe-window-mb = 512
+[madeira-env] game MADEIRA_X64_IMAGE_NOCOPY=1
+[WineProc] Target exe: C:\Games\eFootball PES 2021\PES2021.exe (bundle=arm64ec-windows)
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[02:52:53.380] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[02:52:53.380] [Wine init_process] reply_pipe=41, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=5684 MB + phys_footprint=459 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: map_image_view size=0x1b97c000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x100010000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Games\\eFootball PES 2021\\PES2021.exe" 0x140000000+0x1b97c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[x64-image] #1 0x140000000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x140000000+0x252c000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x14252c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x14252c000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x143398000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #22 0x15b956000+0x1000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #23 0x15b95a000+0x3000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #24 0x15b95d000+0x1000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x126e04000 used=0x13c000/0x19000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x126e04000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 293)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x126f3f000 used=0x56b000/0x19000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x126f3f000)
+[window] 0x7048000000..0x7400000000 regions=78 occupied=8215 MB of 15232 MB free=7016 MB maxhole=7016 MB@0x7048000000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x127368000 used=0x69c000/0x19000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x127368000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x12749c000 used=0x764000/0x19000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x12749c000)
+[window] 0x16d70c000..0x7809000000 regions=25753 occupied=461239 MB of 485816 MB free=41105 MB maxhole=16528 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=909 MB (peak 909) internal=908 MB compressed=0 MB external=113 MB reusable=13 MB (cycle=1)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x127564000 used=0xa64000/0x19000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x127564000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Add image SMC interval: 143D14000 - 15B95194F
+D 24 Add image SMC interval: 15B95F000 - 15B95F061
+D 24 Load module PES2021.exe (pes2021.exe-56e1ac9a54bcac8a): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[jit-pool] image 0x71fe2b0000+0xb0000 (advapi32.dll) → pool 0x127868000 used=0xb1c000/0x19000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 8 .text pages executable (copy @0x127868000)
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FE2B0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FE230000
+D 24 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FE120000
+[x64-image] L"\\??\\C:\\Games\\eFootball PES 2021\\anselsdk64.dll" 0x71fe070000+0xa7000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module anselsdk64.dll (anselsdk64.dll-00240f1cbcc5c570): 71FE070000
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x128988000)
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x128aac000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x128b60000)
+[copy-verify] coml2.dll: OK, 1 .text pages executable (copy @0x128c54000)
+[copy-verify] hid.dll: OK, 2 .text pages executable (copy @0x128ce8000)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x129784000)
+[x64-image] L"\\??\\C:\\Games\\eFootball PES 2021\\steam_api64.dll" 0x71fb850000+0x11e000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x71fb2b0000+0x90000 (msacm32.dll) → pool 0x12a764000 used=0x39f8000/0x19000000 tramp+0x4000
+[jit-pool] image 0x71fb230000+0x80000 (wlanapi.dll) → pool 0x12a7f8000 used=0x3a7c000/0x19000000 tramp+0x4000
+D 24 Load module wlanapi.dll (wlanapi.dll-607f56fa80412290): 71FB230000
+[jit-pool] image 0x71fb1a0000+0x90000 (xinput1_3.dll) → pool 0x12a87c000 used=0x3b10000/0x19000000 tramp+0x4000
+D 24 Load module xinput1_3.dll (xinput1_3.dll-1e6b91746098a307): 71FB1A0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[jit-pool] image 0x71fb100000+0xa0000 (imm32.dll) → pool 0x12a910000 used=0x3bb4000/0x19000000 tramp+0x4000
+D 24 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71FB100000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0x71fb050000+0xb0000 (uxtheme.dll) → pool 0x12a9b4000 used=0x3c68000/0x19000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71FB050000
+[image-reload] unmapped image 0x71fb050000+0xb0000: 1 pool copy marked
+[jit-pool] image 0x71fb070000+0x90000 (concrt140.dll) → pool 0x12aa68000 used=0x3cfc000/0x19000000 tramp+0x4000
+D 24 Load module concrt140.dll (concrt140.dll-7f7bd0536697a14b): 71FB070000
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=1 first=000000015B9560E0
+[store-noalias] #1 rev=ml348 addr=0x15b95f000 insn=0x190000e6 pc=0x13ee2a2d4 NO pool/anon alias | region 0x15b95c000+0x20000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13ee2a2d4 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #1 p0=WRITE p1=0x15b95f000 hostpc=0x13ee2a2d4 hinsn=0x190000e6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13edfc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x15b95f020 pc=0x13ee2a2d4 addr=0x15b95f000 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x15b95c000+0x20000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x13ee2a2d4 addr=0x15b95f000 x18=0x0 type=1 lr=0x13fdfc354 sp=0x71fe3a0000 x16=0xfffffffffffff0b0 x17=0x71fe39cbf0
+[guest-code] rev=ml333 pool_rip=0x15b95f020 (PE 0x15b95f020) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x15b960000 x9=0xf9f x10=0x0 x11=0x0 x0=0x15b95f061 x2=0x71ffff0000 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x15b95f04d (block entry 0x15b95f020) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x15b95c000+0x20000 prot=r-- max=rwx | Wine vprot of the 4 KB pages of host page 0x15b95c000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: none | 32 bytes at rip, loaded image: c6 05 ac ff ff ff 01 5a 59 58 48 8d 64 24 28 e9 9f ef ff ff 00 00 00 00 00 00 00 00 00 00 00 00 | pool copy: - | image and pool copy not compared
+[fault-host] 13ee2a1d4: f9000f86 d65f0160 3fdfc20c 00000001 00000000 000001e8 00000000 5b9560e0
+[fault-host] 13ee2a1f4: 00000001 00000115 00000000 00000032 00000028 00000000 00000000 05800180
+[fault-host] 13ee2a214: 40404070 40404040 70707040 70707070 65403040 10326210 40304040 8905801e
+[fault-host] 13ee2a234: 40401302 40404040 70704040 70707070 00007070 d503201f d503201f 000000c8
+[fault-host] 13ee2a254: 10ffffea f900038a b945eb8b 3400004b d4395fc0 d100a2f7 a9bf22e0 f81f8ee1
+[fault-host] 13ee2a274: 52800006 d29e0007 f2ab72a7 f2c00027 194000f8 53081f0a 6b06615f 51000309
+[mach_exc] insn_stream PC-12..PC+8: d29e0007 f2ab72a7 f2c00027 [190000e6] a8c102e1 f84086e8 9100a2f7
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x701988a7f0 *(gs_cached+0x58)=0x701988a7f0
+[x86_live] RAX=0x15b960000 RCX=0x15b95f061 RDX=0x2e66666666666600 RBX=0x0 RSP=0x703881ff68 RBP=0x703881ffd0 RSI=0x0 RDI=0x0
+[x86_live]  R8=0x71ffff0000  R9=0x0 R10=0x0 R11=0x0 R12=0x0 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x15b95f020 callret_sp=0x7c01001000
+[store-noalias] #2 rev=ml348 addr=0x15b95f000 insn=0x190000e6 pc=0x13ee2a2d4 NO pool/anon alias | region 0x15b95c000+0x20000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13ee2a2d4 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #2 p0=WRITE p1=0x15b95f000 hostpc=0x13ee2a2d4 hinsn=0x190000e6 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x13edfc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x15b95f020 pc=0x13ee2a2d4 addr=0x15b95f000 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x15b95c000+0x20000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x13ee2a2d4 addr=0x15b95f000 x18=0x0 type=1 lr=0x13fdfc354 sp=0x71fe3a0000 x16=0xfffffffffffff0b0 x17=0x71fe39cbf0
+[guest-code] rev=ml333 pool_rip=0x15b95f020 (PE 0x15b95f020) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x15b960000 x9=0xf9f x10=0x0 x11=0x0 x0=0x15b95f061 x2=0x71ffff0000 | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[fault-host] 13ee2a234: 40401302 40404040 70704040 70707070 00007070 d503201f d503201f 000000c8
+[fault-host] 13ee2a254: 10ffffea f900038a b945eb8b 3400004b d4395fc0 d100a2f7 a9bf22e0 f81f8ee1
+[fault-host] 13ee2a274: 52800006 d29e0007 f2ab72a7 f2c00027 194000f8 53081f0a 6b06615f 51000309
+[fault-host] 13ee2a294: 54000221 d2a80008 f2c00028 d29e0c20 f2ab72a0 f2c00020 d9400101 d503201f
+[fault-host] 13ee2a2b4: 91400508 ca000118 eb000109 54ffff6b 52800026 d29e0007 f2ab72a7 f2c00027
+[fault-host] 13ee2a2d4: 190000e6 a8c102e1 f84086e8 9100a2f7 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d29e0007 f2ab72a7 f2c00027 [190000e6] a8c102e1 f84086e8 9100a2f7
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x701988a7f0 *(gs_cached+0x58)=0x701988a7f0
+[x86_live] RAX=0x15b960000 RCX=0x15b95f061 RDX=0x2e66666666666600 RBX=0x0 RSP=0x703881ff68 RBP=0x703881ffd0 RSI=0x0 RDI=0x0
+[x86_live]  R8=0x71ffff0000  R9=0x0 R10=0x0 R11=0x0 R12=0x0 R13=0x0 R14=0x0 R15=0x0
+[x86_live] State.RIP=0x15b95f020 callret_sp=0x7c01001000
+0024:err:seh:bus_handler BUS #1: pc=0x13ee2a2d4 addr=0x15b95f000 x16=0xfffffffffffff0b0 x17=0x71fe39cbf0 x18=0x0 lr=0x13fdfc354 insn=0x190000e6 branch@lr-4=0xd63f0080
+0024:err:seh:bus_handler [bus-rgn] si_code=1 addr=0x15b95f000 pc=0x13ee2a2d4 pc_in_pool=1 readable=1
+0024:err:seh:bus_handler [bus-rgn]   region=0x15b95c000+0x20000 prot=1 max=7 share_mode=6 user_tag=0
+0024:err:seh:bus_handler [bus-rgn]   OWNER extpager=0 resident=8 swapped=0 dirtied=8 reusable=0 refcnt=2 shadow=0  purgeable=not-purgeable(0x0) rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   VERDICT <== ANONYMOUS AND RESIDENT — none of the standard stories fit rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   PROVENANCE NO file mapping covers this address (anonymous — EOF/backing story does NOT apply) rev=ml561
+0024:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x15b95c000: [........]  ('.'=materialises 'X'=fails; fault is at +0x3000) rev=ml561
+[fault-rgn] addr=0x15b95f000 page=0x15b95c000 vprot prev/this/next=2d/25/21 region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x1b95f000 end=0x15b97c000
+ml998: [wr-strip-declined] 0x15b95f000 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1b95c000
+ml998: [wr-strip-declined]   neighbours prev=0x29 this=0x25 next=0x21
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x13ee2a2d4 RX from -32, 64 of 64 bytes: 08 05 40 91 18 01 00 ca 09 01 00 eb 6b ff ff 54 26 00 80 52 07 00 9e d2 a7 72 ab f2 27 00 c0 f2 e6 00 00 19 e1 02 c1 a8 e8 86 40 f8 f7 a2 00 91 01 00 00 14 02 00 00 14 40 01 1f d6 0a 01 00 58 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x13ee2a2d4 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 13EE2A2D4 AV WRITE of 15B95F000
+D 24 Handled inline self-modifying code: pc: 13EE2A2D4 rip: 15B95F04D fault: 15B95F000
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0xe8 type=0x3000 protect=0x40
+[xp-names] m322017 "wine-x18-exc"
+[xp] 02:52:54.039 +0.56 dt=281 cpu=283 (thr 282) P=282 E=0 run=287 pgw=-1.0 GHz P=3.66 E=1.42 Minst=3072 IPC=2.98 mJ=988 pin=0 rdKB=0 fpMB=998
+[xp] 02:52:54.353 +0.87 dt=314 cpu=320 (thr 320) P=320 E=0 run=326 pgw=-1.0 GHz P=3.62 E=1.59 Minst=2965 IPC=2.56 mJ=1026 pin=0 rdKB=0 fpMB=1002
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x13edfc000 size=0x1000000 -> free-list rev=ml438
+[xp] 02:52:54.678 +1.20 dt=325 cpu=329 (thr 328) P=328 E=0 run=333 pgw=-1.0 GHz P=3.64 E=1.46 Minst=3142 IPC=2.63 mJ=1069 pin=0 rdKB=0 fpMB=1125
+[xp] 02:52:54.989 +1.51 dt=310 cpu=311 (thr 311) P=310 E=0 run=315 pgw=-1.0 GHz P=3.65 E=1.58 Minst=3090 IPC=2.73 mJ=1038 pin=0 rdKB=0 fpMB=1128
+[xp] 02:52:55.283 +1.80 dt=294 cpu=295 (thr 295) P=295 E=0 run=300 pgw=-1.0 GHz P=3.63 E=1.50 Minst=2487 IPC=2.32 mJ=900 pin=0 rdKB=0 fpMB=1130
+[footprint] rev=ml358 phys=1136 MB (peak 1136) internal=1135 MB compressed=0 MB external=157 MB reusable=13 MB (cycle=2)
+[xp] 02:52:55.541 +2.06 dt=258 cpu=297 (thr 296) P=296 E=1 run=302 pgw=-1.0 GHz P=3.65 E=1.56 Minst=2494 IPC=2.31 mJ=901 pin=0 rdKB=0 fpMB=1137
+[footprint] rev=ml1060 fast phys=1138 MB compressed=0 MB internal=1136 MB
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000000D8 status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100008
+0024:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000000DC status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[x64-image] L"\\??\\C:\\Games\\eFootball PES 2021\\steamclient64.dll" 0x71fb060000+0xd000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D 24 Load module steamclient64.dll (steamclient64.dll-da727bc695b65b51): 71FB060000
+[store-noalias] #3 rev=ml348 addr=0x15b63cb7e insn=0xf80000c1 pc=0x139146b4c NO pool/anon alias | region 0x15b63c000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x139146b4c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #3 p0=WRITE p1=0x15b63cb7e hostpc=0x139146b4c hinsn=0xf80000c1 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x71fb853300 pc=0x139146b4c addr=0x15b63cb7e kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x15b63c000+0x4000 [first] rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x139146b4c addr=0x15b63cb7e x18=0x0 type=1 lr=0x13fdfc274 sp=0x71fe3a0000 x16=0x126e5d9a4 x17=0x71fe39ff20
+[guest-code] rev=ml333 pool_rip=0x71fb853300 (PE 0x71fb853300) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x70198a8de0 x9=0x388171e0 x10=0x139146af0 x11=0x0 x0=0x140000000 x2=0xd0ff | teb=0x71fffe0000 peb=0x71ffff0000 peb->EcCodeBitMap=0x71fecd0000
+[rwx-fault] rev=ajan5-mhs3 #2 guest rip=0x71fb853191 (block entry 0x71fb853300) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x71fb850000+0x20000 prot=r-- max=rwx | Wine vprot of the 4 KB pages of host page 0x71fb850000: 21 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: none | 32 bytes at rip, loaded image: 48 89 91 7e cb 63 1b 48 8d 15 9f 44 00 00 66 44 89 81 86 cb 63 1b 66 44 89 99 70 cb 63 1b 4c 89 | pool copy: - | image and pool copy not compared
+[mach_exc] insn_stream PC-12..PC+8: 72a36c66 8b060006 d5033bbf [f80000c1] d28ec7c1 f2bf70a1 f2c00e21
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[mach_exc] bt[1] 0x0 ?`?+0x0
+[x86_seg] State.gs_cached=0x71fffe0000 TEB=0x71fffe0000 TEB[0x58]=0x701988a7f0 *(gs_cached+0x58)=0x701988a7f0
+[x86_live] RAX=0x70198a8de0 RCX=0x140000000 RDX=0x71fb857520 RBX=0x140000000 RSP=0x70388171d8 RBP=0x703881fd18 RSI=0x51c8ac33 RDI=0x703881fd40
+[x86_live]  R8=0xd0ff  R9=0x3ec R10=0x71fb969d10 R11=0xb848 R12=0x703881fd40 R13=0x703881fd40 R14=0x703881fd40 R15=0xc0868ef1
+[x86_live] State.RIP=0x71fb853300 callret_sp=0x7c01001000
+[store-noalias] #4 rev=ml348 addr=0x15b63cb7e insn=0xf80000c1 pc=0x139146b4c NO pool/anon alias | region 0x15b63c000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x15b63cb7e hostpc=0x139146b4c hinsn=0xf80000c1 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x71fb853300 pc=0x139146b4c addr=0x15b63cb7e kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x15b63c000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x139146b4c addr=0x15b63cb7e x18=0x0 type=1 lr=0x13fdfc274 sp=0x71fe3a0000 x16=0x126e5d9a4 x17=0x71fe39ff20
+[guest-code] rev=ml333 pool_rip=0x71fb853300 (PE 0x71fb853300) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 72a36c66 8b060006 d5033bbf [f80000c1] d28ec7c1 f2bf70a1 f2c00e21
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[fault-rgn] addr=0x15b63cb7e page=0x15b63c000 vprot prev/this/next=2d/25/2d region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x1b63cb7e end=0x15b97c000
+ml998: [wr-strip-declined] 0x15b63cb7e vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1b63c000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x25
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x139146b4c RX from -32, 64 of 64 bytes: 01 a4 8e d2 a1 70 bf f2 21 0e c0 f2 e2 1f 9a 52 c6 6f 99 52 66 6c a3 72 06 00 06 8b bf 3b 03 d5 c1 00 00 f8 c1 c7 8e d2 a1 70 bf f2 21 0e c0 f2 c6 70 99 52 66 6c a3 72 06 00 06 8b 1f 20 03 d5 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x139146b4c (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 139146B4C AV WRITE of 15B63CB7E
+D 24 Handled self-modifying code: pc: 139146B4C fault: 15B63CB7E
+[store-noalias] #5 rev=ml348 addr=0x14ddc90c7 insn=0x780000e5 pc=0x139146d7c NO pool/anon alias | region 0x14ddc8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x14ddc90c7 hostpc=0x139146d7c hinsn=0x780000e5 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x71fb853300 pc=0x139146d7c addr=0x14ddc90c7 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x14ddc8000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x139146d7c addr=0x14ddc90c7 x18=0x0 type=1 lr=0x13fdfc274 sp=0x71fe3a0000 x16=0x126e5d9a4 x17=0x71fe39ff20
+[guest-code] rev=ml333 pool_rip=0x71fb853300 (PE 0x71fb853300) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 72a1bb87 8b070007 d5033bbf [780000e5] 52921927 72a1bb87 8b070007
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-noalias] #6 rev=ml348 addr=0x14ddc90c7 insn=0x780000e5 pc=0x139146d7c NO pool/anon alias | region 0x14ddc8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x14ddc90c7 hostpc=0x139146d7c hinsn=0x780000e5 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x71fb853300 pc=0x139146d7c addr=0x14ddc90c7 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x14ddc8000+0x4000 rev=ml555
+[fault-rgn] addr=0x14ddc90c7 page=0x14ddc8000 vprot prev/this/next=2d/25/2d region=unknown/foreign
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0xddc90c7 end=0x15b97c000
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0xddc8000
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x139146d7c RX from -32, 64 of 64 bytes: 27 51 a3 72 07 00 07 8b 1f 20 03 d5 e6 00 00 99 e7 18 92 52 87 bb a1 72 07 00 07 8b bf 3b 03 d5 e5 00 00 78 27 19 92 52 87 bb a1 72 07 00 07 8b 1f 20 03 d5 e4 00 00 d9 27 1a 92 52 87 bb a1 72 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x139146d7c (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 139146D7C AV WRITE of 14DDC90C7
+D 24 Handled self-modifying code: pc: 139146D7C fault: 14DDC90C7
+[store-noalias] #7 rev=ml348 addr=0x1448fb770 insn=0xb80000fb pc=0x1391d20a8 NO pool/anon alias | region 0x1448f8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x1448fb770 insn=0xb80000fb pc=0x1391d20a8 NO pool/anon alias | region 0x1448f8000+0x4000 prot=1 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x48fb770 end=0x15b97c000
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x48f8000
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x1391d20a8 RX from -32, 64 of 64 bytes: 39 03 07 8b e7 1c 8b 92 67 c0 b4 f2 21 00 07 8b 07 1d 8b 52 87 3f ab 72 27 00 07 8b bf 3b 03 d5 fb 00 00 b8 e2 03 19 2a e8 03 06 aa c6 3b 85 52 a6 c8 a6 72 01 00 06 8b a6 6c 84 92 46 37 b9 f2 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x1391d20a8 (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 1391D20A8 AV WRITE of 1448FB770
+D 24 Handled self-modifying code: pc: 1391D20A8 fault: 1448FB770
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x1b51f915 end=0x15b97c000
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1b51c000
+D 24 Exception: Code: C0000005 Address: 1391DEB50 AV WRITE of 15B51F915
+D 24 Handled self-modifying code: pc: 1391DEB50 fault: 15B51F915
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0xea7acb8 end=0x15b97c000
+ml998: [wr-strip-declined] 0x14ea7acb8 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0xea78000
+ml998: [wr-strip-declined]   neighbours prev=0x2d this=0x25 next=0x2d
+D 24 Exception: Code: C0000005 Address: 1391DEB50 AV WRITE of 14EA7ACB8
+D 24 Handled self-modifying code: pc: 1391DEB50 fault: 14EA7ACB8
+[free-delay] #1 release of 0x701a510000+0x400000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x701a910000+0x7f0000 held for 2000 ms (2 in flight)
+[free-delay] #1 reservation at 0x701ac00000+0x400000: 1 held release(s) from 0x701a910000 (0x7f0000 bytes) freed at once (1 in flight)
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x1b8c6059 end=0x15b97c000
+ml998: [wr-strip-declined] 0x15b8c6059 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x140000000+0x1b97c000 protect=0x180102d { SEC_IMAGE WRITECOPY  } page_off=0x1b8c4000
+ml998: [wr-strip-declined]   neighbours prev=0x25 this=0x25 next=0x25
+D 24 Handled self-modifying code: pc: 139AD888C fault: 15B8C6059
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x139e56e78 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x139e56e78 x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x18e822b6 end=0x15b97c000
+D 24 Handled self-modifying code: pc: 139E56E78 fault: 158E822B6
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0x70e4867 end=0x15b97c000
+D 24 Exception: Code: C0000005 Address: 139E56E78 AV WRITE of 1470E4867
+D 24 Handled self-modifying code: pc: 139E56E78 fault: 1470E4867
+[footprint] rev=ml358 phys=1156 MB (peak 1156) internal=1154 MB compressed=0 MB external=157 MB reusable=13 MB (cycle=3)
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13a6f366c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #19 p0=WRITE p1=0x14d752aef hostpc=0x13a6f366c hinsn=0xb8000034 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13a6f366c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #20 p0=WRITE p1=0x14d752aef hostpc=0x13a6f366c hinsn=0xb8000034 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+0024:err:seh:bus_handler [bus-rgn] si_code=1 addr=0x14d752aef pc=0x13a6f366c pc_in_pool=1 readable=1
+0024:err:seh:bus_handler [bus-rgn]   region=0x14d750000+0x4000 prot=1 max=7 share_mode=6 user_tag=0
+0024:err:seh:bus_handler [bus-rgn]   OWNER extpager=0 resident=1 swapped=0 dirtied=1 reusable=0 refcnt=2057 shadow=0  purgeable=not-purgeable(0x0) rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   VERDICT <== ANONYMOUS AND RESIDENT — none of the standard stories fit rev=ml560
+0024:err:seh:bus_handler [bus-rgn]   PROVENANCE NO file mapping covers this address (anonymous — EOF/backing story does NOT apply) rev=ml561
+0024:err:seh:bus_handler [bus-rgn]   PAGE-CENSUS 16KB pages from 0x14d750000: [.]  ('.'=materialises 'X'=fails; fault is at +0x2aef) rev=ml561
+[fault-rgn]   IN WINE VIEW base=0x140000000 size=0x1b97c000 protect=0x180102d off=0xd752aef end=0x15b97c000
+D 24 Exception: Code: C0000005 Address: 13A6F366C AV WRITE of 14D752AEF
+D 24 Handled self-modifying code: pc: 13A6F366C fault: 14D752AEF
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13a6f366c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #21 p0=WRITE p1=0x14a425e50 hostpc=0x13a6f366c hinsn=0xb8000034 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[mach-deliver] rev=ml378 no TEB owns sp=0x71fe3a0000 (pc=0x13a6f366c x18=0x0 registry=0x71fffe0000) -> BEST-EFFORT delivery on guest stack
+[av-detail] ml613 #22 p0=WRITE p1=0x14a425e50 hostpc=0x13a6f366c hinsn=0xb8000034 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Exception: Code: C0000005 Address: 13A6F366C AV WRITE of 14A425E50
+D 24 Handled self-modifying code: pc: 13A6F366C fault: 14A425E50
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[footprint] rev=ml1060 fast phys=1170 MB compressed=0 MB internal=1168 MB
+[hwinput] keyboard focus: program (responder)
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #9 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[av-detail] ml613 #23 p0=WRITE p1=0x157ee1470 hostpc=0x13acbe4cc hinsn=0x99000100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #24 p0=WRITE p1=0x157ee1470 hostpc=0x13acbe4cc hinsn=0x99000100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x136dfc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Exception: Code: C0000005 Address: 13ACBE4CC AV WRITE of 157EE1470
+D 24 Handled self-modifying code: pc: 13ACBE4CC fault: 157EE1470
+E 24 [smc-atomic] ml657 #1 handled pc 13ACBE4CC -> 13ACBE4C8 fault 157EE1470
+[fault_rip] cnt=25 rip=0x1598f61b0 pc=0x13acbe4cc addr=0x14aca5930 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x14aca4000+0x4000 [first] rev=ml555
+[fault_rip] cnt=26 rip=0x1598f61b0 pc=0x13acbe4cc addr=0x14aca5930 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x14aca4000+0x4000 rev=ml555
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x13acbe4cc pc=13acbe4cc nparams=2 p0=1 p1=14aca5930
+D 24 Exception: Code: C0000005 Address: 13ACBE4CC AV WRITE of 14ACA5930
+D 24 Handled self-modifying code: pc: 13ACBE4CC fault: 14ACA5930
+[fault_rip] cnt=27 rip=0x1598f61b0 pc=0x13acbe4cc addr=0x148c5b9c0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x148c50000+0xc000 rev=ml555
+[fault_rip] cnt=28 rip=0x1598f61b0 pc=0x13acbe4cc addr=0x148c5b9c0 kr=2(PROTECTION_FAILURE) entryprot=1 nowprot=1 region=0x148c50000+0xc000 rev=ml555
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x13acbe4cc pc=13acbe4cc nparams=2 p0=1 p1=148c5b9c0
+D 24 Exception: Code: C0000005 Address: 13ACBE4CC AV WRITE of 148C5B9C0
+D 24 Handled self-modifying code: pc: 13ACBE4CC fault: 148C5B9C0
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x10028 class='OleMainThreadWndClass' text="" rev=ml853
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\dxdiagn.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\dxdiagn.dll"
+[fault_rip] cnt=29 rip=0x140411821 pc=0x13adbed9c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[fault_rip] cnt=30 rip=0x140411821 pc=0x13adbed9c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+0024:err:seh:segv_handler SEGV #1: pc=0x13adbed9c addr=0x0 uctx_x18=0x71fffe0000 disp=0 mach_exc=29409
+0024:err:seh:segv_handler SEGV at pc=0x13adbed9c addr=0x0 esr=0x92000006 TPIDR_EL0=0x1004 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0x0 x1=0x703881f568 x2=0xd x3=0x8
+0024:err:seh:segv_handler   x8=0x703881f568 x9=0x703881f520 x10=0x13adbec30 x16=0x126e5d9a4 x17=0x71fe39ff20 x18=0x71fffe0000 x19=0x0 x20=0x0
+0024:err:seh:segv_handler   fp=0x703881f630 lr=0x13fdfc274 sp=0x71fe3a0000
+0024:err:seh:segv_handler   [teb-tsd] base=0x16d3330e0 offset=0x928 raw=0x71fffe0000 teb_key_val=0x71fffe0000
+0024:err:seh:segv_handler   [guest-state] x28=0x7c00801140 rip=0x140411821
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x13adbec30 rip=0x140411a1b x86=48 8b 01 4c 8d 44 24 30 48 8d 15 6e 1b 18 02 ff
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #11 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #12 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0024:err:seh:segv_handler   [guest-state]   rax=0x703881f570 rcx=0x703881f570 rdx=0x703881f568 rbx=0x701a926950
+0024:err:seh:segv_handler   [guest-state]   rsp=0x703881f528 rbp=0x703881f630 rsi=0x1436f0950 rdi=0x1436f0850
+0024:err:seh:segv_handler   [guest-state]   r8 =0xd r9 =0x8 r10=0x703881ed48 r11=0x703881f200
+0024:err:seh:segv_handler   [guest-state]   r12=0x0 r13=0x0 r14=0x1436f08d0 r15=0x0
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=11/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-24  f900038a b945eb8b 3400004b d4395fc0 d9400100 d503201f
+0024:err:seh:segv_handler   [emit-dump]   +0    d9400008 d503201f 9100c2e2 d286b301 f2a84b21 f2c00021
+0024:err:seh:segv_handler   [emit-dump]   +24   d9428106 d503201f d28345a7 f2a80827 f2c00027 f81f8ee7
+0024:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x703881f530  gregs[RSP]=0x703881f528  NZCV/flags[24]=0x60000000  callret_sp=0x7c01001000 base=0x7c00c01000  x28=0x7c00801140
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: d4395fc0 d9400100 d503201f [d9400008] d503201f 9100c2e2 d286b301
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x13adbed9c addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x13adbed9c pc=13adbed9c nparams=2 p0=0 p1=0
+D 24 Exception: Code: C0000005 Address: 13ADBED9C AV READ of 0
+[set-ctx] ml946 distinct#12 tid=0024 req pc=0x71ffd315d0 sp=0x703881f0a0 flags=00400007 status=00000000 | frame pc=0x71ffd315d0 sp=0x703881f0a0 | is_ec(frame.pc)=1 ec_cur=1
+D 24 Exception: Code: C0000005 Address: 140411A1B AV READ of 0
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=0000000140411A1B flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 7038820000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unhandled page fault on read access to 0000000000000000 at address 0000000140411A1B (thread 0024), starting debugger...
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #13 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #14 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=12489
+[unwind] term ml661 begin rip=1275dc1fc rsp=703881db18 window=[703881db18..703901db18) max=32
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #15 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #16 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[unwind] term ml661 #00 pc=1275dc1fc rsp=703881db18  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? 71ffcf5388  ntdll.dll+0x25388
+[term-stack] ml660 sp+0f0:   ? 71fe6e1b0c  kernel32.dll+0x31b0c
+[term-stack] ml660 sp+0f8:   ? 71fe6d6468  kernel32.dll+0x26468
+[term-stack] ml660 sp+100:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+610:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+618:   ? 71ffcd0000  ntdll.dll+0x0
+[term-stack] ml660 sp+620:   ? 71ffdc2140  ntdll.dll+0xf2140
+[term-stack] ml660 sp+640:   ? 71ffcf5388  ntdll.dll+0x25388
+[srv-kill] kill_thread tid=002c pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #17 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+002c:err:seh:NtGetContextThread [ec-getctx] ml715 #18 handle=FFFFFFFFFFFFFFFE status=00000000 native_pc=0000000000000000 is_ec=0 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00100000
+[footprint] rev=ml1060 fast phys=1205 MB compressed=0 MB internal=1204 MB
+[02:52:58.405] [INFO] [session] length=6s play=0s frames=0 stalls=0/0s peak=1205MB limit=6143MB thermal=fair lpm=0 api=D3D11/64 res=1024x768 cap=60 game=PES2021
+[02:52:58.407] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=1207 MB (peak 1207) internal=1206 MB compressed=0 MB external=219 MB reusable=13 MB (cycle=4)
+[02:53:00.391] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1207 MB (peak 1207) internal=1206 MB compressed=0 MB external=219 MB reusable=13 MB (cycle=5)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1207 MB (peak 1207) internal=1206 MB compressed=0 MB external=219 MB reusable=13 MB (cycle=6)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=11% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ced5ee0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d3beb30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d81c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=1 threads=1 samples=200 buckets=1 span=0x0 [0x15b7048b0..0x15b7048b0] top: 0x15b704880=100%
+[cpu-split] ml1123 gen=1 running samples=200: x64 JIT 100%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[freeze] alive t+54s beats=1 gaps=2 iter=85 gen=1 threads=19 resident=1343MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d81c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2 threads=1 samples=200 buckets=1 span=0x0 [0x15b7048b0..0x15b7048b0] top: 0x15b704880=100%
+[cpu-split] ml1123 gen=2 running samples=200: x64 JIT 100%, ARM64EC images 0%, native 0%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top:
+[footprint] rev=ml358 phys=1208 MB (peak 1214) internal=1110 MB compressed=97 MB external=219 MB reusable=17 MB (cycle=15)
+[footprint] rev=ml358 phys=1208 MB (peak 1214) internal=1110 MB compressed=97 MB external=219 MB reusable=17 MB (cycle=16)
+[footprint] rev=ml358 phys=1208 MB (peak 1214) internal=1110 MB compressed=97 MB external=219 MB reusable=17 MB (cycle=17)
+[footprint] rev=ml358 phys=1208 MB (peak 1214) internal=1110 MB compressed=97 MB external=219 MB reusable=17 MB (cycle=18)
+[footprint] rev=ml358 phys=1206 MB (peak 1214) internal=1109 MB compressed=97 MB external=217 MB reusable=17 MB (cycle=19)
+[freeze] alive t+151s beats=2 gaps=3 iter=135 gen=1 threads=20 resident=1345MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d81c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b2 "" teb=0x71fffd0000 cpu=86% RUN pc=0x1388f46cc lr=0x13fdfc354 sp=0x71fb070000 GUEST rip=0x15b7048d5(PES2021.exe+0x1b7048d5) callret=[ ] rsp=0x701a50ff80 stack-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=9% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ced6230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0x71ffff0000 modules=56 first=PES2021.exe@0x140000000
+[thread-sample] ml876 b3 "" teb=0x71fffd0000 cpu=94% RUN pc=0x1388f46cc lr=0x13fdfc354 sp=0x71fb070000 GUEST rip=0x15b7048d5(PES2021.exe+0x1b7048d5) callret=[ ] rsp=0x701a50ff80 stack-cand=[ ]
+[thread-sample] ml876 b3 "" teb=0x0 cpu=1% RUN pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d44ab30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[footprint] rev=ml358 phys=1209 MB (peak 1214) internal=1110 MB compressed=97 MB external=221 MB reusable=17 MB (cycle=20)
+[xp] 02:55:27.403 +153.92 dt=315 cpu=326 (thr 326) P=321 E=4 run=329 pgw=-1.0 GHz P=3.77 E=1.76 Minst=2434 IPC=2.00 mJ=792 pin=0 rdKB=0 fpMB=1210
+[xp] 02:55:27.667 +154.19 dt=265 cpu=294 (thr 294) P=286 E=8 run=353 pgw=-1.0 GHz P=3.76 E=2.02 Minst=2162 IPC=1.98 mJ=708 pin=0 rdKB=0 fpMB=1210
+[xp] 02:55:27.939 +154.46 dt=272 cpu=343 (thr 343) P=297 E=47 run=352 pgw=-1.0 GHz P=3.77 E=2.09 Minst=2564 IPC=2.11 mJ=759 pin=1 rdKB=16 fpMB=1210
+[xp] 02:55:28.273 +154.78 dt=322 cpu=673 (thr 641) P=331 E=342 run=680 pgw=-1.0 GHz P=3.78 E=2.11 Minst=5146 IPC=2.61 mJ=943 pin=2 rdKB=32 fpMB=1212
+[02:55:28.273] [xp] 02:55:28.273 +154.78 dt=322 cpu=673 (thr 641) P=331 E=342 run=680 pgw=-1.0 GHz P=3.78 E=2.11 Minst=5146 IPC=2.61 mJ=943 pin=2 rdKB=32 fpMB=1212
+[02:55:28.530] [xp] 02:55:28.530 +155.05 dt=268 cpu=525 (thr 557) P=265 E=259 run=529 pgw=-1.0 GHz P=3.78 E=2.03 Minst=3709 IPC=2.43 mJ=738 pin=0 rdKB=4 fpMB=1216

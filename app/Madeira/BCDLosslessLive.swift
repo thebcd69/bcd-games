@@ -29,6 +29,8 @@ enum BCDLosslessFiles {
     static var shaderFileURL: URL { prefixFolder.appendingPathComponent(BCDLossless.shaderFile) }
     static var controlFileURL: URL { prefixFolder.appendingPathComponent(BCDLossless.controlFile) }
     static var statusFileURL: URL { prefixFolder.appendingPathComponent(BCDLossless.statusFile) }
+    /// The shaders as Metal Shading Language, for a Vulkan game's driver (build 706); made at the session's start, gone at its end.
+    static var mslFileURL: URL { prefixFolder.appendingPathComponent(BCDLosslessMSL.file) }
 
     /// A random secret that exists only on this device (Keychain, this device only, after first unlock). The keys are made from it.
     static func deviceSecret() -> SymmetricKey {
@@ -74,6 +76,7 @@ enum BCDLosslessFiles {
 
     static func removeSessionFiles() {
         try? fm.removeItem(at: shaderFileURL)
+        try? fm.removeItem(at: mslFileURL)
         try? fm.removeItem(at: controlFileURL)
         try? fm.removeItem(at: statusFileURL)
     }
@@ -90,6 +93,50 @@ enum BCDLosslessFiles {
     static func write(_ control: BCDLossless.Control, hz: Int) {
         try? fm.createDirectory(at: prefixFolder, withIntermediateDirectories: true)
         try? control.text(hz: hz).write(to: controlFileURL, atomically: true, encoding: .utf8)
+    }
+}
+
+/// The translator for a Vulkan game's driver (build 706): gl/libbcd-dxbc-msl.dylib, Wine's vkd3d-shader with BCD's additions
+/// (LGPL-2.1-or-later; build/vkd3d-msl), turns the frame generation's DXBC shaders into Metal Shading Language on this device.
+/// Loaded only when a `vulkan = kosmickrisp` game starts with Lossless Scaling on; one translation at a time (vkd3d keeps a little
+/// state of its own). The shaders come from the person's own Lossless.dll, sealed on this device.
+enum BCDLosslessTranslator {
+    private typealias Translate = @convention(c) (UnsafeRawPointer?, Int, UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?,
+                                                  UnsafeMutablePointer<UInt32>?, UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?) -> Int32
+    private typealias Free = @convention(c) (UnsafeMutableRawPointer?) -> Void
+    private static let lock = NSLock()
+    private static var functions: (Translate, Free)?
+
+    static var path: String { Bundle.main.bundleURL.appendingPathComponent("gl/libbcd-dxbc-msl.dylib").path }
+
+    private static func load() -> (Translate, Free)? {
+        if let functions { return functions }
+        guard let h = dlopen(path, RTLD_NOW | RTLD_LOCAL), let t = dlsym(h, "bcd_dxbc_to_msl"), let f = dlsym(h, "bcd_dxbc_free") else { return nil }
+        functions = (unsafeBitCast(t, to: Translate.self), unsafeBitCast(f, to: Free.self))
+        return functions
+    }
+
+    /// The driver's file (BCDLosslessMSL) made from DXMT's shader file: every shader translated. nil and why.
+    static func driverFile(from container: Data) -> (file: Data?, words: String) {
+        lock.lock(); defer { lock.unlock() }
+        guard let blobs = BCDLosslessMSL.blobs(container: container) else { return (nil, "the shader file cannot be read") }
+        guard let (translate, free) = load() else {
+            return (nil, FileManager.default.fileExists(atPath: path) ? "the shader translator would not load" : "this build has no shader translator")
+        }
+        var shaders: [Int: (tg: [UInt32], msl: String)] = [:]
+        for (id, blob) in blobs.sorted(by: { $0.key < $1.key }) {
+            var msl: UnsafeMutablePointer<CChar>?
+            var log: UnsafeMutablePointer<CChar>?
+            var tg: [UInt32] = [0, 0, 0]
+            let r = blob.withUnsafeBytes { raw in tg.withUnsafeMutableBufferPointer { translate(raw.baseAddress, raw.count, &msl, $0.baseAddress, &log) } }
+            let note = log.map { String(cString: $0) } ?? ""
+            defer { free(msl); free(log) }
+            guard r == 0, let text = msl else {
+                return (nil, "shader \(id) did not translate (\(r)\(note.isEmpty ? "" : ": " + note.split(whereSeparator: \.isNewline).prefix(2).joined(separator: " / ")))")
+            }
+            shaders[id] = (tg, String(cString: text))
+        }
+        return (BCDLosslessMSL.file(shaders), "\(shaders.count) shaders translated")
     }
 }
 
@@ -228,6 +275,8 @@ final class BCDLosslessLive: ObservableObject {
         BCDLosslessFiles.removeSessionFiles()
         unsetenv("MADEIRA_LSFG_CTL")
         unsetenv("MADEIRA_LSFG_SHADERS")
+        unsetenv("MADEIRA_LSFG_HOST_CTL")
+        unsetenv("MADEIRA_LSFG_HOST_MSL")
         guard let generated = BCDLossless.generated(MadeiraConfig.gameValue(BCDLossless.key) ?? MadeiraConfig.get(BCDLossless.key)) else { return nil }
         guard BCDLosslessFiles.prepareForGame() else {
             let setup = BCDLossless.Setup(signedIn: SteamSignIn.isSignedIn, installed: BCDLosslessFiles.fileBytes != nil, status: BCDLosslessFiles.status(BCDLosslessFiles.receipt()))
@@ -242,12 +291,28 @@ final class BCDLosslessLive: ObservableObject {
         setenv("MADEIRA_LSFG_SHADERS", BCDLossless.windowsShaderPath, 1)
         // A 64-bit game's Direct3D 11 library with the passes is BCD's source build (tools/build-d3d11-dll.sh); a 32-bit game's has them.
         setenv("MADEIRA_D3D11_SRC", "1", 1)
+        // A Vulkan game through KosmicKrisp (build 706): the driver's own present makes the frames (playport patch 0036,
+        // wsi_common_metal_lsfg.m) from the shaders translated here, and reads the same control file by its path on this device.
+        // A Direct3D game's frames go through DXMT as before; nothing below runs for it.
+        var vulkan = ""
+        if MadeiraConfig.gameValue(BCDVTInterp.vulkanKey) == BCDVTInterp.kosmickrispValue {
+            let t0 = Date()
+            let (file, words) = (try? Data(contentsOf: BCDLosslessFiles.shaderFileURL)).map { BCDLosslessTranslator.driverFile(from: $0) }
+                ?? (nil, "the shader file cannot be read")
+            if let file, (try? file.write(to: BCDLosslessFiles.mslFileURL, options: [.atomic])) != nil {
+                setenv("MADEIRA_LSFG_HOST_CTL", BCDLosslessFiles.controlFileURL.path, 1)
+                setenv("MADEIRA_LSFG_HOST_MSL", BCDLosslessFiles.mslFileURL.path, 1)
+                vulkan = "; KosmicKrisp's present makes them for this Vulkan game (\(words) in \(Int(Date().timeIntervalSince(t0) * 1000)) ms)"
+            } else {
+                vulkan = "; KosmicKrisp's present cannot make them for this Vulkan game: \(words)"
+            }
+        }
         // One frame generator at a time: MetalFX's stays off for this session (the app's switch wins over the game's line).
         _ = madeira_fgl_set(0)
         madeira_lsfg_set_shown(Int32(generated + 1))
         DispatchQueue.main.async { MainActor.assumeIsolated { shared.sessionStarted(start) } }
         return "[lossless] Lossless Scaling frame generation on for this session: \(generated) added per frame, flow 1/\(flow), \(quality ? "quality" : "lighter") passes; "
-            + "control file \(BCDLossless.windowsControlPath); MADEIRA_D3D11_SRC=1; MetalFX frame generation off; the frame-rate limit counts every frame shown"
+            + "control file \(BCDLossless.windowsControlPath); MADEIRA_D3D11_SRC=1; MetalFX frame generation off; the frame-rate limit counts every frame shown" + vulkan
     }
 
     private func sessionStarted(_ start: BCDLossless.Control) {

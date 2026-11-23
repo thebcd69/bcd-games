@@ -471,6 +471,14 @@ OVERLAY = {
                         "Horizon Zero Dawn needs it (its constant buffers sit in spaces 6 and 8). Shaders converted "
                         "with it on are cached apart from the others. Read once per session.",
                 "sources": ["madeira-d3d12/src/unix/madeira_ir_unix.mm", "madeira-d3d12/src/pe/madeira_d3d12.c"]},
+    # round 707 (G1 S23): the size/move loop's reader (winios_input_wake_enter) comes first in driver_ios.c now, with code, not the
+    # comment, next to its getenv: the note is written here so the scan's nearest line never stands in for it.
+    "env.MADEIRA_GAME_INPUT_WAKE": {"category": "Windows, display & input", "title": "Taps and keys for a launcher or message box over a game",
+                "kind": "bool", "default": "1",
+                "note": "Default on. A thread that shows a launcher or message box smaller than the screen over a game, and a game "
+                        "window's size/move loop (a click on its frame, round 707), wake their message waits every 16 ms to take "
+                        "taps and keys; without it the box took no tap or key and the frame click froze the game. 0 = off. "
+                        "Logs [game-input] once per thread (8 at most)."},
     "env.MADEIRA_GAME_DIALOG_CURSOR": {"category": "Windows, display & input", "title": "Cursor over a game's launcher or message box",
                 "kind": "bool", "default": "1",
                 "note": "Default on. A game session draws no cursor: the finger is the pointer. While the game shows a "
@@ -574,6 +582,16 @@ OVERLAY = {
                         "(Final Fantasy Tactics - The Ivalice Chronicles' enhanced-mode UI layers) lose blocks. Opt-in: passes with many UAV-atomic "
                         "draws that need no order would be serialised. Not tried together with rp-carry. Read once per game start; the "
                         "summary line counts the splits. Not tried on a device in BCD yet.",
+                "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
+    # madeira-bcd indirect-expand (2026-11-21, Teardown): madeira_d3d12.c mad_indirect_expand
+    "indirect-expand": {"category": "Direct3D 12", "title": "ExecuteIndirect with several arguments per record: draw from the CPU's records",
+                "kind": "bool", "default": "0",
+                "note": "Default off; turn it on for one game (Teardown). A game that issues indirect draws whose records also change a "
+                        "root view, a constant, a vertex buffer or an index buffer loses every one of those draws: BCD's Direct3D 12 runtime "
+                        "replays only single-argument signatures. 1: when the records are in an upload heap, BCD reads them as the call is "
+                        "recorded and issues each record as the plain calls the game would have made, with its draw. The records are a "
+                        "snapshot taken then: a game that changes them after recording (a list reused every frame) draws stale or missing "
+                        "geometry, which is why it is off by default. At most 8192 records a call. [madeira-d3d12] ExecuteIndirect lines in the log.",
                 "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
     # build 632 (upstream Madeira #516, ajan66): madeira_d3d12.c mad_pso_async_on
     "pso-async": {"category": "Direct3D 12", "title": "Experiment: build new pipelines on background threads",
@@ -768,6 +786,14 @@ OVERLAY = {
                 "note": "Default 2. 3: OPTIONS reports resource binding tier 3, as Apple's D3DMetal and vkd3d-proton do; "
                         "a game can take another binding path for it. Anything else keeps tier 2. Read once per game "
                         "start."},
+    # round 707 (M3 S10; Metro Exodus Enhanced Edition): a list row uses it, so it gets a title and a note.
+    "d3d12-raytracing-tier": {"category": "Direct3D 12", "title": "Report ray tracing (experiment)",
+                "kind": "choice", "default": "0", "choices": [("0", "Off (as a GPU without ray tracing)"), ("10", "DXR 1.0"), ("11", "DXR 1.1")],
+                "note": "Default 0: Direct3D 12 says the GPU has no ray tracing, which is true. 10 or 11: an EXPERIMENT that reports DXR 1.0 or "
+                        "1.1 with nothing behind it; creating ray tracing state, acceleration structures and DispatchRays still fail, each "
+                        "logged once. Only to learn whether a game that refuses to start without ray tracing has a path without it. Read once "
+                        "per game start.",
+                "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
     "d3d12-pipeline-library": {"category": "Direct3D 12", "title": "Pipeline library for the game",
                 "kind": "bool", "default": "0",
                 "note": "Default off: CreatePipelineLibrary fails (E_NOTIMPL), as before. 1: it makes a library that "
@@ -1042,6 +1068,14 @@ OVERLAY = {
                         "read/write memory, not a store-trapped copy in the code pool. 0: off. 2 (build 652): also a 64-bit program's view of 4 MB or more whose "
                         "size is a multiple of 64 KB (an older Unity's own mono.dll: Wolfpack stored 12.5 million times into such a heap). Logged as [rwx-view] "
                         "(the first 24 views of a run). Read once per session."},
+    # round 707 (agent G2 S15; The Binding of Isaac: Repentance 12PA5Y): round 669's S2(a), built.
+    "env.MADEIRA_WOW_ALLOC_INSIDE": {"category": "Memory & JIT pool", "title": "A 32-bit program's memory must lie in its window", "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default off (build 708). A 32-bit program lives in a 4 GB window of BCD's address map; a placement outside it is cut to its low 32 bits "
+                        "for the program and cannot work (The Binding of Isaac: Repentance wrote through such a 4 MB block and crashed). 1: a request of "
+                        "the program's own, of any size and with no address of its own, that was placed outside the window is asked again inside; if the "
+                        "window has no room it is refused (out of memory), which a program with a fallback answers by asking for less. Both VirtualAlloc "
+                        "and VirtualAlloc2; never the emulator's own requests. Logged as [wow-inside]."},
     "env.MADEIRA_WOW_JUMBO_INSIDE": {"category": "Memory & JIT pool", "title": "A 32-bit program's huge reservation must fit its window", "kind": "choice", "default": "0",
                 "sources": ["build/ntdll-unix/virtual_ios.c"],
                 "choices": [("0", "Off"), ("1", "Refuse one placed outside"), ("2", "Place it again inside")],
@@ -1049,7 +1083,8 @@ OVERLAY = {
                         "window (an address the program cannot use): 1 refuses it (STATUS_NO_MEMORY), so a program that has a fallback asks for less; 2 (build "
                         "666) asks for it again inside the window and gives the program that place, or, when the window has no room, keeps the old answer. "
                         "The Binding of Isaac: Repentance reserves 1 GB for Lua and then crashes; auto-tune tries 2 after that. Only the program's own "
-                        "VirtualAlloc, never the emulator's. Logged as [jumbo-wow]. Set it in the game's own file; read at every such request."},
+                        "VirtualAlloc and VirtualAlloc2 (build 708: before it the key never acted for a 32-bit program, whose requests always carry its "
+                        "own limit), never the emulator's. Logged as [jumbo-wow]. Set it in the game's own file; read at every such request."},
     # madeira-bcd (night round 2026-11-11, reports G9 S1 / G5 S9): anonymous RWX blocks across a pool seam (Slay the Spire 2), a stale guard bit under a commit (Half-Life 2).
     "env.MADEIRA_SEAM_TRACE": {"category": "Memory & JIT pool", "title": "Diagnostic: log pool seams between guest-adjacent code blocks", "kind": "bool", "default": "0",
                 "sources": ["build/ntdll-unix/virtual_ios.c"],
@@ -1067,6 +1102,28 @@ OVERLAY = {
                 "note": "Default off (build 652). 1: before a commit without PAGE_GUARD, a guard bit on a page of the same 16 KB host page that is outside the commit and not committed is cleared "
                         "(PAGE_GUARD means nothing for an uncommitted page; a leftover one turned the whole host page unreadable: Half-Life 2 with its browser died 9 s after the start). "
                         "An experiment; a committed page's guard bit is never touched. Logged as [commit-guard]. Read once per session."},
+    # round 707 (agent M4 S5; S.T.A.L.K.E.R.: Call of Pripyat 13CYSY): read by the patched vkd3d-shader (tools/patch-wine-vkd3d-loop-fallback.py).
+    "env.MADEIRA_HLSL_LOOP_FALLBACK": {"category": "Wine libraries", "title": "Write loops of old Direct3D 9 shaders as repeated steps", "kind": "int",
+                "default": "0", "sources": ["tools/patch-wine-vkd3d-loop-fallback.py"],
+                "note": "Default off (build 708). Wine's shader compiler cannot write a loop whose count it does not know for Shader Model 1 to 3 "
+                        "(E5017 ... HLSL_IR_LOOP), and the game stops at that shader. N (8 to 256; 1 means 64): such a loop is written as N guarded "
+                        "copies of its body, so up to N passes run and a count above N is cut there. S.T.A.L.K.E.R.'s sun shafts need 40. Shader "
+                        "Model 4 and every shader that compiled before are unchanged; more copies cost compile time (256 is very slow). Read once."},
+    # round 707 (agent M3 S18; METAL GEAR SOLID V E4QKPA): read by the rebuilt wintrust (tools/patch-wine-wintrust-root-pin.py).
+    "env.MADEIRA_CODESIGN_ROOTS": {"category": "Wine libraries", "title": "Trust Windows' code-signing root for this game's signatures", "kind": "bool",
+                "default": "0", "sources": ["tools/patch-wine-wintrust-root-pin.py"],
+                "note": "Default off (build 708). BCD's root certificates are the web's list, which lacks a root Windows trusts for code signing: "
+                        "VeriSign Class 3 Public Primary Certification Authority - G5. 1: a signature check (WinVerifyTrust) whose chain ends in that "
+                        "root, pinned by its SHA-256, and whose only fault is the untrusted root, passes; nothing is added to the root store, so "
+                        "secure connections never use it. METAL GEAR SOLID V checks its steam_api64.dll this way. Needs the rebuilt 64-bit Wine set "
+                        "(env.MADEIRA_WIN64_FRESH = 1) for a 64-bit game. Logged as [wintrust]."},
+    # round 707 (agent M4 S7; Half-Life 2 J17QEB, JSJ8EP): round 660's M074, built.
+    "env.MADEIRA_GUARD_NEIGHBOUR_PASS": {"category": "Memory & JIT pool", "title": "Let a write beside a guard page through", "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "Default off (build 708). A 16 KB host page holds four 4 KB Windows pages, and a guard bit on one of them makes the whole host page "
+                        "unreadable. 1: a fault on a committed page with no guard bit of its own, in such a host page, is let through (the guard is the "
+                        "neighbour's, which loses its one-time notice) instead of a guard-page violation: Half-Life 2 died 7-9 s after the start, every time. "
+                        "A thread stack's guard is not touched. Logged as [guard-neighbour]. Read once per session."},
     "oversize-reserve-min-mb": {"category": "Memory & JIT pool", "title": "Large memory reservations: the smallest one served in part (MB)", "kind": "int", "default": "65536",
                 "sources": ["build/ntdll-unix/virtual_ios.c"],
                 "note": "Default 65536 (64 GB; at least 1024). With oversize-reserve = 1: an unhinted reserve-only request of at least this size is served in "
@@ -1183,6 +1240,20 @@ OVERLAY = {
                         "download keeps 4 chunks in flight instead of 8 (or 16 from a PC on the network), in order, so the drive "
                         "is not made to jump between many files. A [drive] line in the log says what was measured. Faster drives "
                         "and the device itself are written as before."},
+    # X-Plane 12 at its lowest graphics settings (2026-11-22, build 701): app/Madeira/XPlaneGraphics.swift, read in
+    # ContentView.launchLibraryEntry from the game's own settings.
+    "xplane-graphics": {"category": "Graphics", "kind": "choice", "default": "",
+                "title": "X-Plane 12 graphics defaults",
+                "sources": ["app/Madeira/XPlaneGraphics.swift", "app/Madeira/ContentView.swift"],
+                "choices": [("", "X-Plane's own"), ("lowest", "Lowest")],
+                "note": "For X-Plane 12 only. lowest: before the game starts BCD sets the default of every graphics setting in "
+                        "X-Plane's Resources/settings.txt to its lowest value (3-d detail, trees, drawing range, clouds, shadows, "
+                        "textures, anti-aliasing, FSR, SSAO, parked aircraft, boats, anisotropic filtering), for every config but "
+                        "X-Plane's safe mode; nothing else in the file changes. X-Plane keeps what the player saves in X-Plane.prf, "
+                        "which it reads over these defaults, so a choice made in X-Plane still wins. The file as X-Plane shipped it "
+                        "is kept as settings.txt.bcd-original and is put back when the line is taken out. For a device whose memory "
+                        "or address space runs out at X-Plane's defaults (\"X-Plane is totally out of memory\", \"Failed to allocate "
+                        "a GPU buffer\"). Logged as [xplane-graphics]. Read when the game starts."},
     # Porthole port, item 5: scheduler hints for a running game and the watch on the fast cores' clock, an experiment
     # (app/Madeira/BCDSchedHints.swift, BCDSchedHintsLive.swift, BCDSchedHints.m).
     "sched-hints": {"category": "App & front end", "kind": "choice", "default": "",
@@ -1208,7 +1279,20 @@ OVERLAY = {
                         "MADEIRA_VT_INTERP, MetalFX frame generation is off, and a frame-rate limit holds the game's own frames with "
                         "the extra ones on top. Whether a device takes the game's resolution and how long a pair takes is what the "
                         "test in Settings (Graphics, Experimental) reports; [vt-interp] lines in the log. The in-game menu (Display) "
-                        "switches it off and on while the game runs. Read when the game starts."},
+                        "switches it off and on while the game runs. From build 703 a Vulkan game on KosmicKrisp (vulkan = kosmickrisp) "
+                        "gets the pictures from the driver's own present instead (BCD's playport patch 0036), without "
+                        "env.MADEIRA_PRESENT_FX; there too it stays off while Lossless Scaling frame generation is on (from build "
+                        "706 Lossless Scaling reaches a Vulkan game on KosmicKrisp); [vt-interp] "
+                        "kosmickrisp lines in the log. Read when the game starts."},
+    "env.MADEIRA_VK_FPS_CAP": {"category": "Graphics", "kind": "bool", "default": "1",
+                "title": "The frame-rate limit holds Vulkan presents",
+                "sources": ["build/win32u-unix/vulkan_ios.c", "tools/patch-wine-vulkan-fps-cap.py"],
+                "note": "On by default (build 703). The app's frame-rate limit (60, 40 or 30 FPS) holds a Windows Vulkan game's presents "
+                        "(MoltenVK and KosmicKrisp) in Wine's win32u, right before the host's present, as winemetal holds a DirectX "
+                        "game's: the presenting thread waits for the limit's next deadline; a game slower than the limit never waits. "
+                        "Before build 703 a Vulkan game ran at the screen's own rate whatever the limit said (X-Plane 12's menu at 120 "
+                        "with the limit at 60). 0 turns it off. Logged once as [winios-vk] the frame-rate limit holds Vulkan presents. "
+                        "Read once per session."},
     "env.MADEIRA_VT_INTERP": {"category": "Direct3D 9/10/11 (DXMT)", "kind": "text", "default": "",
                 "title": "", "sources": ["tools/patch-winemetal-vt-interp.py"],
                 "note": "Set by the app for a session of a game with vt-interpolation (1 or 3): winemetal hands the frames of one "
@@ -1220,7 +1304,7 @@ OVERLAY = {
                 "sources": ["app/Madeira/BCDLosslessLive.swift"],
                 "choices": [("", "Off"), ("1", "2x (one frame added)"), ("2", "3x (two added)"), ("3", "4x (three added)")],
                 "note": "Default off. 1 to 3: the person's own copy of Lossless Scaling (Steam app 993090) makes that many pictures "
-                        "between every two frames the game draws: in DXMT's Direct3D 11 swap chain, and for a Direct3D 12 game through a bridge in d3d11-src.dll (madeira_d3d12.dll copies each picture over and presents the generated ones). It has to be set up first in Settings "
+                        "between every two frames the game draws: in DXMT's Direct3D 11 swap chain, for a Vulkan game on KosmicKrisp (vulkan = kosmickrisp, build 706: its shaders are translated to Metal on the device when the game starts, and the Vulkan frame-rate limit holds the game's own frames) in the driver's present, and for a Direct3D 12 game through a bridge in d3d11-src.dll (madeira_d3d12.dll copies each picture over and presents the generated ones); for a Vulkan game with vulkan = kosmickrisp in KosmicKrisp's own present (build 706: the shaders are translated to Metal on this device when the game starts; Apple frame interpolation then stays off for it). It has to be set up first in Settings "
                         "(Graphics, Lossless Scaling): BCD checks the purchase with Steam, downloads the program with the person's "
                         "account and keeps its Lossless.dll sealed on the device; nothing of it is in BCD. While a game with this line "
                         "runs, the frame generation's compiled shaders are in the prefix (C:\\ProgramData\\BCD\\lsfg.bin) and are "
@@ -1437,6 +1521,12 @@ OVERLAY = {
                 "note": "Set by BCD itself for a BCD Dock session (Valve's client runs inside the host process); not a setting to change by hand. "
                         "A few log lines and the Steam start checks are only made in such a session.",
                 "sources": ["app/Madeira/ContentView.swift", "app/Madeira/WineProcessBridge.m", "build/ntdll-unix/thread_ios.c"]},
+    # Branch steam-client (2026-11-21, milestone M1): Steam for Windows (app/Madeira/SteamDesktop.swift, docs/STEAM_DESKTOP.md).
+    "env.MADEIRA_STEAM_DESKTOP_SESSION": {"category": "App & front end", "title": "Set by BCD: this is a Steam for Windows session",
+                "note": "Set by BCD itself for a Steam for Windows session (Valve's own Steam client in the Wine desktop; experimental, "
+                        "Settings > BCD Dock > Steam for Windows); not a setting to change by hand. Such a session publishes no fixed Steam "
+                        "game identity: Valve's client gives each game it starts that game's own.",
+                "sources": ["app/Madeira/ContentView.swift", "app/Madeira/WineProcessBridge.m", "app/Madeira/SteamDesktop.swift"]},
     "env.MADEIRA_WIN_TEXT": {"category": "Windows, display & input", "title": "Diagnostic: log an error box's details pane",
                 "kind": "bool", "default": "0",
                 "note": "Default off. 1: when a read-only multi-line text box becomes visible (the details pane of an error box: a .NET launcher's "
@@ -1587,6 +1677,15 @@ OVERLAY = {
                 "note": "Default off. With env.BCD_EPIC_CLOUD on for the game, 1 also sends this device's newer saves to Epic Cloud as a new snapshot when "
                         "BCD compares them (when BCD starts and when the game's page opens); off, they go up on the page's Sync now.",
                 "sources": ["app/Madeira/BCDEpic/BCDEpicCloud.swift"]},
+    # build 708 (round 707, A1-S13; Dark Souls Remastered CR9EAN): the physical memory a game is told, which a list row may now set.
+    "env.MADEIRA_TOTAL_PHYS_MB": {"category": "Memory & JIT pool", "title": "Physical memory the game is told (MB)",
+                "kind": "int", "default": "0",
+                "note": "Default 0: a game is told the memory this app may use before iOS ends it (measured at the start, "
+                        "about 6 GB on many phones), not the device's RAM, so that games which size their pools from it stay inside "
+                        "it. N: the game is told N MB instead; the report is only ever lowered, so a device with less RAM than N keeps "
+                        "its own (ml992 in the log). For a game whose start-up check refuses the measured figure (Dark Souls "
+                        "Remastered's minimum-memory box: 8192). Changes what the game is told, not what it may use.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
     "env.MADEIRA_WOW_MIN_FREE_GB": {"category": "Memory & JIT pool", "title": "Address space a 32-bit window must leave free (GB)",
                 "kind": "int", "default": "8",
                 "note": "Default 8. A 32-bit program's 4 GB window is refused when taking it would leave less than this many GB of the "
@@ -1594,6 +1693,12 @@ OVERLAY = {
                         "with 2 GB left (the EA app's session does this; GTA IV's launcher chain on a 63 GB map needed it). Read at "
                         "every window.",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    # round 707 (agent G1 S8): list rows have set it since build 624; an auto-tune rule adds Wine's wgl warnings with it.
+    "env.WINEDEBUG": {"category": "Wine libraries", "title": "Wine's debug channels (WINEDEBUG)", "kind": "text", "default": "",
+                "sources": ["wine/dlls/ntdll/unix/debug.c"],
+                "note": "Default empty: BCD's own channel set. A Wine debug-channel list, e.g. err+all,err-virtual,fixme-d3dcompiler,warn+wgl: "
+                        "the last item also prints why wglGetProcAddress refused a name (Day of the Tentacle Remastered). Log only; more channels "
+                        "make the log longer. Read when the game starts."},
     "env.WINE_D3D_CONFIG": {"category": "Wine libraries", "title": "Wine's Direct3D settings (wined3d)", "kind": "text",
                 "default": "",
                 "note": "Wine's own WINE_D3D_CONFIG for its wined3d layer (DirectDraw and the Direct3D Wine draws itself), e.g. renderer=no3d: "
@@ -2477,6 +2582,16 @@ OVERLAY = {
                         "locked its ~1 MB index buffer about 920 times a frame, ~0.9 GB of copying a frame at 32 FPS. 0: the whole "
                         "buffer again, for a game that draws wrong with the new way. The census line \"buffer refresh per frame\" "
                         "shows the copy volume either way. Set it in the game's own file; read once per game start."},
+    # madeira-bcd (Resident Evil 4, B1TDSR): DXMT's Direct3D 9 vertex-buffer range refresh (tools/patch-dxmt-d9-vb-range.py; DXMT reads it).
+    "env.DXMT_D9_VB_RANGE": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Direct3D 9: copy only the vertex bytes a draw reads",
+                "kind": "bool", "default": "0", "sources": ["tools/patch-dxmt-d9-vb-range.py"],
+                "note": "Default off. 1: a draw that is not indexed (DrawPrimitive) copies only the vertex bytes it reads to the GPU (it "
+                        "renames the buffer first when an earlier draw read those bytes); indexed draws, instanced draws, draws from the "
+                        "game's own memory and every stream whose stride or layout is doubtful keep the whole-buffer copy. Before, every "
+                        "draw after a lock of a dynamic vertex buffer copied the whole buffer: Resident Evil 4 (2005) locked its ~3.8 MB "
+                        "buffer 210 times a frame with 1 to 256 bytes each and copied 788 MB a frame, at 4 FPS. The census line \"buffer "
+                        "refresh per frame\" and the log line \"[vb-range]\" show whether it acts. Set it in the game's own file; read "
+                        "once per game start."},
     # madeira-bcd (round 624): an SRV's GetDesc reports the real mip count (tools/patch-dxmt-srv-getdesc-mips.py; DXMT reads it).
     "env.MADEIRA_SRV_GETDESC_RESOLVE": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Shader resource views: report the real mip count",
                 "kind": "bool", "default": "0", "sources": ["tools/patch-dxmt-srv-getdesc-mips.py"],
@@ -2838,7 +2953,7 @@ OVERLAY = {
                 "kind": "text", "default": "",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh",
                             "tools/patch-wine-setupapi-devinst-lock.py", "tools/patch-wine-mfasfsrcsnk-winedmo.py",
-                            "tools/patch-wine-dxdiagn-directshow.py", "tools/patch-wine-combase-implicit-mta.py", "tools/build-dxcompiler.sh"],
+                            "tools/patch-wine-dxdiagn-directshow.py", "tools/patch-wine-combase-implicit-mta.py", "tools/build-dxcompiler.sh", "tools/build-icu-optin.sh"],
                 "note": "A comma-separated list (dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore, setupapi): each named DLL, which BCD ships as "
                         "<name>-optin.dll and never for every game, runs as <name>.dll for this game. For a program that "
                         "imports one and exits at once with c0000135 (\"Library dxva2.dll ... not found\"; Fort Solis, "
@@ -2875,10 +2990,14 @@ OVERLAY = {
                         "it instead of the old FXC compiler: wgpu games (skate. 2 PC port) do, and Wine's FXC cannot compile the Shader Model 5.1 "
                         "sampler array every wgpu shader with a texture declares (\"E5017: ... Shader model 5.1+ resource array\"; build 663). "
                         "mscms is Windows' colour management, which the Adobe AIR runtime's Adobe AIR.dll imports with msi.dll (Brawlhalla; build 668). "
+                        "icuuc and icuin are ICU (the International Components for Unicode: collation, text encodings, time zones, break iterators), which BCD "
+                        "builds for 64-bit programs, as Windows 10 and newer have it in System32: a Qt 6 program's Qt6Core.dll imports both and without them "
+                        "ended at once with c0000135 (\"Library icuuc.dll ... not found\"; Bloodborne's PySide6 launcher, Anki, the Albion launcher; build 708). "
+                        "List both (icuin alone brings icuuc along). "
                         "An earlier session's links are removed when a name is gone. "
                         "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint, oledlg, fwpuclnt, sensapi, gamingtcui, qwave, "
                         "xinputuap, httpapi, dbgcore, setupapi, dxdiagn, msvcp_win, bluetoothapis, gameinput, ntdsapi, mfplay, avicap32, coremessaging, combase, dxcompiler, mscms and (with "
-                        "env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},
+                        "env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures. For a Qt 6 program that stops on icuuc.dll it adds icuuc,icuin (build 708)."},
     # round 669 (agent B S7; Doki Doki Literature Club N8E7GN): tools/patch-wine-loader-import-appdir.py
     "env.MADEIRA_IMPORT_APPDIR": {"category": "Wine libraries", "title": "Look for a missing library in the program's own folder",
                 "kind": "bool", "default": "0",
@@ -2957,6 +3076,14 @@ OVERLAY = {
                         "and the range fits the 32 GB gap. A range too small ends in an out-of-memory error once the heap "
                         "outgrows it. Set it in the game's own file; read when the game starts. Auto-tune adds it after "
                         "that failure."},
+    # round 707 (agent G2 S6; Project Zomboid): auto-tune's next experiment for a Java runtime that dies after its first G1 collection.
+    "env.JAVA_TOOL_OPTIONS": {"category": "Memory & JIT pool", "title": "Java runtime options read first (JAVA_TOOL_OPTIONS)", "kind": "text",
+                "default": "",
+                "note": "Default empty. Read by the game's own Java runtime before its command line and before env._JAVA_OPTIONS, so a game's own "
+                        "options (Project Zomboid's -XX:-UseZGC) stay as they are. Auto-tune adds -XX:+UseSerialGC -Xmn1g -Xms1536m after a "
+                        "Java fatal error that came right after the first G1 collection (jvm-fatal-error-after-first-gc): the simple collector "
+                        "with a large young generation puts the first collection minutes away. Read when the game starts.",
+                "sources": ["build/tools/autotune_rules.py"]},
     "env._JAVA_OPTIONS": {"category": "Memory & JIT pool", "title": "Options of a Java game's runtime (JVM)",
                 "kind": "text", "default": "",
                 "sources": ["build/tools/autotune_rules.py"],
@@ -3398,6 +3525,14 @@ OVERLAY = {
                         "address window; a minute into the session the address map can be too full to find one and the program does not "
                         "start (GTA IV through BCD Dock: its window was refused, the launcher's error 137). 1 or 2: that many windows are "
                         "reserved when the session starts, before the launcher and its helpers take the space. Read once per session."},
+    # Branch steam-client (2026-11-21, build 693): Steam for Windows' session sets it with its held window (app/Madeira/SteamDesktop.swift).
+    "env.MADEIRA_WOW_HIGH_SIDE_CAP": {"category": "Memory & JIT pool", "title": "Held 32-bit window: keep 64-bit memory below the furniture ceiling",
+                "kind": "bool", "default": "0", "sources": ["build/ntdll-unix/virtual_ios.c", "app/Madeira/SteamDesktop.swift"],
+                "note": "Default off (build 693). With a window held from the session start (env.MADEIRA_WOW_PLACEHOLDER_SLOTS) and Social "
+                        "Club's layout 2 (env.MADEIRA_SC_PA_POOLS = 2), the held slot is the 64-bit programs' floor, so their memory went "
+                        "above it, up to Chromium's pools: Steam for Windows' web helper then could not reserve its pools and Steam never "
+                        "opened (build 691). 1: 64-bit memory above the held window stops at the furniture ceiling, and goes there first "
+                        "when there is no room below. Steam for Windows' session sets it. Read once per session."},
     "env.MADEIRA_TLS_CLEAR_OWN_PROCESS": {"category": "Wine core (ntdll)", "title": "TlsFree only touches the calling program's threads",
                 "kind": "bool", "default": "1",
                 "note": "Default on from build 652 (builds 579 to 651: off). TlsFree frees a thread-local slot in the threads of the calling program only, as on "
