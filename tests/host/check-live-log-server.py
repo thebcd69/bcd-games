@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
-"""Compile the live log server and exercise it over macOS loopback TCP."""
+"""Check live logs over macOS loopback TCP and restoration of the saved opt-in."""
 
 from contextlib import contextmanager
 from http.client import HTTPConnection
@@ -16,9 +16,11 @@ import tempfile
 import unittest
 
 
-SERVER = Path(__file__).resolve().parents[2] / "app/Madeira/BCDLiveLogServer.swift"
+APP = Path(__file__).resolve().parents[2] / "app/Madeira"
+SERVER = APP / "BCDLiveLogServer.swift"
 TIMEOUT = 5
 HARNESS = r"""
+import Combine
 import Foundation
 import Network
 
@@ -27,6 +29,40 @@ func reply(_ message: String) {
 }
 
 let logURL = URL(fileURLWithPath: CommandLine.arguments[1])
+
+struct LogStore {
+    static let shared = LogStore()
+    var logFileURL: URL { logURL }
+}
+
+@MainActor func checkSavedAccess() {
+    let suite = "bcd.live-log-check.\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suite)!
+    defer { defaults.removePersistentDomain(forName: suite) }
+
+    do {
+        let access = BCDLiveLogAccess(defaults: defaults)
+        access.restore()
+        precondition(!access.state.isOn, "Live log access must default to off")
+        access.setEnabled(true)
+        precondition(access.state.isOn)
+    }
+    do {
+        let access = BCDLiveLogAccess(defaults: UserDefaults(suiteName: suite)!)
+        access.restore()
+        guard case .starting = access.state else {
+            preconditionFailure("A new controller must start live log access after opt-in")
+        }
+        access.setEnabled(false)
+        precondition(!access.state.isOn)
+    }
+    let access = BCDLiveLogAccess(defaults: UserDefaults(suiteName: suite)!)
+    access.restore()
+    precondition(!access.state.isOn, "A new controller must preserve an explicit opt-out")
+}
+
+MainActor.assumeIsolated { checkSavedAccess() }
+
 let network = BCDLiveLogServer.IPv4Network(address: .loopback, netmask: IPv4Address("255.0.0.0")!)
 let subnet = BCDLiveLogServer.IPv4Network(address: IPv4Address("192.168.42.65")!,
                                           netmask: IPv4Address("255.255.255.192")!)
@@ -66,6 +102,12 @@ while let line = readLine() {
 """
 
 
+def swift_declaration(filename, marker):
+    text = (APP / filename).read_text()
+    start = text.index(marker)
+    return text[start:text.index("\n}", start) + 2]
+
+
 @contextmanager
 def request(endpoint, target=None, host=None):
     connection = HTTPConnection(endpoint.hostname, endpoint.port, timeout=TIMEOUT)
@@ -103,17 +145,27 @@ class LiveLogServerTest(unittest.TestCase):
             self.assertEqual(response.read(), b"")
 
     def test_lan_live_stream(self):
+        self.assertIn("BCDLiveLogAccess.shared.restore()", (APP / "MadeiraApp.swift").read_text())
         with tempfile.TemporaryDirectory(prefix="bcd-live-log-") as directory:
             folder = Path(directory)
             source, binary = folder / "main.swift", folder / "live-log-server"
-            source.write_text(HARNESS)
+            source.write_text("\n".join((
+                HARNESS,
+                swift_declaration("BCDSettingsSections.swift", "enum BCDLiveLogState {"),
+                swift_declaration("BCDSettingsLive.swift", "@MainActor final class BCDLiveLogAccess:"),
+            )))
             subprocess.run([os.environ.get("SWIFTC", "swiftc"), "-module-cache-path", str(folder / "modules"),
                             str(SERVER), str(source), "-o", str(binary)], check=True, timeout=120)
 
             log = folder / "bcd-log.txt"
             recent = b"recent log line\n" * 4096
             log.write_bytes(b"older log entry\n" + recent)
-            with subprocess.Popen([binary, log], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as server:
+
+            preferences = folder / "test-user"
+            (preferences / "Library/Preferences").mkdir(parents=True)
+            env = dict(os.environ, CFFIXED_USER_HOME=str(preferences))
+            with subprocess.Popen([binary, log], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                  text=True, env=env) as server:
                 try:
                     endpoint = self.start(server)
                     self.assert_rejected(endpoint, 404, target="/api/log?extra=value")

@@ -922,14 +922,27 @@ struct BCDTouchEditorHost: View {
 // MARK: - Logs
 
 /// Kept for the app run so closing Settings can leave the stream open during a game.
-@MainActor private final class BCDLiveLogAccess: ObservableObject {
+@MainActor final class BCDLiveLogAccess: ObservableObject {
     static let shared = BCDLiveLogAccess()
+    static let defaultsKey = "bcd.logs.liveAccess"
     @Published private(set) var state = BCDLiveLogState.off
+    private let defaults: UserDefaults
     private var monitor: NWPathMonitor?
     private var server: BCDLiveLogServer?
 
+    init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+
+    func restore() {
+        guard case .off = state, defaults.bool(forKey: Self.defaultsKey) else { return }
+        start()
+    }
+
     func setEnabled(_ on: Bool) {
-        guard on else { stop(.off); return }
+        defaults.set(on, forKey: Self.defaultsKey)
+        if on { start() } else { stop(.off) }
+    }
+
+    private func start() {
         guard monitor == nil else { return }
         let monitor = NWPathMonitor(requiredInterfaceType: .wifi)
         self.monitor = monitor
@@ -946,15 +959,20 @@ struct BCDTouchEditorHost: View {
     private func update(_ path: NWPath, monitor: NWPathMonitor) {
         guard let interface = path.availableInterfaces.first(where: { $0.type == .wifi }),
               let network = BCDLiveLogServer.ipv4Network(on: interface) else {
-            stop(.failed("Connect to Wi-Fi with an IPv4 address, then turn on live log access again."))
+            if server == nil {
+                state = .waitingForWiFi
+            } else {
+                stop(.failed("The Wi-Fi connection was lost."))
+            }
             return
         }
         if let server {
             if server.network != network || server.interface != interface {
-                stop(.failed("The Wi-Fi network changed. Turn on live log access again."))
+                stop(.failed("The Wi-Fi network changed."))
             }
             return
         }
+        state = .starting
         do {
             server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, network: network, interface: interface) {
                 [weak self, weak monitor] result in

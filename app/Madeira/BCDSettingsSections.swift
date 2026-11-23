@@ -1337,12 +1337,12 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
 }
 
 enum BCDLiveLogState {
-    case off, starting, sharing(URL), failed(String)
+    case off, starting, waitingForWiFi, sharing(URL), failed(String)
 
     var isOn: Bool {
         switch self {
-        case .starting, .sharing: return true
-        case .off, .failed: return false
+        case .starting, .waitingForWiFi, .sharing, .failed: return true
+        case .off: return false
         }
     }
 }
@@ -1414,13 +1414,15 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
             BCDSettingsGroup(title: "Live logs",
                              footer: "Anyone on this Wi-Fi subnet can read the raw log over unencrypted HTTP. BCD shows the .local hostname when Bonjour finds it.") {
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "live"), title: "Allow live log access",
-                                     note: "Stream this run's log while BCD is running.",
+                                     note: "Stream this run's log while BCD is running. This setting stays on after a restart.",
                                      isOn: backend.liveLogState.isOn) { backend.setLiveLogAccess($0) }
                 switch backend.liveLogState {
                 case .off:
                     EmptyView()
                 case .starting:
                     BCDSettingsInfoRow(title: "Starting live log access…", value: "")
+                case .waitingForWiFi:
+                    BCDSettingsInfoRow(title: "Waiting for Wi-Fi", note: "Live logs need a Wi-Fi connection with an IPv4 address.", value: "")
                 case .sharing(let url):
                     BCDSettingsActionRow(id: BCDSettingsID.control(.logs, "copy-live-url"), title: "Copy live log URL",
                                          note: url.absoluteString, detail: copied == url.absoluteString ? "Copied" : nil,
@@ -1429,7 +1431,7 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                         copied = url.absoluteString
                     }
                 case .failed(let message):
-                    BCDSettingsInfoRow(title: "Live logs unavailable", note: message, value: "")
+                    BCDSettingsInfoRow(title: "Live logs unavailable", note: message + " Turn access off and on to retry.", value: "")
                 }
             }
             BCDSettingsGroup(title: "Send a log",
