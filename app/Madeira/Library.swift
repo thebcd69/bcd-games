@@ -844,6 +844,11 @@ final class LibraryModel: ObservableObject {
     // exited with a Windows error (wine_crash_exit_status, WineProcessBridge.m).
     // MADEIRA_EXIT_REPORT=0 returns to the library without a message.
     private var quitRequested = false
+    /// madeira-bcd (round 707, G1-S15; Hollow Knight DEQCHZ): a game that ignores Close. When the player first asked to close, when they chose
+    /// "End the game now", and what is offered now (SessionForceEnd.swift). The menu's quit row reads `forceEnd`.
+    private var quitRequestedAt: Date?
+    private var forceEndAskedAt: Date?
+    @Published private(set) var forceEnd = SessionForceEnd.Phase.none
     /// madeira-bcd (round 577, GTA IV freeze): the program's exit code when the library itself ended the session
     /// because the engine never reported the program's end (watchProgramEnd); nil otherwise.
     private var endedByWatch: Int32?
@@ -1387,6 +1392,7 @@ final class LibraryModel: ObservableObject {
         desktopCloseError = nil
         if BCDDuoFeatures.active { winios_compositor_set_backgrounded(desktopHome ? 1 : 0) }   // native Duo interface: the desktop may run behind BCD Home
         quitRequested = false
+        quitRequestedAt = nil; forceEndAskedAt = nil; forceEnd = .none
         endedByWatch = nil; endWatchNote = ""
         endedByDockGame = false; dockEndNote = ""; dockFailedAt = nil; endedByDockFailure = nil; endedByDockShortExit = nil
         // round 624 (agent D2 S3/S7): only what ends after this moment, only on the Windows desktop
@@ -1446,6 +1452,7 @@ final class LibraryModel: ObservableObject {
         BCDHUDState.shared.sessionBegan(entry)   // madeira-bcd: the performance HUD this session takes (BCDHUDLive.swift): the game's own, an old overlay switch carried over, or the choice for every game (Off unless chosen)
         BCDFeelLive.sessionBegan(entry)   // madeira-bcd (round 604): the game's saved menu settings (touch feel, picture filter, cooling, pointer ...), BCDSessionFeelLive.swift; a game with none saved changes nothing
         BCDSessionRecorder.sessionBegan(entry)   // madeira-bcd: the frame statistics start and the open-session marker is written (BCDSessionRecorderLive.swift)
+        BCDSteamDesktopLive.sessionBegan(entry)   // madeira-bcd (branch steam-client, M1): a Steam for Windows session starts its log watch; any other session, nothing
         if remember { var played = entry; played.lastPlayed = Date(); save(played) }
         launchDismissLogged = false
         DockStartScreen.shared.begin(dock, at: launchStarted)
@@ -1485,6 +1492,7 @@ final class LibraryModel: ObservableObject {
             watchOpenURL()
             watchDesktopExits()
             watchDesktopClose()
+            watchForceEnd()   // round 707 (G1-S15): the last watch, so the older watches keep their places
         } else if sawProcess && wineserver_is_running() == 0 { finish() }
         // The first frame gives Aspect and Fill height the drawable's shape.
         if current != nil, !laidOutAfterFirstPresent, madeira_get_present_count() != MetalBackedView.presentCountAtLaunch {
@@ -1738,6 +1746,50 @@ final class LibraryModel: ObservableObject {
             DispatchQueue.global(qos: .userInitiated).async { wine_session_abandon() }
         }
     }
+    /// madeira-bcd (round 707, G1-S15; Hollow Knight DEQCHZ: Unity's Mono waits for a thread at shutdown and the game never ends; 31 of 330
+    /// archive logs with a close request show no return to the library a minute later): the player asked to close and the session is
+    /// still up 45 s later. The session line says what to do and the menu's quit row becomes "End the game now" (endGameNow). Only a
+    /// game that is showing: not the Windows desktop (watchDesktopClose ends it its own way), not a start under way. Nothing here
+    /// ends anything; a game that closes meanwhile goes through finish() as always.
+    private func watchForceEnd() {
+        guard let asked = quitRequestedAt, SessionForceEnd.applies(desktop: activeEntry?.desktop == true, launching: launching) else { return }
+        let sinceClose = -asked.timeIntervalSinceNow
+        let phase = SessionForceEnd.phase(sinceClose: sinceClose, sinceEnd: forceEndAskedAt.map { -$0.timeIntervalSinceNow }, sessionUp: true)
+        guard phase != forceEnd else { return }
+        forceEnd = phase
+        switch phase {
+        case .offered:
+            LogStore.shared.log("[force-end] the game is still up \(Int(sinceClose)) s after Close; End the game now is offered")
+            sessionMessage = SessionForceEnd.offerWords
+        case .stuck:
+            LogStore.shared.log("[force-end] the session is still up \(Int(SessionForceEnd.recoverAfter)) s after the player ended the game; only closing BCD is left", level: .error)
+            sessionMessage = SessionForceEnd.stuckWords
+        case .none, .ending:
+            break
+        }
+    }
+
+    /// The player chose "End the game now" (the menu's quit row, offered by watchForceEnd). It ends the session the way the Dock's game-end watch does
+    /// once nothing of the game is left (wine_session_dock_game_quit: the engine's end work runs, the status is the player's quit and not a crash,
+    /// so no error box and auto-tune reads a quit): the wineserver stops, poll() then finds the session over and finish() returns to the library,
+    /// which also clears the open-session marker (BCDSessionRecorder.sessionEnded), so the next start is no crash question. If the session is still
+    /// up 10 s later, watchForceEnd says so. Nothing is killed from here.
+    func endGameNow() {
+        guard current != nil, forceEnd == .offered, let asked = quitRequestedAt else { return }
+        var names = [CChar](repeating: 0, count: 256)
+        let running = Int(madeira_live_user_processes(&names, Int32(names.count)))
+        let list = String(decoding: names.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
+        LogStore.shared.log(SessionForceEnd.logLine(secondsAfterClose: Int(-asked.timeIntervalSinceNow), running: running, names: list))
+        forceEndAskedAt = Date()
+        forceEnd = .ending
+        sessionMessage = SessionForceEnd.endingWords
+        menu = false
+        DispatchQueue.global(qos: .userInitiated).async {
+            let ended = wine_session_dock_game_quit(0)
+            LogStore.shared.log("[force-end] the engine's end work " + (ended == 1 ? "ran" : "had nothing to do (the session was already over)"))
+        }
+    }
+
     /// madeira-bcd (round 579, BCD Dock: the game died and the session stayed open): a Dock session's initial program is
     /// Wine's desktop, which never ends by itself on iOS, so a game that crashed left its dead desktop on the screen for
     /// good (Dying Light 32FEAT, The Binding of Isaac VV5NHZ). Only a Dock session, only after the game was seen
@@ -1924,6 +1976,7 @@ final class LibraryModel: ObservableObject {
         BCDPauseLive.resume()   // madeira-bcd (round 604): a paused game could not answer Alt+F4; nothing when it is not paused
         LibraryKeyboard.hide()
         quitRequested = true
+        if quitRequestedAt == nil { quitRequestedAt = Date() }   // round 707: the first Close starts the 45 s (watchForceEnd)
         // Ask the application to close (Alt+F4) through the normal input queue,
         // so it can save; the surface stays up until the native session ends.
         winios_post_key(0x12, 1); winios_post_key(0x73, 1)
@@ -1982,6 +2035,7 @@ final class LibraryModel: ObservableObject {
     private func finish() {
         let returnHome = BCDDuoFeatures.active && quitRequested && activeEntry?.desktop == true
         BCDSessionRecorder.sessionEnded()   // madeira-bcd: the [session] summary line, and the open-session marker goes (BCDSessionRecorderLive.swift)
+        BCDSteamDesktopLive.sessionEnded()   // madeira-bcd (branch steam-client, M1): a Steam for Windows session's last lines, and BCD's own Steam connection may come back; any other session, nothing
         // madeira-bcd: auto-tune reads this session's log afterwards (AutoTune.swift); off, nothing.
         if AutoTune.enabled { autoTuneSessionEnded() }
         // madeira-bcd (round 603): the session's times for "Find where it saves", and, with the game's switch on, its saves backed up (BCDSaveBackups/GameSaveAuto.swift).
@@ -2016,6 +2070,7 @@ final class LibraryModel: ObservableObject {
         controls.editing = false; controls.selected = nil
         controls.controls = savedControls; controls.visible = savedVisible; controls.sizeScale = savedSize
         if ControlPresetsModel.enabled { controls.layoutID = savedLayout }
+        quitRequestedAt = nil; forceEndAskedAt = nil; forceEnd = .none   // round 707 (G1-S15)
         current = nil; activeEntry = nil; menu = false; sessionMessage = ""
         desktopHome = false
         desktopEndsAfter = nil; desktopNotices = []; poolWait = nil

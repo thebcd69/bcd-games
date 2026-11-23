@@ -54,9 +54,10 @@ mark = mapper.index('view->protect |= VPROT_X64DATA;')
 cond_start = mapper.rindex('if (!ios_map_resource_view && !ios_wow_base() &&', 0, mark)
 cond = mapper[cond_start:mark]
 branch = mapper[cond_start:mapper.index('#endif', cond_start)]
-assert branch.count('view->protect |= VPROT_X64DATA;') == 2, 'two marks under the one guard'
-assert branch.index('if (ios_x64_image_nocopy_enabled())') < branch.index('else if (ios_x64_image_copy_can_never_fit( total_size ))'), \
-    'the switch first, then the fallback'
+# round 707 (agent S1 S1): a third mark, for an image that cannot fit what is left of the pool now (ios_x64_image_copy_cannot_fit_now)
+assert branch.count('view->protect |= VPROT_X64DATA;') == 3, 'three marks under the one guard'
+assert branch.index('if (ios_x64_image_nocopy_enabled())') < branch.index('else if (ios_x64_image_copy_can_never_fit( total_size ))') \
+    < branch.index('if (ios_x64_image_copy_cannot_fit_now( total_size, &room ))'), 'the switch first, then the two fallbacks'
 assert 'NOCOPY fallback; MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off' in branch, 'the fallback says so in its [x64-image] line'
 for need in ('!ios_map_resource_view', '!ios_wow_base()', 'nt->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64',
              'nt->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC', '!(view->protect & VPROT_ARM64EC)',
@@ -190,6 +191,62 @@ with tempfile.TemporaryDirectory() as d:
         out = subprocess.run([str(exe)], capture_output=True, text=True, check=True).stdout.strip()
         assert out == want, (auto, size, pool, out)
 print('PASS: an image larger than the whole JIT pool runs from its file (round 625); every image an empty pool could hold keeps its copy')
+
+# --- round 707 (agent S1 S1): an image that cannot fit what is left of the pool, compiled against a model pool -------------
+now = function(native, 'static int ios_x64_image_copy_cannot_fit_now(')
+holes = function(native, 'static size_t ios_pool_hole_between(') + function(native, 'static size_t ios_pool_holes_between(')
+mprog = r'''
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+static pthread_mutex_t ios_pool_lock = PTHREAD_MUTEX_INITIALIZER;
+struct ios_pool_free { size_t off, size; time_t freed_at; int advised; };
+static struct ios_pool_free ios_pool_freelist[8];
+static int ios_pool_free_count;
+static size_t ios_jit_pool_size_global, jit_pool_offset, ios_jit_tail_reserved, ios_jit_hole_off_eff, ios_jit_hole_end_eff,
+              ios_jit_hole2_off, ios_jit_hole2_end, ios_jit_low_size_global, ios_pool_big_size;
+static volatile size_t ios_jit_low_reserved;
+static int ios_pool_big_taken;
+static time_t ios_pool_big_freed_at;
+#define IOS_POOL_BIG_MIN (64u * 1024 * 1024)
+static const char *fake_auto;
+static const char *fake_getenv(const char *n) { return !strcmp(n, "MADEIRA_X64_IMAGE_NOCOPY_AUTO") ? fake_auto : NULL; }
+#define getenv fake_getenv
+''' + holes + now + r'''
+#define MB (1024u * 1024u)
+int main(int argc, char **argv)
+{
+    size_t room; int what = atoi(argv[1]);
+    fake_auto = argc > 2 ? argv[2] : NULL;
+    /* a 560 MB pool, 460 MB used from the bottom, the tail 0, no hole, a 40 MB free run, no low pool */
+    ios_jit_pool_size_global = 560 * MB; jit_pool_offset = 460 * MB;
+    ios_pool_freelist[0].size = 40 * MB; ios_pool_free_count = 1;
+    if (what == 9) ios_jit_pool_size_global = 0;
+    if (what == 8) { ios_pool_big_size = 256 * MB; }
+    if (what == 7) { ios_jit_low_size_global = 300 * MB; ios_jit_low_reserved = 10 * MB; }
+    size_t sizes[] = { 200 * MB, 99 * MB, 100 * MB - 0x10000, 45 * MB };
+    int r[4], i;
+    for (i = 0; i < 4; i++) r[i] = ios_x64_image_copy_cannot_fit_now(sizes[i], &room);
+    printf("%d %d %d %d %lu\n", r[0], r[1], r[2], r[3], (unsigned long)(room / MB));
+    return 0;
+}
+'''
+with tempfile.TemporaryDirectory() as d:
+    src = Path(d) / 'nw.c'
+    src.write_text(mprog)
+    exe = Path(d) / 'nw'
+    subprocess.run(['cc', '-std=gnu11', '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-o', str(exe), str(src)], check=True)
+    def run(*a):
+        return subprocess.run([str(exe)] + list(a), capture_output=True, text=True, check=True).stdout.strip()
+    # 100 MB untouched + a 40 MB run: nw.dll's 200 MB cannot fit, 99 MB can, 100 MB - 64 KB is at the edge (fits with the slack), 45 MB fits
+    assert run('0') == '1 0 0 0 100', run('0')
+    assert run('0', '0') == '0 0 0 0 0', 'MADEIRA_X64_IMAGE_NOCOPY_AUTO=0 turns it off'
+    assert run('9') == '0 0 0 0 0', 'no pool yet: as before'
+    assert run('8') == '0 0 0 0 100', 'a free big-image slot counts for an image of 64 MB or more (200 MB fits now), not for a smaller one'
+    assert run('7') == '0 0 0 0 286', "the low pool's part for images counts"
+print('PASS: an image that cannot fit what is left of the JIT pool runs from its file (round 707); one that may fit keeps its copy')
 
 # --- catalog and CI -----------------------------------------------------------
 gen = (root / 'build/tools/gen-config-catalog.py').read_text()

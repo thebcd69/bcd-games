@@ -58,7 +58,23 @@ enum BCDFeedbackRules {
 @MainActor final class BCDFeedbackDraft: ObservableObject {
     @Published var kind = BCDFeedbackKind.bug
     @Published var text = ""
-    @Published var attachLog = false
+    /// A bug report: the stored choice, on until the person turns it off (BCDFeedbackAttach). Any other message: the switch for it, off
+    /// until the person turns it on, as it always was.
+    @Published private var bugLog = BCDFeedbackAttach.bugChoice()
+    @Published private var otherLog = false
+
+    /// Whether the log goes with a message of the kind chosen now. Turning it off for a bug report is kept: that is the option.
+    var attachLog: Bool {
+        get { kind == .bug ? bugLog : otherLog }
+        set {
+            if kind == .bug {
+                bugLog = newValue
+                BCDFeedbackAttach.setBugChoice(newValue)
+            } else {
+                otherLog = newValue
+            }
+        }
+    }
 }
 
 enum BCDFeedbackState: Equatable {
@@ -76,7 +92,7 @@ struct BCDSentFeedback: Identifiable, Hashable {
     var id: String { code }
 }
 
-/// The log "Attach my newest log" would send.
+/// The log "Attach my last game's log" would send.
 struct BCDFeedbackLog: Hashable {
     var name: String
     var date: Date
@@ -86,12 +102,13 @@ struct BCDFeedbackLog: Hashable {
 
 @MainActor protocol BCDFeedbackBackend: ObservableObject {
     var draft: BCDFeedbackDraft { get }
-    /// The newest log on this device, or nil before a game has run.
+    /// The log a message can carry: the newest game log on this device, or BCD's own newest one when no game ran in the last day; nil before
+    /// a game has run.
     var newestLog: BCDFeedbackLog? { get }
     /// What was sent, newest first (the last 20 are kept).
     var sent: [BCDSentFeedback] { get }
     var state: BCDFeedbackState { get }
-    /// Sends the draft: with the newest log first when `attachLog` is on. On success the draft's
+    /// Sends the draft: with `newestLog` first when `draft.attachLog` is on (a bug report: unless turned off). On success the draft's
     /// text is cleared and the state says the code.
     func send()
     func copy(_ code: String)
@@ -234,15 +251,15 @@ struct BCDFeedbackSettings<Backend: BCDFeedbackBackend>: View {
 
     // MARK: The log
 
+    /// What the log is: the game, the day, the size. A bug report carries it unless the person turns this off (and that is kept);
+    /// any other message only when the person turns it on.
     private var attachRow: some View {
         let log = backend.newestLog
-        let note = log.map {
-            "\(BCDSettingsText.logName($0.name)) · \(BCDFormat.dateTime($0.date)) · \(BCDFormat.bytes($0.bytes))"
-                + ($0.hasGame ? "" : ": no game ran in it")
-                + ". Sent first and cleaned on this device, as in Logs (a performance trace, if you recorded one, goes along); its code goes with your message."
-        } ?? "No log yet. One appears once a game has run."
-        return BCDSettingsToggleRow(id: BCDSettingsID.control(.feedback, "log"), title: "Attach my newest log", note: note,
-                                    isOn: log != nil && draft.attachLog, enabled: log != nil && !sending) { draft.attachLog = $0 }
+        let on = log != nil && draft.attachLog
+        let shown = log.map { BCDFeedbackAttach.Shown(name: $0.name, when: BCDFormat.dateTime($0.date), size: BCDFormat.bytes($0.bytes), hasGame: $0.hasGame) }
+        return BCDSettingsToggleRow(id: BCDSettingsID.control(.feedback, "log"), title: BCDFeedbackAttach.title,
+                                    note: BCDFeedbackAttach.note(isBug: draft.kind == .bug, on: on, log: shown),
+                                    isOn: on, enabled: log != nil && !sending) { draft.attachLog = $0 }
     }
 
     // MARK: Send
@@ -261,6 +278,12 @@ struct BCDFeedbackSettings<Backend: BCDFeedbackBackend>: View {
                 .font(BCDStyle.body(layout == .pad ? 14 : 12.5)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 4)
+            if backend.newestLog != nil && draft.attachLog {
+                Text(BCDFeedbackAttach.privacyWithLog)
+                    .font(BCDStyle.body(layout == .pad ? 14 : 12.5)).foregroundStyle(BCDStyle.textSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+            }
         }
     }
 

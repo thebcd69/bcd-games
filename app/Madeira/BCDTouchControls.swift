@@ -52,7 +52,19 @@ extension BCDTouchInput {
 /// The editor's hands on the layout.
 @MainActor protocol BCDTouchArranging: AnyObject {
     func select(_ id: UUID?)
+    func selectMany(_ ids: Set<UUID>)
+    func beginDrag(_ id: UUID)
+    func drag(_ id: UUID, delta: CGSize, screen: CGSize)
+    func endDrag(_ id: UUID, moved: Bool)
     func move(_ id: UUID, x: Double, y: Double)
+}
+
+extension BCDTouchArranging {
+    /// Keeps third-party and preview adapters compatible with single selection.
+    func selectMany(_ ids: Set<UUID>) { select(ids.count == 1 ? ids.first : nil) }
+    func beginDrag(_ id: UUID) { select(id) }
+    func drag(_ id: UUID, delta: CGSize, screen: CGSize) {}
+    func endDrag(_ id: UUID, moved: Bool) { if !moved { select(id) } }
 }
 
 // MARK: - Colours
@@ -93,20 +105,50 @@ struct BCDTouchLayer: View {
     var opacity = 1.0
     var editing = false
     var selected: UUID? = nil
+    var selectedIDs: Set<UUID> = []
+    var alignmentX: CGFloat? = nil
+    var alignmentY: CGFloat? = nil
     let input: BCDTouchInput
     var arranging: BCDTouchArranging? = nil
     /// How the controls look (round 604, BCDTouchLook.swift); BCD's own unless the player chose another.
     var look = BCDTouchLook()
     /// madeira-bcd (Porthole port, item 9): floating sticks (BCDTouchFeel.floatingSticks, the in-game menu's touch settings; off by default).
     var floatingSticks = false
+    @State private var marquee: CGRect?
+
+    private func controlFrame(_ item: BCDTouchItem) -> CGRect {
+        let diameter = BCDTouchGeometry.diameter(scale: item.scale, layoutScale: layoutScale)
+        let size = BCDTouchGeometry.size(item.shape, diameter: diameter)
+        return CGRect(x: CGFloat(item.x) * screen.width - size.width / 2,
+                      y: CGFloat(item.y) * screen.height - size.height / 2,
+                      width: size.width, height: size.height)
+    }
+
+    private var emptySpaceSelection: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                guard editing else { return }
+                let a = value.startLocation, b = value.location
+                guard hypot(b.x - a.x, b.y - a.y) > 5 else { return }
+                marquee = CGRect(x: min(a.x, b.x), y: min(a.y, b.y),
+                                 width: abs(b.x - a.x), height: abs(b.y - a.y))
+            }
+            .onEnded { _ in
+                guard editing, let arranging else { marquee = nil; return }
+                if let rect = marquee {
+                    arranging.selectMany(Set(items.filter { controlFrame($0).intersects(rect) }.map(\.id)))
+                } else { arranging.select(nil) }
+                marquee = nil
+            }
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             if editing, let arranging {
-                // A tap on empty space puts the selected control down.
+                // Drag from empty canvas to marquee-select, tap empty space to deselect.
                 Color.clear
                     .contentShape(Rectangle())
-                    .onTapGesture { arranging.select(nil) }
+                    .gesture(emptySpaceSelection)
             }
             if floatingSticks && !editing {
                 // The controller sticks first, under every other control: a control in a stick's zone keeps its own touches.
@@ -122,13 +164,34 @@ struct BCDTouchLayer: View {
             } else {
                 ForEach(items) { item in
                     BCDTouchControl(item: item, screen: screen, layoutScale: layoutScale, opacity: opacity,
-                                    editing: editing, selected: editing && selected == item.id,
+                                    editing: editing, selected: editing && (selected == item.id || selectedIDs.contains(item.id)),
                                     input: input, arranging: arranging, look: look)
                         .equatable()
                 }
             }
+            if editing, let x = alignmentX {
+                Rectangle().fill(BCDTouchPalette.selected.opacity(0.7))
+                    .frame(width: 1, height: screen.height)
+                    .position(x: x, y: screen.height / 2)
+                    .allowsHitTesting(false)
+            }
+            if editing, let y = alignmentY {
+                Rectangle().fill(BCDTouchPalette.selected.opacity(0.7))
+                    .frame(width: screen.width, height: 1)
+                    .position(x: screen.width / 2, y: y)
+                    .allowsHitTesting(false)
+            }
+            if editing, let rect = marquee {
+                Rectangle()
+                    .fill(BCDTouchPalette.selected.opacity(0.1))
+                    .overlay(Rectangle().stroke(BCDTouchPalette.selected.opacity(0.9), lineWidth: 1))
+                    .frame(width: rect.width, height: rect.height)
+                    .position(x: rect.midX, y: rect.midY)
+                    .allowsHitTesting(false)
+            }
         }
         .frame(width: screen.width, height: screen.height, alignment: .topLeading)
+        .onChange(of: editing) { _, isEditing in if !isEditing { marquee = nil } }
         .transaction { $0.animation = nil }
     }
 }
@@ -148,7 +211,8 @@ struct BCDTouchControl: View, Equatable {
     @State private var down = false
     @State private var direction = -1
     @State private var vector = CGSize.zero
-    @State private var dragBase: CGPoint?
+    @State private var dragStarted = false
+    @State private var dragMoved = false
 
     nonisolated static func == (a: BCDTouchControl, b: BCDTouchControl) -> Bool {
         a.item == b.item && a.screen == b.screen && a.layoutScale == b.layoutScale && a.opacity == b.opacity
@@ -196,20 +260,25 @@ struct BCDTouchControl: View, Equatable {
         vector = .zero
     }
 
-    /// Editing: touch a control to select it, drag it to move it.
+    /// A tap selects only this control. Dragging a member keeps its group selected.
     private var editDrag: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 guard editing, let arranging else { return }
-                arranging.select(item.id)
-                if item.locked { return }   // selected to unlock it, resize nothing, move nothing
-                if dragBase == nil { dragBase = CGPoint(x: item.x, y: item.y) }
-                let base = dragBase ?? .zero
-                arranging.move(item.id,
-                               x: BCDTouchGeometry.clampPlace(Double(base.x) + Double(value.translation.width / screen.width)),
-                               y: BCDTouchGeometry.clampPlace(Double(base.y) + Double(value.translation.height / screen.height)))
+                if !dragStarted {
+                    dragStarted = true
+                    arranging.beginDrag(item.id)
+                }
+                if item.locked { return }  // A locked control cannot move its group.
+                guard hypot(value.translation.width, value.translation.height) > 4 else { return }
+                dragMoved = true
+                arranging.drag(item.id, delta: value.translation, screen: screen)
             }
-            .onEnded { _ in dragBase = nil }
+            .onEnded { _ in
+                if editing { arranging?.endDrag(item.id, moved: dragMoved) }
+                dragStarted = false
+                dragMoved = false
+            }
     }
 }
 

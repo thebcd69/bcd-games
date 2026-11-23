@@ -50,8 +50,10 @@ ctl, park = "tools/patch-winemetal-ctl-gpu-time-wow64.py", "tools/patch-dxmt-d3d
 check("the workflow runs the 32-bit GPU time patch after the GPU stall patch and before winemetal is built",
       ctl in scripts and scripts.index(ctl) == scripts.index("tools/patch-winemetal-gpu-stall.py") + 1
       and wf.index("python3 " + ctl) < wf.index("name: Build dxmt-ios"))
-check("the workflow runs the query park patch right after the index-range patch, before the i386 farm key",
-      park in scripts and scripts.index(park) == scripts.index("tools/patch-dxmt-d9-ib-range.py") + 1
+check("the workflow runs the query park patch right after the index-range patch and its vertex-buffer counterpart (the one step "
+      "between them), before the i386 farm key",
+      park in scripts and scripts.index(park) == scripts.index("tools/patch-dxmt-d9-ib-range.py") + 2
+      and scripts.index(park) == scripts.index("tools/patch-dxmt-d9-vb-range.py") + 1
       and wf.index("python3 " + park) < wf.index("name: i386 farm revision")
       and "'tools/patch-dxmt-*.py'" in wf[wf.index("name: i386 farm revision"):][:600])
 check("CI runs this check", "python3 tests/host/check-gpu-time-wow64.py" in wf)
@@ -109,9 +111,15 @@ with tempfile.TemporaryDirectory() as tmp:
     after = {k: f.read_text() for k, f in files.items()}
 
     # nothing else changed: the wow64 entry is the only change by the ctl patch; the park patch's insertions undo exactly
+    # a later patch of the chain adds one line to the same function (tools/patch-winemetal-frames-made.py: op 31, no pointer in it):
+    # taken back out before the comparison, so this still says the GPU time patch changed that function and nothing else
+    made_spec = importlib.util.spec_from_file_location("frames_made_patch", R / "tools/patch-winemetal-frames-made.py")
+    made_mod = importlib.util.module_from_spec(made_spec)
+    made_spec.loader.exec_module(made_mod)
+    after_wm = after["wm"].replace(made_mod.WOW64, made_mod.A_WOW64, 1)
     check("the 32-bit GPU time patch changes only _madeira_ctl_wow64",
-          after["wm"].count(ctl_mod.NEW) == 1 and before["wm"].count(ctl_mod.OLD) == 1
-          and re.sub(re.escape(ctl_mod.NEW), lambda m: ctl_mod.OLD, after["wm"], count=1).count(ctl_mod.NEW) == 0)
+          after_wm.count(ctl_mod.NEW) == 1 and before["wm"].count(ctl_mod.OLD) == 1
+          and re.sub(re.escape(ctl_mod.NEW), lambda m: ctl_mod.OLD, after_wm, count=1).count(ctl_mod.NEW) == 0)
     undone = {"hpp": after["hpp"], "cpp": after["cpp"], "qry": after["qry"]}
     for path, pairs in park_mod.EDITS:
         key = {"d3d9_census.hpp": "hpp", "d3d9_census.cpp": "cpp", "d3d9_query.cpp": "qry"}[path.name]

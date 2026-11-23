@@ -35,11 +35,20 @@ OUT="$R/app/Madeira/gl"
 SDK="$(xcrun --sdk iphoneos --show-sdk-path)"
 MESA_TAR_SHA256=592272df3cf01e85e7db300c449df5061092574d099da275d19e97ef0510f8a6
 
+# madeira-bcd (2026-11-22, the build time study's S2): a kept tree whose patches are not the series any more (a patch corrected
+# under the same name, one gone from the series, or the old empty markers) is removed first and unpacked again below; the
+# KosmicKrisp recipe has done the same since build 676.
+sh "$HERE/kk-stale-source.sh" "$SRC" "$HERE/patches" osmesa
 if [ ! -f "$SRC/meson.build" ]; then
     tar_dir="$(dirname "$SRC")"
     mkdir -p "$tar_dir"
-    echo "Mesa source not found at $SRC; downloading mesa-25.0.7.tar.xz"
-    curl -fsSL -o "$tar_dir/mesa-25.0.7.tar.xz" https://archive.mesa3d.org/mesa-25.0.7.tar.xz
+    # The kept tarball is unpacked again when it is the pinned one; anything else is downloaded and checked.
+    if [ "$(shasum -a 256 "$tar_dir/mesa-25.0.7.tar.xz" 2>/dev/null | awk '{print $1}')" != "$MESA_TAR_SHA256" ]; then
+        echo "Mesa source not found at $SRC; downloading mesa-25.0.7.tar.xz"
+        curl -fsSL -o "$tar_dir/mesa-25.0.7.tar.xz" https://archive.mesa3d.org/mesa-25.0.7.tar.xz
+    else
+        echo "Mesa source not found at $SRC; unpacking the kept mesa-25.0.7.tar.xz"
+    fi
     got="$(shasum -a 256 "$tar_dir/mesa-25.0.7.tar.xz" | awk '{print $1}')"
     if [ "$got" != "$MESA_TAR_SHA256" ]; then
         echo "mesa-25.0.7.tar.xz has sha256 $got, expected $MESA_TAR_SHA256" >&2
@@ -60,13 +69,14 @@ fi
 
 export PATH="$VENV/bin:$PATH"
 
-# Patches are applied once; the marker keeps re-runs idempotent.
+# Patches are applied once; the marker keeps re-runs idempotent. It holds the patch's SHA-256, so kk-stale-source.sh above can
+# tell a patch changed under the same name (an empty marker named the file only and kept the old code: build 676).
 for p in "$HERE"/patches/[0-9]*.patch; do
     [ -e "$p" ] || continue
     m="$SRC/.madeira-applied-$(basename "$p")"
     if [ ! -f "$m" ]; then
         patch -d "$SRC" -p1 --forward < "$p"
-        touch "$m"
+        shasum -a 256 < "$p" | cut -d' ' -f1 > "$m"
     fi
 done
 

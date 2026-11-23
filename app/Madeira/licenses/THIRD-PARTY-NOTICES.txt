@@ -122,6 +122,12 @@ A separate Windows DLL built from third-party source with one patch (opt-in per 
   (DXC pull request #8265, adapted by BCD: build/dxc-win), offered under the project's licence. Used only by a game whose file
   says env.MADEIRA_OPTIN_DLLS = dxcompiler.
 
+A separate Windows DLL pair built from third-party source without a patch (opt-in per game; nothing runs without it):
+- ICU 78.3 (https://icu.unicode.org/), Unicode License V3, (c) 2016-2025 Unicode, Inc. and others, with the third-party notices its licence lists
+  (legal/LICENSES/ICU-LICENSE.txt): arm64ec-windows/icuuc-optin.dll and icuin-optin.dll, ARM64EC DLLs built from the release tarball icu_78.3.orig.tar.gz
+  (build/icu-win), their data trimmed to the root and English locales. Used only by a game whose file says env.MADEIRA_OPTIN_DLLS = icuuc,icuin (Qt 6
+  programs, whose Qt6Core.dll imports both).
+
 Separate libraries for BCD's OpenGL (opt-in per game: a game whose gl-backend setting is zink or gles; nothing runs without it):
 - Mesa 25.0.7 (https://mesa3d.org; OSMesa, Zink and softpipe), MIT and other permissive licences (legal/LICENSES/MIT-Mesa.txt,
   Mesa-license.rst): gl/libOSMesa.dylib, built from the unmodified release with BCD's patches

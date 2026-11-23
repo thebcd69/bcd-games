@@ -187,10 +187,14 @@ if (wine / 'dlls/msi/Makefile.in').exists():
               re.search(r'^MODULE\s*=\s*%s\.dll$' % n, mk, re.M) and
               all((shipdir / (i + '.dll')).exists() or re.search(r'\b%s\b' % i, want) or i in EA5 or i in ('uuid', 'dxguid', 'strmiids')
                   for i in imports))   # want: the DLLs this script builds and ships under their own name (cabinet)
+# Round 707 (agents A1 S2, S1 S8, G2 S19): the EA games started through Steam (EASteamLauncher.exe -> the EA app) carry the EA app's own set.
+EA707 = ('battlefield-4', 'mass-effect-andromeda', 'need-for-speed-2015', 'need-for-speed-heat', 'star-wars-jedi-fallen-order', 'the-sims-4',
+         'mass-effect-legendary-edition', 'unravel', 'fifa-22')
 launchers = (root / 'app/Madeira/BCDLaunchers.swift').read_text()
 check('only the EA app\'s launcher entry names them',
       launchers.count('"env.MADEIRA_OPTIN_DLLS = msi,mspatcha,odbccp32,sxs,rstrtmgr,dxva2"') == 1 and
-      not any('mspatcha' in json.dumps(r) for r in recs['rules'] if r['id'] not in ('hearts-of-iron-iv', 'brawlhalla', 'need-for-speed-most-wanted-2012')))   # round 677 (A1 S2): NFS 2012's EA background service runs with the EA app's set   # night round 2026-11-11 (G5 S11): the Paradox launcher's installer needs the same set; round 668 (N007): Brawlhalla's Adobe AIR.dll imports msi.dll
+      not any('mspatcha' in json.dumps(r) for r in recs['rules'] if r['id'] not in ('hearts-of-iron-iv', 'brawlhalla', 'need-for-speed-most-wanted-2012')
+              + EA707))   # round 677 (A1 S2): NFS 2012's EA background service runs with the EA app's set   # night round 2026-11-11 (G5 S11): the Paradox launcher's installer needs the same set; round 668 (N007): Brawlhalla's Adobe AIR.dll imports msi.dll
 policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('RecommendationsPolicy lets a downloaded list name oledlg, fwpuclnt and sensapi',
       '["oledlg", "fwpuclnt", "sensapi", "ddraw"].contains($0)' in policy and 'wmadmod, or oledlg, fwpuclnt, sensapi' in policy)

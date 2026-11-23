@@ -127,18 +127,31 @@ enum ExternalSteamLibraries {
             folders[String(next)] = .object(["path": .text(path), "apps": .object([:])])
         }
         root["libraryfolders"] = .object(folders)
-        func quote(_ text: String) -> String {
-            "\"" + text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
-        }
-        func encode(_ fields: [String: SteamValue], indent: String = "") -> String {
-            fields.keys.sorted().map { key in
-                switch fields[key]! {
-                case .text(let value): return indent + quote(key) + "\t" + quote(value) + "\n"
-                case .object(let nested): return indent + quote(key) + "\n" + indent + "{\n" + encode(nested, indent: indent + "\t") + indent + "}\n"
-                }
-            }.joined()
-        }
         return Data(encode(root).utf8)
+    }
+
+    /// Branch steam-client (2026-11-22, Steam for Windows): the list without the entries whose path is one of `paths` (drive_c
+    /// relative, as `add` takes them); every other entry and field is kept. Without the file there is nothing to remove.
+    static func remove(paths: [String], from data: Data) throws -> Data {
+        var parser = try SteamKeyValues(data)
+        var root = try parser.read().fields
+        guard case .object(let folders)? = root["libraryfolders"] else { throw ExternalStorageError.invalidRecord }
+        let drop = Set(try paths.map { ("C:\\" + (try ExternalStoragePath.components($0)).joined(separator: "\\")).lowercased() })
+        root["libraryfolders"] = .object(folders.filter { !drop.contains((($0.value["path"]?.string ?? $0.value.string) ?? "").lowercased()) })
+        return Data(encode(root).utf8)
+    }
+
+    private static func quote(_ text: String) -> String {
+        "\"" + text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
+    }
+
+    private static func encode(_ fields: [String: SteamValue], indent: String = "") -> String {
+        fields.keys.sorted().map { key in
+            switch fields[key]! {
+            case .text(let value): return indent + quote(key) + "\t" + quote(value) + "\n"
+            case .object(let nested): return indent + quote(key) + "\n" + indent + "{\n" + encode(nested, indent: indent + "\t") + indent + "}\n"
+            }
+        }.joined()
     }
 }
 

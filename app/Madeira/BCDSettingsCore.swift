@@ -13,7 +13,7 @@ import Foundation
 
 /// Settings' sections, in the order the list shows them.
 enum BCDSettingsSection: String, CaseIterable, Identifiable {
-    case accounts, jit, dock, memory, graphics, appearance, controls, storage, dotnet, vcruntime, gecko, logs, feedback, all, developer, updates, about
+    case accounts, jit, dock, memory, graphics, appearance, controls, storage, dotnet, vcruntime, gecko, logs, feedback, recommended, all, developer, updates, about
 
     var id: String { rawValue }
 
@@ -32,6 +32,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .gecko: return "HTML engine for installers"
         case .logs: return "Logs"
         case .feedback: return "Feedback"
+        case .recommended: return "Recommended settings"
         case .all: return "All settings"
         case .developer: return "Developer"
         case .updates: return "Updates"
@@ -55,6 +56,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .gecko: return "Wine Gecko, for installers that show web pages"
         case .logs: return "Send a log, export it, diagnostics"
         case .feedback: return "Say what is broken or could be better"
+        case .recommended: return "Every game BCD has a list for"
         case .all: return "Every option, searchable"
         case .developer: return "The Windows desktop, the log, a controller check"
         case .updates: return "Whether a newer BCD is out"
@@ -77,6 +79,7 @@ enum BCDSettingsSection: String, CaseIterable, Identifiable {
         case .gecko: return "globe"
         case .logs: return "doc.text.fill"
         case .feedback: return "text.bubble.fill"
+        case .recommended: return "checklist"
         case .all: return "slider.horizontal.3"
         case .developer: return "hammer.fill"
         case .updates: return "arrow.down.circle.fill"

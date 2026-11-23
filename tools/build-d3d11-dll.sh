@@ -132,6 +132,8 @@ done
 #                                             since build 559, a 64-bit game never did)
 #   tools/patch-dxmt-view-private-ref.py      Hatred (opt-in, env.MADEIRA_VIEW_PRIVATE_REF = 1: a view holds its resource with a private reference, [view-ref])
 #   tools/patch-dxmt-lsfg.py                  Lossless Scaling frame generation (opt-in: only with MADEIRA_LSFG_CTL, which the app sets for a game's `lossless-scaling` line; [lsfg])
+#   tools/patch-dxmt-frames-made.py           the presents of Lossless Scaling's generated frames are marked (MadeiraCtl op 31): the HUD counts them apart
+#                                             from the game's ("15+15", build 707; [frames-made])
 # madeira-bcd (2026-11-15, owner's decision: every Direct3D 10/11 fix d3d11-src.dll lacked; the audit of the CI-only DXMT patches):
 #   tools/patch-dxmt-wsi-tiny-fullscreen.py   a fullscreen swapchain's window under 160x120 gets the monitor's size ([wsi-fullscreen]; American
 #                                             Truck Simulator, build 576). Its code is in util, which no binary that calls it compiled: the
@@ -160,6 +162,7 @@ BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skippe
              "patch-dxmt-layer-format.py" "[layer-format] madeira-bcd: back buffer format "
              "patch-dxmt-view-private-ref.py" "[view-ref] madeira-bcd #"
              "patch-dxmt-lsfg.py" "[lsfg] madeira-bcd "
+             "patch-dxmt-frames-made.py" "[frames-made] madeira-bcd: "
              "patch-dxmt-wsi-tiny-fullscreen.py" "[wsi-fullscreen] a fullscreen swapchain"
              "patch-dxmt-d3d11-fault-info.py" "[fault-enc] madeira-bcd frame "
              "patch-dxmt-bc-half.py" "[bc-half] madeira-bcd "

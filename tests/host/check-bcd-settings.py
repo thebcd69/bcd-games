@@ -57,7 +57,7 @@ R = Path(__file__).resolve().parents[2]
 APP = R / "app" / "Madeira"
 PREVIEW = R / "app" / "BCDPreview"
 VIEWS = ["BCDSettings.swift", "BCDSettingsCore.swift", "BCDSettingsSections.swift", "BCDSettingsAll.swift",
-         "BCDSettingsAbout.swift", "BCDUpdates.swift", "BCDSettingsFeedback.swift"]
+         "BCDSettingsAbout.swift", "BCDUpdates.swift", "BCDSettingsFeedback.swift", "BCDRecommendedCatalogView.swift"]
 LIVE = "BCDSettingsLive.swift"
 SAMPLE = PREVIEW / "BCDSettingsPreviewData.swift"
 HEADER = ("// SPDX-License-Identifier: GPL-3.0-only\n// Copyright 2026 thebcd69 (BCD)\n"
@@ -181,9 +181,13 @@ func check(_ cond: Bool, _ what: String) {
 typealias N = BCDSettingsNavigator
 let all = BCDSettingsSection.allCases
 let list = BCDSettingsID.list
-check(all.count == 17 && all.last == .about && all[all.count - 2] == .updates && all.contains(.developer)
+check(all.count == 18 && all.last == .about && all[all.count - 2] == .updates && all.contains(.developer)
       && all.firstIndex(of: .gecko) == all.firstIndex(of: .vcruntime)! + 1,
-      "seventeen sections (Appearance after Graphics, Developer among them, the HTML engine for installers right after Visual C++), Updates then About last")
+      "eighteen sections (Appearance after Graphics, Developer among them, the HTML engine for installers right after Visual C++, Recommended settings after Feedback and before All settings), Updates then About last")
+check(all.firstIndex(of: .recommended) == all.firstIndex(of: .feedback)! + 1 && all.firstIndex(of: .all) == all.firstIndex(of: .recommended)! + 1
+      && BCDSettingsSection.recommended.title == "Recommended settings" && BCDSettingsSection(name: "recommended") == .recommended
+      && !BCDSettingsSection.recommended.placeholder,
+      "Recommended settings is a section of its own, right after Feedback")
 check(all.firstIndex(of: .feedback) == all.firstIndex(of: .logs)! + 1 && BCDSettingsSection.feedback.title == "Feedback"
       && BCDSettingsSection(name: "feedback") == .feedback && !BCDSettingsSection.feedback.placeholder,
       "Feedback is a section of its own, right after Logs")

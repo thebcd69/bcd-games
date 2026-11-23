@@ -195,6 +195,47 @@ enum BCDLosslessShaders {
     }
 }
 
+/// Lossless Scaling for a Vulkan game (KosmicKrisp, build 706; BCD's playport patch 0036, wsi_common_metal_lsfg.m): the driver runs
+/// the passes in its own present, from the shaders translated on this device to Metal Shading Language (BCDLosslessTranslator), in a
+/// file of its own next to the control file: "LSFM", u32 version 1, u32 count, then for each u32 id, u32 thread group x, y and z,
+/// u32 size and the text. The file is the person's own, made from their Lossless.dll for the session, and goes when it ends.
+enum BCDLosslessMSL {
+    static let file = "lsfg-msl.bin"
+
+    /// DXMT's shader file ("LSFG", version 1, count, then id, size and the DXBC): id -> DXBC. nil when it is not one or is cut short.
+    static func blobs(container: Data) -> [Int: Data]? {
+        let b = [UInt8](container)
+        func u32(_ o: Int) -> Int? {
+            guard o >= 0, o + 4 <= b.count else { return nil }
+            return Int(b[o]) | Int(b[o + 1]) << 8 | Int(b[o + 2]) << 16 | Int(b[o + 3]) << 24
+        }
+        guard b.count >= 12, Array(b[0..<4]) == Array("LSFG".utf8), u32(4) == 1, let n = u32(8), n > 0, n <= 256 else { return nil }
+        var out: [Int: Data] = [:]
+        var o = 12
+        for _ in 0..<n {
+            guard let id = u32(o), let size = u32(o + 4), size > 0, o + 8 + size <= b.count else { return nil }
+            out[id] = Data(b[(o + 8)..<(o + 8 + size)])
+            o += 8 + size
+        }
+        return out
+    }
+
+    /// The driver's file: id -> (thread group, Metal Shading Language), in the order of the ids.
+    static func file(_ shaders: [Int: (tg: [UInt32], msl: String)]) -> Data {
+        var out = Data("LSFM".utf8)
+        func put(_ v: UInt32) { var le = v.littleEndian; withUnsafeBytes(of: &le) { out.append(contentsOf: $0) } }
+        put(1); put(UInt32(shaders.count))
+        for (id, s) in shaders.sorted(by: { $0.key < $1.key }) {
+            let text = Data(s.msl.utf8)
+            put(UInt32(id))
+            for i in 0..<3 { put(i < s.tg.count ? s.tg[i] : 1) }
+            put(UInt32(text.count))
+            out.append(text)
+        }
+        return out
+    }
+}
+
 /// A game's choice and what the engine is told while it runs.
 enum BCDLossless {
     /// The game's own line: frames added between two of the game's ("1" to "3"); no line is off.
@@ -213,7 +254,7 @@ enum BCDLossless {
 
     static let choices: [(String, String)] = [("", "Off"), ("1", "2× (one frame added)"), ("2", "3× (two added)"), ("3", "4× (three added)")]
     static let title = "Lossless Scaling frame generation (experimental)"
-    static let note = "Your own copy of Lossless Scaling makes one to three pictures between every two frames the game draws: it needs no help from the game, and it works on the picture before MetalFX enlarges it. For Direct3D 11 and 12 games. Set it up once in Settings, under Graphics: BCD checks the purchase with Steam and downloads the program with your account. Extra frames cost GPU time and add a little delay; the frame-rate limit then counts every frame shown. A 64-bit game runs on BCD's own build of the Direct3D 11 library while this is on; a Direct3D 12 game uses that library for the extra frames only."
+    static let note = "Your own copy of Lossless Scaling makes one to three pictures between every two frames the game draws: it needs no help from the game, and it works on the picture before MetalFX enlarges it. For Direct3D 11 and 12 games, and for Vulkan games on KosmicKrisp (Vulkan set to KosmicKrisp), where BCD translates its shaders to Metal when the game starts. Set it up once in Settings, under Graphics: BCD checks the purchase with Steam and downloads the program with your account. Extra frames cost GPU time and add a little delay; the frame-rate limit then counts every frame shown (in a Vulkan game it holds the game's own frames and the extra ones come on top). Apple frame interpolation stays off while this is on. A 64-bit game runs on BCD's own build of the Direct3D 11 library while this is on; a Direct3D 12 game uses that library for the extra frames only."
 
     static let setupFooter = "For frame generation with your own copy of Lossless Scaling, a program sold on Steam. Nothing of it is in BCD: BCD asks Steam whether your account owns it, downloads it with your account, and keeps its file sealed on this device. The purchase is checked again every week. A game uses it when its page says so, under Display."
 

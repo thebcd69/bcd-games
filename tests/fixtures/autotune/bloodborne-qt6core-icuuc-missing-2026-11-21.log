@@ -1,0 +1,304 @@
+[03:18:42.684] [INFO] Checking entitlements...
+[03:18:42.684] [INFO] [build] v0.1.686 (686)
+[03:18:42.685] [INFO] [device] model=iPad17,4 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=11443MB available=12259MB cores=9
+[03:18:42.685] [INFO] [device] address-map=[0x1001e8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[03:18:42.685] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=365d left=364d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=1 appid-match=1 wildcard=0 lc=0
+[03:18:42.698] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@2.0x max-fps=120 utc-offset=+03:00 free-disk=19GB stikdebug-url=1
+[03:18:42.702] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[03:18:45.749] [INFO] [bcd-ui] play local
+[03:18:45.752] [INFO] Requesting JIT with Built-in StikJIT...
+[03:18:47.053] [INFO] [bcd] library launch Bloodborne.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[03:18:52.113] [INFO] Running full Wine sequence...
+[03:18:52.114] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1001e8000,0x8000000000) 512GB available=12242MB low-power=0 thermal=nominal
+[03:18:52.122] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_IMPORT_APPDIR=1
+[03:18:52.124] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[03:18:52.127] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[03:18:52.127] [INFO] Allocating 896MB JIT pool via debugger...
+[03:18:52.127] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[03:18:52.128] [INFO] [jit-debugger] attached=1 at the pool request
+[03:18:52.128] [INFO] [jit-age] attach age=5s source=enable-jit method=builtin thermal=0
+[03:18:52.128] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[03:18:52.129] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[03:18:52.803] [INFO] RX pool at 0x148000000
+[03:18:52.816] [OK] JIT pool ready (debugger still attached).
+[03:18:52.817] [INFO] BRK suspension lasted 0.69s
+[03:18:52.818] [INFO] Detaching debugger...
+[03:18:52.822] [OK] Debugger detached.
+[03:18:52.823] [OK] [early-detach] rev=ml524 took 5 ms
+[phase] wine-start             t+  0.731s rev=ml526
+[03:18:52.858] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 12 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_IMPORT_APPDIR=1
+[WineProc] Target exe: C:\Games\Bloodborne\bbport-windows\Bloodborne.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1150 pool: 12 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 4994 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x71a7000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[03:18:53.372] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[03:18:53.372] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=11604 MB + phys_footprint=683 MB = 12288 MB (hw.memsize says 11443 MB)
+ml993: REJECTED 12288 MB -- larger than hw.memsize (11443 MB), so it is a sentinel, not a limit
+ml985: preferred base 0x140000000+0x73000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x74000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11a1a0000+0x73000 (?) → pool 0x148004000 used=0x78000/0x27000000 tramp+0x0
+[copy-verify] ?: OK, 13 .text pages executable (copy @0x148004000)
+ml957: ? backing 0x11a1a0000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x148078000 used=0x1b0000/0x27000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x71a7000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x7048000000..0x7400000000 regions=99 occupied=13856 MB of 15232 MB free=1391 MB maxhole=1391 MB@0x71a7974000 rev=ml787 (periodic)
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x1481b3000 used=0x5df000/0x27000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x1481b3000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x1485dc000 used=0x710000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1485dc000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x148710000 used=0x7d8000/0x27000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x148710000)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x1487d8000 used=0xad8000/0x27000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1487d8000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[window] 0x122400000..0x7997000000 regions=80071 occupied=468372 MB of 493388 MB free=47911 MB maxhole=22896 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 4 MB in 3 views of the 16384 MB arena (0 MB of them in 0 unity-va views), highest end +8 MB, largest free gap 16376 MB
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=699 MB (peak 699) internal=694 MB compressed=0 MB external=84 MB reusable=8 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module Bloodborne.exe (bloodborne.exe-071e503addb093e0): 11A1A0000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE140000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE050000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF20000
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x10000 type=0x3000 protect=0x40
+[x64-data-imp] ml1245 importer pe=0x11a1a0000 IAT window 0x11a1d3000+0x4d8: 150 slot(s), 0 data import(s) bound
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[free-delay] #1 release of 0x71a86d0000+0x200000 held for 2000 ms (1 in flight)
+[copy-verify] libffi-8.dll: OK, 2 .text pages executable (copy @0x149c20000)
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x149c2c000)
+[xp] 03:18:53.982 +0.56 dt=294 cpu=152 (thr 152) P=151 E=0 run=158 pgw=8.0 GHz P=4.28 E=2.15 Minst=2694 IPC=4.15 mJ=817 pin=173 rdKB=3492 fpMB=757
+[copy-verify] combase.dll: OK, 11 .text pages executable (copy @0x149d50000)
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x149e04000)
+[xp] 03:18:54.240 +0.82 dt=258 cpu=109 (thr 109) P=109 E=0 run=115 pgw=8.5 GHz P=4.35 E=2.10 Minst=2361 IPC=5.00 mJ=645 pin=192 rdKB=4208 fpMB=761
+[xp] 03:18:54.507 +1.09 dt=267 cpu=202 (thr 202) P=202 E=0 run=199 pgw=0.0 GHz P=4.34 E=2.18 Minst=3348 IPC=3.82 mJ=965 pin=0 rdKB=736 fpMB=766
+[xp] 03:18:54.798 +1.38 dt=292 cpu=294 (thr 293) P=294 E=0 run=297 pgw=0.0 GHz P=4.43 E=2.01 Minst=4499 IPC=3.45 mJ=1471 pin=0 rdKB=0 fpMB=769
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x16dffc000 size=0x1000000 -> free-list rev=ml438
+[xp] 03:18:55.116 +1.70 dt=318 cpu=298 (thr 298) P=297 E=0 run=306 pgw=0.0 GHz P=4.41 E=2.18 Minst=4914 IPC=3.75 mJ=1583 pin=0 rdKB=256 fpMB=888
+[xp] 03:18:55.395 +1.98 dt=279 cpu=115 (thr 115) P=115 E=0 run=122 pgw=0.0 GHz P=3.90 E=2.15 Minst=2064 IPC=4.59 mJ=484 pin=0 rdKB=685 fpMB=890
+[footprint] rev=ml358 phys=898 MB (peak 898) internal=893 MB compressed=0 MB external=98 MB reusable=8 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[copy-verify] netapi32.dll: OK, 5 .text pages executable (copy @0x14b16c000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"icuuc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library icuuc.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\Qt6Core.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"Qt6Core.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library Qt6Core.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\pyside6.abi3.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"pyside6.abi3.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library pyside6.abi3.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"icuuc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library icuuc.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\Qt6Core.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"Qt6Core.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library Qt6Core.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #2 release of 0x71a91d0000+0x800000 held for 2000 ms (1 in flight)
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"icuuc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library icuuc.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\Qt6Core.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"Qt6Core.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library Qt6Core.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\pyside6.abi3.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #9 L"pyside6.abi3.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library pyside6.abi3.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #10 L"icuuc.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library icuuc.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\Qt6Core.dll") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #11 L"Qt6Core.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:import_dll Library Qt6Core.dll (which is needed by L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd") not found
+0024:err:module:load_dll [dll-missing] rev=ml336 #12 L"C:\\Games\\Bloodborne\\bbport-windows\\_internal\\PySide6\\QtCore.pyd" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[guest-log] file <container>/Documents/wine/drive_c/users/mythic/AppData/Roaming/bbport-launcher/launcher-startup.log
+[guest-log] #1 tid=0024 ImportError: DLL load failed while importing QtCore: Module not found.
+[image-reload] unmapped image 0x71f7ec0000+0xb0000: 1 pool copy marked
+[footprint] rev=ml358 phys=1050 MB (peak 1050) internal=1044 MB compressed=0 MB external=117 MB reusable=8 MB (cycle=3)
+[win-pos] #1 hwnd=0x1002a after=0x0 flags=4000003c vis={0,0,834,624} surface=0x1036dec10 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x1002a class='TtkMonitorClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10032 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1036dec10 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x10032 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10032 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1036dec10 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10032 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x1002a after=0x0 flags=40000018 vis={0,0,834,624} surface=0x1036dec10 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x1002a class='TtkMonitorClass' text="TtkMonitorWindow" rev=ml853
+[footprint] rev=ml358 phys=1068 MB (peak 1068) internal=1062 MB compressed=0 MB external=118 MB reusable=8 MB (cycle=4)
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1036dec10 rev=ml505 style=86000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10034 class='TkChild' text="" rev=ml853
+[win-pos] #6 hwnd=0x10034 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1036dec10 rev=ml505 style=86000000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x10034 class='TkChild' text="" rev=ml853
+[win-name] #7 hwnd=0x10034 class='TkChild' text="" rev=ml853
+[xp-names] m69023 "wine-x18-exc"
+[free-delay] #3 release of 0x71ab9b0000+0x3e0000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x71ab3a0000+0x610000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x71a92d0000+0x610000 held for 2000 ms (3 in flight)
+[free-delay] #6 release of 0x71abd90000+0x280000 held for 2000 ms (4 in flight)
+D 24 Load module _imagingft.cp313-win_amd64.pyd (_imagingft.cp313-win_amd64.pyd-9f017f4c308cabc0): 71F78F0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #13 L"fribidi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #14 L"fribidi-0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #15 L"libfribidi-0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 24 Load module _imagingtk.cp313-win_amd64.pyd (_imagingtk.cp313-win_amd64.pyd-267801f660375d74): 71F78E0000
+D 24 Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 71F7850000
+[blit] #1 rop=cc0020  SRC phys=0,0 254x259 vis={0,0,254,259}  DST phys=0,0 254x259 vis={0,0,254,259} rev=ml506
+[blit] #2 rop=cc0020  SRC phys=0,0 254x259 vis={0,0,254,259}  DST phys=0,259 254x259 vis={0,259,254,518}  <<< SRC!=DST OFFSET rev=ml506
+[footprint] rev=ml358 phys=1107 MB (peak 1107) internal=1101 MB compressed=0 MB external=119 MB reusable=8 MB (cycle=5)
+002c:fixme:file:server_get_file_info Unsupported info class e
+002c:fixme:file:server_get_file_info Unsupported info class e
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-name] #1063 hwnd=0x10250 class='TkChild' text="" rev=ml853
+[win-pos] #1064 hwnd=0x10252 after=0x0 flags=00000014 vis={0,0,1,1} surface=0x0 rev=ml505 style=46000000 visible=0 parent=0x1024e
+[win-name] #1064 hwnd=0x10252 class='TkChild' text="" rev=ml853
+[win-pos] #1065 hwnd=0x10252 after=0x1 flags=00000010 vis={0,0,1,1} surface=0x0 rev=ml505 style=46000000 visible=0 parent=0x1024e
+[win-name] #1065 hwnd=0x10252 class='TkChild' text="" rev=ml853
+[win-pos] #1066 hwnd=0x10034 after=0x0 flags=0000181f vis={0,0,1,1} surface=0x1036dec10 rev=ml505 style=86000000 visible=0 parent=0x10020
+[win-name] #1066 hwnd=0x10034 class='TkChild' text="" rev=ml853
+[win-pos] #1067 hwnd=0x10252 after=0x0 flags=0000181b vis={0,0,1,1} surface=0x0 rev=ml505 style=46000000 visible=0 parent=0x1024e
+[win-name] #1067 hwnd=0x10252 class='TkChild' text="" rev=ml853
+002c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Games\\Bloodborne\\bbport-windows\\bin\\bb-gpu-capabilities.exe" cmdline=L"\"C:\\Games\\Bloodborne\\bbport-windows\\bin\\bb-gpu-capabilities.exe\" --live-resolution"
+[phase] spawn:L"C:\\Games\\Bloodborne\\bbport-windows\\bin\\bb-gpu-capabilities.exe" t+ 10.062s rev=ml526
+002c:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Games\\Bloodborne\\bbport-windows\\bin\\bb-gpu-capabilities.exe\" --live-resolution" (fd=147, unixdir=153, dup_unixdir=157) cwd=L"C:\\Games\\Bloodborne\\bbport-windows\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x11a020000+0x17000 (?) → pool 0x14f6a2000 used=0x76be000/0x27000000 tramp+0x0
+ml957: ? backing 0x11a020000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[nls-getptr] type=11 id=1252 peb=0x108d7c000
+[nls-getptr] type=11 id=437 peb=0x108d7c000
+[jit-pool] image 0x71f73a0000+0x421000 (libarm64ecfex.dll) → pool 0x14f7f7000 used=0x7c23000/0x27000000 tramp+0x4000
+0038:fixme:file:server_get_file_info Unsupported info class e
+003c:fixme:file:server_get_file_info Unsupported info class e
+[jit-pool] image 0x71f7230000+0x130000 (ucrtbase.dll) → pool 0x14fc20000 used=0x7d54000/0x27000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14fc20000)
+[jit-pool] image 0x71f7170000+0xc0000 (kernel32.dll) → pool 0x14fd54000 used=0x7e1c000/0x27000000 tramp+0x8000
+[jit-pool] image 0x71f6e80000+0x2f0000 (kernelbase.dll) → pool 0x14fe1c000 used=0x811c000/0x27000000 tramp+0x10000
+0034:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x28 --headless"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+ 10.120s rev=ml526
+[nls-getptr] type=11 id=20127 peb=0x108d7c000
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 34 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 34 Load module bb-gpu-capabilities.exe (bb-gpu-capabilities.exe-326171653c7fdbad): 11A020000
+D 34 Load module  (-2d1580055211ffc7): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #3 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[apc-requeue] on (MADEIRA_APC_REQUEUE=0 restores dropping async I/O APCs for busy threads)
+[apc-requeue] #1 async I/O APC status=00000101 for busy thread 003c -> waiting thread 0028
+[exec-alloc] NtAllocateVirtualMemoryEx #5 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[apc-requeue] #2 async I/O APC status=00000101 for busy thread 003c -> waiting thread 0028
+[nls-getptr] type=11 id=1252 peb=0x108d7c000
+[nls-getptr] type=11 id=437 peb=0x108d7c000
+[jit-pool] image 0x71f6df0000+0x23000 (vulkan-1.dll) → pool 0x150122000 used=0x814e000/0x27000000 tramp+0x4000
+D 34 Load module vulkan-1.dll (vulkan-1.dll-2c1a3868f823fd80): 71F6DF0000
+0034:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x1) syscalls=0 unix_calls=2631
+[unwind] term ml661 begin rip=14fcb11d4 rsp=71ad1efde8 window=[71ad1efde8..71ad9efde8) max=32
+[unwind] term ml661 #00 pc=14fcb11d4 rsp=71ad1efde8  ucrtbase.dll+0x911d4
+[unwind] term ml662 #00 nv: rbx=11a026088 rbp=71ad1efe10 rsi=71a98fafd0 rdi=12 r12=71a98fc770 r13=14fcb11bc r14=71a98fc770 r15=14fd01000
+[unwind] term ml662   rbx=11a026088: 00000000 00000000 00000000 00000000 00000000 00000000 01000000 00000000
+[unwind] term ml662   rbp=71ad1efe10: 8060021a 01000000 02000000 00000000 b0dc6e4f 01000000 a4dc6e4f 01000000
+[unwind] term ml661 #01 pc=71ad1efda0 rsp=71ad1efdf0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+028:   ? 11a026080  (exe)+0x6080
+[term-stack] ml660 sp+068:   ? 11a026080  (exe)+0x6080
+[term-stack] ml660 sp+140: CALL 11a021387  (exe)+0x1387
+[term-stack] ml660 sp+160:   ? 11a026088  (exe)+0x6088
+[jit-pool] tail FREE rx=0x165ff8000 size=0x4000 -> free-list rev=ml438
+0034:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x1) syscalls=0 unix_calls=2636
+[unwind] term ml661 begin rip=14fcb11d4 rsp=71ad1efde8 window=[71ad1efde8..71ad9efde8) max=32
+[unwind] term ml661 #00 pc=14fcb11d4 rsp=71ad1efde8  ucrtbase.dll+0x911d4
+[unwind] term ml662   rbp=71ad1efe10: 8060021a 01000000 02000000 00000000 c0dc6e4f 01000000 b4dc6e4f 01000000
+[unwind] term ml661 #01 pc=2 rsp=71ad1efdf0  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+028:   ? 11a026080  (exe)+0x6080
+[term-stack] ml660 sp+068:   ? 11a026080  (exe)+0x6080
+0034:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(1)
+[Wine ntdll/server] process_exit_wrapper(1): closing child fd_socket=156
+[pool-freechk] POISONED AT FREE off=0x76a0000 size=0x1c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x8120000 size=0x2c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7e1c000 size=0x300000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7d54000 size=0xc8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7c20000 size=0x134000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x77f4000 size=0x42c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x76bc000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[Wine ntdll/server] process_exit_wrapper(1)
+E 3C [thr-term] rev=ml435 deinit #1 tid=0x3c
+E 38 [thr-term] rev=ml435 deinit #2 tid=0x38
+E 2C [thr-term] rev=ml435 deinit #3 tid=0x2c
+[vfree] ml842 # base=0x123390000 size=0x0 type=0x8000 tid=002c
+[vfree] ml842 # base=0x123290000 size=0x0 type=0x8000 tid=002c
+[srv-own] read_request EOF tid=002c pid=0020 request_unixfd=145 -> kill_thread rev=ml586
+[srv-kill] kill_thread tid=002c pid=0020 violent=0 rev=ml586
+[win-pos] #1068 hwnd=0x10254 after=0x0 flags=4000003c vis={327,249,785,583} surface=0x1036dec10 rev=ml505 style=84cc0884 visible=0 parent=0x10020
+[win-name] #1068 hwnd=0x10254 class='#32770' text="" rev=ml853
+[win-pos] #1069 hwnd=0x10254 after=0x0 flags=40000018 vis={327,249,785,583} surface=0x1036dec10 rev=ml505 style=84cc0884 visible=0 parent=0x10020
+[win-name] #1069 hwnd=0x10254 class='#32770' text="Unhandled exception in script" rev=ml853
+[alias-own] ml640 #1 0x71a8090000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x149270000 rw=0x7001270000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+0024:err:seh:call_seh_handlers [exc] ml811 code=80000100 addr=00000001480B1144 flags=1 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 71a7820000 (== stack hi) ControlPc=71ffd32dd8 handler=00000071FFCF5388 — this is the unhandled-exception filter frame
+wine: Unimplemented function COMCTL32.dll.380 called at address 00000001480B1144 (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x80000100) syscalls=0 unix_calls=2664
+[unwind] term ml661 begin rip=1488501fc rsp=71a7818b28 window=[71a7818b28..71a8018b28) max=32
+[unwind] term ml661 #00 pc=1488501fc rsp=71a7818b28  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+120:   ? 71ffd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+128: call* 11a1a39c3  (exe)+0x39c3
+[term-stack] ml660 sp+1f8: call* 11a1a3324  (exe)+0x3324
+[term-stack] ml660 sp+988: call* 11a1a3324  (exe)+0x3324
+[term-stack] ml660 sp+e48: CALL 11a1b4d2e  (exe)+0x14d2e
+[term-stack] ml660 sp+ec8: call* 11a1a3324  (exe)+0x3324
+[srv-kill] kill_thread tid=0028 pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-2147483392)
+[WineProc] Wine exited with code -2147483392 (caught by longjmp)
+[WineProc] stopping wineserver...
+[03:19:02.613] [INFO] [session] length=10s play=0s frames=0 stalls=0/0s peak=1171MB limit=12287MB thermal=nominal lpm=0 res=1112x832 cap=60 game=Bloodborne
+[03:19:02.617] [INFO] [exit-report] status=0x80000100
+[frontend] returned to library
+[hwinput] keyboard focus: elsewhere (poll)
+[footprint] rev=ml358 phys=1152 MB (peak 1152) internal=1148 MB compressed=0 MB external=129 MB reusable=7 MB (cycle=6)
+[03:19:04.500] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1153 MB (peak 1153) internal=1148 MB compressed=0 MB external=130 MB reusable=7 MB (cycle=7)
+[footprint] rev=ml358 phys=1146 MB (peak 1153) internal=1142 MB compressed=0 MB external=130 MB reusable=13 MB (cycle=8)
+[footprint] rev=ml358 phys=1146 MB (peak 1153) internal=1142 MB compressed=0 MB external=130 MB reusable=13 MB (cycle=9)
+[footprint] rev=ml358 phys=1146 MB (peak 1153) internal=1142 MB compressed=0 MB external=130 MB reusable=13 MB (cycle=10)
+[thread-sample] ml876 b0 "" teb=0x0 cpu=2% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fc16220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16fd2afc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x17055c9e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16fdb6fc0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x170676b40 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`$s7Madeira7LogTailC13readAvailable33_021D1B84151237F59396648796200A17LLyyFSiSwXEfU_+0x9c sp=0x170702440 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=1% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x17078eb30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.UIKit.inProcessAnimationManag" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`semaphore_wait_trap+0x8 lr=libdispatch.dylib`<redacted>+0x1c sp=0x17081ac40 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml358 phys=1146 MB (peak 1153) internal=1142 MB compressed=0 MB external=130 MB reusable=13 MB (cycle=11)
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=1: no guest threads found (no plausible RIP at x28+0x18)
+[footprint] rev=ml358 phys=1146 MB (peak 1153) internal=1142 MB compressed=0 MB external=130 MB reusable=13 MB (cycle=12)
+[xp] 03:19:16.348 +22.93 dt=325 cpu=150 (thr 138) P=130 E=20 run=173 pgw=13.0 GHz P=4.00 E=2.93 Minst=1612 IPC=2.79 mJ=500 pin=207 rdKB=7288 fpMB=1157
+[xp] 03:19:16.674 +23.26 dt=326 cpu=22 (thr 21) P=0 E=22 run=25 pgw=0.0 GHz P=0.00 E=1.53 Minst=55 IPC=1.65 mJ=3 pin=0 rdKB=0 fpMB=1157
+[xp] 03:19:16.975 +23.56 dt=301 cpu=43 (thr 44) P=17 E=26 run=48 pgw=0.2 GHz P=2.04 E=2.19 Minst=238 IPC=2.62 mJ=23 pin=1 rdKB=180 fpMB=1152
+[xp] 03:19:17.277 +23.86 dt=303 cpu=64 (thr 64) P=24 E=41 run=71 pgw=0.0 GHz P=2.73 E=2.05 Minst=327 IPC=2.20 mJ=47 pin=5 rdKB=0 fpMB=1153
+[xp] 03:19:17.579 +24.16 dt=302 cpu=34 (thr 34) P=0 E=34 run=40 pgw=0.0 GHz P=0.00 E=2.22 Minst=132 IPC=1.74 mJ=10 pin=0 rdKB=0 fpMB=1153
+[03:19:17.580] [xp] 03:19:17.579 +24.16 dt=302 cpu=34 (thr 34) P=0 E=34 run=40 pgw=0.0 GHz P=0.00 E=2.22 Minst=132 IPC=1.74 mJ=10 pin=0 rdKB=0 fpMB=1153

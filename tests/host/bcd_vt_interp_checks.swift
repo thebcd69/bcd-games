@@ -32,6 +32,18 @@ enum Checks {
               BCDVTInterp.start(line: "1", ios26: true, lossless: true, presentFX: true).log?.contains("Lossless Scaling frame generation runs") == true)
         check("without the live present path it is refused, naming the switch",
               BCDVTInterp.start(line: "1", ios26: true, lossless: false, presentFX: false).log?.contains("env.MADEIRA_PRESENT_FX = 1") == true)
+        // build 703: a Vulkan game on KosmicKrisp gets the pictures from the driver (playport patch 0036)
+        check("a KosmicKrisp game: on without the live present path",
+              BCDVTInterp.start(line: "1", ios26: true, lossless: false, presentFX: false, kosmickrisp: true) == .on(1)
+              && BCDVTInterp.start(line: "3", ios26: true, lossless: false, presentFX: false, kosmickrisp: true) == .on(3))
+        // build 706: the driver makes Lossless Scaling's frames for such a game too; one generator a session
+        check("a KosmicKrisp game whose session got Lossless Scaling: no pictures (its variable is the driver's own)",
+              BCDVTInterp.start(line: "1", ios26: true, lossless: true, presentFX: false, kosmickrisp: true).log?.contains("Lossless Scaling") == true
+              && BCDVTInterp.losslessKosmicKrispVariable == "MADEIRA_LSFG_HOST_CTL" && BCDVTInterp.losslessVariable == "MADEIRA_LSFG_CTL")
+        check("a KosmicKrisp game: still nothing without the line, and still refused below iOS 26",
+              BCDVTInterp.start(line: nil, ios26: true, lossless: false, presentFX: false, kosmickrisp: true) == .off
+              && BCDVTInterp.start(line: "1", ios26: false, lossless: false, presentFX: false, kosmickrisp: true).log?.contains("needs iOS 26") == true)
+        check("the driver's line words: vulkan = kosmickrisp", BCDVTInterp.vulkanKey == "vulkan" && BCDVTInterp.kosmickrispValue == "kosmickrisp")
 
         // the engine's status in words
         let making = BCDVTInterp.Status(raw: 3, width: 1280, height: 720, gameFPS: 29.6, generatedFPS: 30.2, pairMs: 7.25, why: "")

@@ -7,6 +7,11 @@
 // "[kk-retry] compiles" line (finished per kind with average and longest time, failed, in flight with the oldest, waiting for a slot),
 // and a compile still running after 60 s is named at once and its MSL saved under the same cap (X-Plane 12's loading screen froze on
 // one: the old dump only wrote after a compile ended).
+// Modified by BCD (thebcd69), 2026-11-22: a library request without MSL (its source nil or empty) is answered with an error here and
+// never reaches Metal's compiler, and the first ones are logged with their caller. X-Plane 12 (build 695, iPhone18,2) froze on one:
+// after about 700 compiles of 0.1 to 2 s, a library compile with 0 bytes of MSL was still running 96 s later and the game never drew
+// again. On a Mac, Metal's own compiler asserts on a nil source ("source must not be nil"). A library without source holds no function,
+// so the caller fails either way; every request with MSL goes on exactly as before.
 // kk-retry: shim in front of BCD's KosmicKrisp (libvulkan_kosmickrisp_real.dylib, re-exported whole).
 // Why: on iPad, under memory pressure iOS kills the Metal compiler service mid-game; Metal 4's
 // MTL4Compiler then fails with XPC_ERROR_CONNECTION_INTERRUPTED ("Failed to create MTLLibrary"),
@@ -56,7 +61,7 @@ enum { KKR_LIB, KKR_RPS, KKR_CPS, KKR_KINDS, KKR_SLOTS = 64 };
 static const char *const kkr_kind_name[KKR_KINDS] = { "library", "render pipeline", "compute pipeline" };
 static os_unfair_lock kkr_lock = OS_UNFAIR_LOCK_INIT;
 static struct kkr_slot { CFAbsoluteTime t0; CFTypeRef desc; unsigned long bytes; int kind, used, named; } kkr_slots[KKR_SLOTS];
-static long kkr_done[KKR_KINDS], kkr_failed[KKR_KINDS], kkr_waiting, kkr_untracked;
+static long kkr_done[KKR_KINDS], kkr_failed[KKR_KINDS], kkr_waiting, kkr_untracked, kkr_refused;
 static double kkr_ms_sum[KKR_KINDS], kkr_ms_max[KKR_KINDS];
 #ifdef KKR_TEST
 double kkr_overdue_s = 60;     // test hook: when a running compile is named
@@ -124,6 +129,7 @@ void kkr_report(char *out, size_t cap) {
         kkr_done[k] = kkr_failed[k] = 0; kkr_ms_sum[k] = kkr_ms_max[k] = 0;
     }
     untracked = kkr_untracked; kkr_untracked = 0;
+    long refused = kkr_refused; kkr_refused = 0;
     for (int i = 0; i < KKR_SLOTS; i++) {
         struct kkr_slot *s = &kkr_slots[i];
         if (!s->used) continue;
@@ -139,7 +145,7 @@ void kkr_report(char *out, size_t cap) {
     os_unfair_lock_unlock(&kkr_lock);
     waiting = __atomic_load_n(&kkr_waiting, __ATOMIC_RELAXED);
     if (out && cap) out[0] = 0;
-    long any = running + waiting + untracked;
+    long any = running + waiting + untracked + refused;
     for (int k = 0; k < KKR_KINDS; k++) any += done[k] + failed[k];
     if (any) {
         char line[600]; int n = snprintf(line, sizeof line, "[kk-retry] compiles in the last 10 s:");
@@ -152,6 +158,7 @@ void kkr_report(char *out, size_t cap) {
                           old.kind == KKR_LIB ? [[NSString stringWithFormat:@", %lu bytes of MSL", old.bytes] UTF8String] : "");
         n += snprintf(line + n, sizeof line - n, "; waiting for a slot %ld", waiting);
         if (untracked) n += snprintf(line + n, sizeof line - n, "; %ld not tracked (all %d slots busy)", untracked, KKR_SLOTS);
+        if (refused) n += snprintf(line + n, sizeof line - n, "; %ld without MSL refused", refused);
         fprintf(stderr, "%s\n", line);
         if (out && cap) snprintf(out, cap, "%s", line);
     }
@@ -224,7 +231,51 @@ static void kkr_dump(MTL4LibraryDescriptor *d, double secs, BOOL running) {
     fprintf(stderr, "[kk-retry] slow library compile: %.1f s%s, %lu bytes of MSL, saved to Documents/kk-retry-slow/%s\n",
             secs, running ? " so far" : "", (unsigned long)src.length, f.lastPathComponent.UTF8String);
 }
+/* BCD (2026-11-22): the caller of a request worth naming, a few frames on one line (frames 0 to 2 are this shim). */
+static NSString *kkr_caller(void) {
+    NSArray<NSString *> *frames = [NSThread callStackSymbols];
+    NSMutableArray<NSString *> *out = [NSMutableArray array];
+    for (NSUInteger i = 3; i < frames.count && out.count < 10; i++) {
+        NSString *f = [frames[i] stringByReplacingOccurrencesOfString:@"\\s+" withString:@" " options:NSRegularExpressionSearch range:NSMakeRange(0, frames[i].length)];
+        [out addObject:f];
+    }
+    return [out componentsJoinedByString:@" | "];
+}
+
+/* BCD (2026-11-22): a library request without MSL. Counted for the census; the first four are named with their caller. */
+static long kkr_refusals;
+static void kkr_no_source(MTL4LibraryDescriptor *d) {
+    os_unfair_lock_lock(&kkr_lock);
+    kkr_refused++;
+    os_unfair_lock_unlock(&kkr_lock);
+    long n = __atomic_add_fetch(&kkr_refusals, 1, __ATOMIC_RELAXED);
+    if (n > 4) return;
+    fprintf(stderr, "[kk-retry] a library compile without MSL was refused (#%ld; source %s, name %s): Metal's compiler may never return "
+            "from one; called from: %s\n", n, d.source ? "empty" : "nil", d.name.length ? d.name.UTF8String : "-", kkr_caller().UTF8String);
+}
+
+/* BCD (2026-11-22): a library request of another descriptor class goes on as before; the first of each of four classes is named. */
+static void kkr_other_class(id desc) {
+    static NSMutableSet<NSString *> *seen; static os_unfair_lock seen_lock = OS_UNFAIR_LOCK_INIT;
+    NSString *name = NSStringFromClass([desc class]) ?: @"nil";
+    os_unfair_lock_lock(&seen_lock);
+    if (!seen) seen = [NSMutableSet set];
+    BOOL first = seen.count < 4 && ![seen containsObject:name];
+    if (first) [seen addObject:name];
+    os_unfair_lock_unlock(&seen_lock);
+    if (first)
+        fprintf(stderr, "[kk-retry] a library compile with a %s descriptor (not MTL4LibraryDescriptor; its MSL is not counted) goes on; "
+                "called from: %s\n", name.UTF8String, kkr_caller().UTF8String);
+}
+
 static id w_lib(id self, SEL s, id desc, NSError **error) {
+    if ([desc isKindOfClass:[MTL4LibraryDescriptor class]] && ((MTL4LibraryDescriptor *)desc).source.length == 0) {
+        kkr_no_source(desc);
+        if (error) *error = [NSError errorWithDomain:MTLLibraryErrorDomain code:MTLLibraryErrorCompileFailure
+                                            userInfo:@{NSLocalizedDescriptionKey: @"kk-retry: a library without MSL was not compiled"}];
+        return nil;
+    }
+    if (![desc isKindOfClass:[MTL4LibraryDescriptor class]]) kkr_other_class(desc);
     if (kkr_opt_size && [desc isKindOfClass:[MTL4LibraryDescriptor class]]) {
         MTL4LibraryDescriptor *d = desc;
         MTLCompileOptions *o = d.options ? [d.options copy] : [MTLCompileOptions new];

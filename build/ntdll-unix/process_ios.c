@@ -824,6 +824,26 @@ int madeira_live_user_processes( char *buf, int len )
     return count;
 }
 
+/* madeira-bcd (round 707, G1-S15): a session the player ended with "End the game now" (LibraryModel.endGameNow) can leave a game process
+ * that never exits (Hollow Knight's Mono shutdown wait). Nothing releases its slot, so the next session in the same app run would count it as
+ * running and the Dock's game-end watch could wait on it for good. A new session starts with no process of an earlier one: at its start
+ * (wine_process_start) every slot still counted as running is marked ended long ago and kept out of the ended ring (it never ended). A ghost
+ * whose boot thread returns later releases its slot as before; until then the slot stays taken (at most one of the 32 per forced end). */
+void madeira_child_table_new_session( void )
+{
+    unsigned i;
+    pthread_mutex_lock( &ios_child_lock );
+    for (i = 0; i < IOS_CHILD_SLOTS; i++)
+        if (ios_child_slots[i].used && !ios_child_slots[i].exited)
+        {
+            ios_child_slots[i].exited = 1;
+            ios_child_slots[i].exited_at = 0;   /* ios_child_slot_gone(): ended long ago */
+            ios_child_slots[i].noted = 1;       /* not in the ended ring: it never ended */
+        }
+    ios_child_untracked = 0;
+    pthread_mutex_unlock( &ios_child_lock );
+}
+
 /* madeira-bcd (round 579, BCD Dock): a text snapshot of this table for the library's game-end watch
  * (LibraryModel.watchDockGameEnd, DockGameEnd.swift): one line per process, fields separated by tabs, the image path last.
  *   R <helper> <seconds since start> <path>                              still runs
@@ -1624,16 +1644,29 @@ static int cef_one_kind( const char *list, const WCHAR *image, int image_len, co
 static const char *child_extra_args( const char *spec, const WCHAR *image, int image_len )
 {
     char name[64];
-    int n = 0;
+    int n = 0, b, p = -1, i;
 
     if (!spec) return NULL;
     while (*spec == ' ') spec++;
-    while (spec[n] && spec[n] != ' ' && n < (int)sizeof(name) - 1)
-    {
-        char c = spec[n];
-        name[n++] = (c >= 'A' && c <= 'Z') ? c + 32 : c;
-    }
+    for (b = 0; spec[b] && spec[b] != ' ' && b < (int)sizeof(name) - 1; b++) {}   /* the name up to the first blank, as it always was */
+    /* madeira-bcd (round 707, agent G1 S7; Buckshot Roulette FEYMC1): a program whose file name has a blank ("Buckshot Roulette.exe
+     * --rendering-driver opengl3") could never match. The first ".exe" followed by a blank ends the name when a blank comes before it;
+     * when that ".exe" ends right at the first blank (every spec that works today: "GTA5_Enhanced.exe -scDebugLogging",
+     * "Battle.net.exe --in-process-gpu ...") p == b and the old rule stands. The scan starts at the first character, so a spec shorter
+     * than ".exe " is never read past its end. */
+    for (i = 0; spec[i] && i < (int)sizeof(name) - 1; i++)
+        if (i >= 4 && spec[i] == ' ' && spec[i - 4] == '.' && (spec[i - 3] | 32) == 'e' && (spec[i - 2] | 32) == 'x' && (spec[i - 1] | 32) == 'e')
+        {
+            p = i;
+            break;
+        }
+    n = p > b ? p : b;
     if (!n || (spec[n] && spec[n] != ' ')) return NULL;
+    for (i = 0; i < n; i++)
+    {
+        char c = spec[i];
+        name[i] = (c >= 'A' && c <= 'Z') ? c + 32 : c;
+    }
     name[n] = 0;
     spec += n;
     while (*spec == ' ') spec++;

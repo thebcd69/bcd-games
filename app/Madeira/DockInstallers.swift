@@ -496,6 +496,11 @@ enum DockInstallScripts {
     /// not trapped); both are off for every other program.
     static let sharedLauncherSessionEnv: [String: [String: String]] = [
         "ubisoftconnectinstaller.exe": ["MADEIRA_APC_BUSY_QUEUE": "1", "MADEIRA_FEX_SPLIT_LOCK": "1", "MADEIRA_SELF_WRITE": "1"],
+        // Round 707 (agents A1 S2, S1 S8, G2 S19; Battlefield 4, Mass Effect: Andromeda, Need for Speed, Jedi: Fallen Order, The Sims 4,
+        // Unravel): an EA game's Steam launch entry is EASteamLauncher.exe, whose background service needs Windows' service manager
+        // ("Win32Service::open ... Error opening SCM", "Failed to start/determine BGS IPC port"); a Steam game's session starts none unless
+        // this is set (tools/patch-dock-game-scm.py). The EA app's DLL set comes from the game's row, which a Paradox start sets on its own.
+        "eaappinstaller.exe": ["MADEIRA_DOCK_GAME_SCM": "1"],
     ]
 
     /// madeira-bcd: every name sharedLauncherSessionEnv sets (a start without such a launcher clears them).

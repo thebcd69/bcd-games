@@ -21,6 +21,10 @@ MADEIRA_DOCK_LICENCE_WAIT_MS sets the first question (0..30000 ms; anything else
 session-licence-answer-ms (ms from the sign-in to the answer; only for an answer before the old 5 s). The variable of that name in upstream's patch is called licence_ask_ms here: the
 round 630 licence-wait patch (tools/patch-dock-licence-wait.py) has a `licence_wait` of its own in the same function.
 
+2026-11-21: the Dock asks through the client build's own slots (layout->slot_subscribed, layout->slot_subscriptions; the November 2026
+client has the two methods one slot later than the earlier builds), so the anchors and the lines written carry those names instead of 181
+and 182. Nothing else of the patch changed.
+
 Usage: patch-dock-licence-ask.py madeira-dock/src/session.c (idempotent; fails by name when an anchor moved)
 """
 from pathlib import Path
@@ -45,12 +49,12 @@ DECL_NEW = ("    unsigned logged_callbacks = 0, online_callbacks = 0, blips = 0,
             "    result = 34;\n")
 
 ASK_OLD = ("        if (was_online && !offline_since && now - online_at >= 5000) {\n"
-           "            bool entitled = ((subscribed_fn)v[181])(client_user, (uint32_t)app);\n"
+           "            bool entitled = ((subscribed_fn)v[layout->slot_subscribed])(client_user, (uint32_t)app);\n"
            "            if (!entitled && now - last_probe >= 10000) {\n")
 ASK_NEW = ("        if (was_online && !offline_since && now - online_at >= licence_ask_ms) {\n"
            "            /* " + MARKER + ": before the old fixed 5 s only a listed app is acted on (and nothing is probed or logged). */\n"
            "            bool early = now - online_at < 5000;\n"
-           "            bool entitled = ((subscribed_fn)v[181])(client_user, (uint32_t)app);\n"
+           "            bool entitled = ((subscribed_fn)v[layout->slot_subscribed])(client_user, (uint32_t)app);\n"
            "            if (!entitled && !early && now - last_probe >= 10000) {\n")
 
 LIST_OLD = "            if (entitled || (use_list && now - last_list >= 1000)) {\n"
@@ -60,7 +64,7 @@ LIST_NEW = ("            bool ask_list = early ? ((entitled || use_list) && now 
 
 ALLOC_OLD = ("                uint32_t *apps = calloc(65536, sizeof(uint32_t));\n"
              "                if (!apps) { result = 36; break; }\n"
-             "                int32_t count = ((subscriptions_fn)v[182])(client_user, apps, 65536, true);\n"
+             "                int32_t count = ((subscriptions_fn)v[layout->slot_subscriptions])(client_user, apps, 65536, true);\n"
              "                bool listed = false;\n"
              "                if (count < 0 || count >= 65536) {\n"
              "                    free(apps); result = 36; break;\n"
@@ -71,7 +75,7 @@ ALLOC_NEW = ("                uint32_t *apps = calloc(65536, sizeof(uint32_t));\
              "                    last_list = now;   /* too early to tell: asked again */\n"
              "                    goto licence_later;\n"
              "                }\n"
-             "                int32_t count = ((subscriptions_fn)v[182])(client_user, apps, 65536, true);\n"
+             "                int32_t count = ((subscriptions_fn)v[layout->slot_subscriptions])(client_user, apps, 65536, true);\n"
              "                bool listed = false;\n"
              "                if (count < 0 || count >= 65536) {\n"
              "                    free(apps);\n"

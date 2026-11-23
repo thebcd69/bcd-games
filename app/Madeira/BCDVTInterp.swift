@@ -18,10 +18,16 @@ enum BCDVTInterp {
     static let presentKey = "env.MADEIRA_PRESENT_FX"
     /// The app sets this for a session with Lossless Scaling frame generation (BCDLosslessLive.launch); one generator runs at a time.
     static let losslessVariable = "MADEIRA_LSFG_CTL"
+    /// The same for a Vulkan game whose driver makes Lossless Scaling's frames itself (build 706; BCDLosslessLive.launch sets it only
+    /// when its shaders were translated, so a session where they could not be still gets the pictures).
+    static let losslessKosmicKrispVariable = "MADEIRA_LSFG_HOST_CTL"
+    /// The game's Vulkan driver line; `kosmickrisp` makes the pictures in that driver (build 703).
+    static let vulkanKey = "vulkan"
+    static let kosmickrispValue = "kosmickrisp"
 
     static let title = "Apple frame interpolation (experimental)"
     static let choices = [("", "Off"), ("1", "One frame between two"), ("3", "Up to three")]
-    static let note = "An experiment. iOS's own video frame interpolation makes one or three pictures between every two frames the game draws, from the two pictures alone: it needs no help from the game and nothing but iOS 26. Whether this device takes the game's resolution, and how long a pair takes, is what the test in Settings (Graphics, Experimental) finds out; try a small resolution first. It switches on Live upscaling and frame generation for this game, turns MetalFX frame generation off, and a frame-rate limit then holds the game's own frames with the extra ones on top. Extra frames add a little delay."
+    static let note = "An experiment. iOS's own video frame interpolation makes one or three pictures between every two frames the game draws, from the two pictures alone: it needs no help from the game and nothing but iOS 26. Whether this device takes the game's resolution, and how long a pair takes, is what the test in Settings (Graphics, Experimental) finds out; try a small resolution first. It switches on Live upscaling and frame generation for this game, turns MetalFX frame generation off, and a frame-rate limit then holds the game's own frames with the extra ones on top. Extra frames add a little delay. A Vulkan game on KosmicKrisp (vulkan = kosmickrisp) gets the frames from the driver itself, without Live upscaling. With Lossless Scaling frame generation on, in any game, Lossless Scaling makes the frames and this stays off."
 
     /// The line's value as a number of pictures: 1, 3, or 0 for anything else.
     static func frames(_ value: String?) -> Int {
@@ -50,12 +56,15 @@ enum BCDVTInterp {
         }
     }
 
-    static func start(line: String?, ios26: Bool, lossless: Bool, presentFX: Bool) -> Start {
+    /// `kosmickrisp`: the game's own line says `vulkan = kosmickrisp` (build 703): KosmicKrisp's present makes the pictures itself
+    /// (build/mesa-ios/playport-patches/0036), so it needs no live present path. `lossless`: Lossless Scaling's frames are made in this
+    /// session (for such a game by the same driver since build 706, when its shaders could be translated): no pictures then.
+    static func start(line: String?, ios26: Bool, lossless: Bool, presentFX: Bool, kosmickrisp: Bool = false) -> Start {
         let n = frames(line)
         guard n > 0 else { return .off }
         guard ios26 else { return .refused("it needs iOS 26") }
         guard !lossless else { return .refused("Lossless Scaling frame generation runs in this session") }
-        guard presentFX else { return .refused("Live upscaling and frame generation (\(presentKey) = 1) is off for it") }
+        guard presentFX || kosmickrisp else { return .refused("Live upscaling and frame generation (\(presentKey) = 1) is off for it") }
         return .on(n)
     }
 

@@ -36,6 +36,8 @@ struct BCDContentOptions: Sendable {
     /// The first wait before a retry, doubled each time up to 8 s (the host checks use 0).
     var backoff: Double = 0.5
     var freeSpace: @Sendable (URL) -> Int64? = { BCDContentEngine.freeSpace($0) }
+    /// Whether the staging folder is on the device's own volume (false: an external drive). Replaced by the host checks.
+    var onDevice: @Sendable (URL) -> Bool = { BCDContentEngine.onDevice($0) }
 }
 
 /// The store-neutral download: plan in, checked files in a staging folder out.
@@ -52,22 +54,69 @@ struct BCDContentOptions: Sendable {
 /// - A failing host moves behind the others; addresses a host refuses (401/403/410) are renewed
 ///   by the store's source.
 enum BCDContentEngine {
-    static func freeSpace(_ url: URL) -> Int64? {
+    /// The nearest folder of `url` that exists (a staging folder may not be made yet).
+    private static func existing(_ url: URL) -> URL {
         var probe = url
         while !FileManager.default.fileExists(atPath: probe.path), probe.pathComponents.count > 1 {
             probe.deleteLastPathComponent()
         }
-        let important = (try? probe.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
-            .volumeAvailableCapacityForImportantUsage
-        // 2026-11-20 (an Epic game on an external drive): an exFAT drive reports 0 for important usage, so the plain figure of a
-        // volume that is not the device's own is taken there (as Steam's URL.freeSpace does). The device's answer is as before.
-        if let important, important > 0 { return important }
-        let real = probe.resolvingSymlinksInPath()
-        guard (try? real.resourceValues(forKeys: [.volumeIsInternalKey]))?.volumeIsInternal == false else { return important }
-        if let plain = (try? real.resourceValues(forKeys: [.volumeAvailableCapacityKey]))?.volumeAvailableCapacity, plain > 0 { return Int64(plain) }
+        return probe
+    }
+
+    /// Free bytes for a download into `url`, or nil when unknown (an unknown figure does not block a download).
+    ///
+    /// - On the device: the "important usage" figure, as always.
+    /// - On an external drive (drive_c/External/<name> links to it), the same steps as Steam's URL.freeSpace, which installs on
+    ///   these drives: the link resolved first, then the important figure, the plain one and statfs, the first above 0.
+    ///   Build 686 asked the important figure through the link and took the plain one only when the drive also said it was
+    ///   not internal; on a tester's drive (iOS 26.7, "lifs") that answered 0, and every Epic install there was refused for
+    ///   space at once (log FCS8QA, 2026-11-20).
+    static func freeSpace(_ url: URL) -> Int64? {
+        let probe = existing(url)
+        if onDevice(probe) {
+            return (try? probe.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))?
+                .volumeAvailableCapacityForImportantUsage
+        }
+        return driveFreeSpace(probe)
+    }
+
+    /// Steam's URL.freeSpace (SwiftSteam/Content/DepotDownloader.swift), step for step: the engine is built without SwiftSteam.
+    static func driveFreeSpace(_ url: URL) -> Int64? {
+        let real = existing(url.resolvingSymlinksInPath())
+        let values = try? real.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeAvailableCapacityKey])
+        if let important = values?.volumeAvailableCapacityForImportantUsage, important > 0 { return important }
+        if let plain = values?.volumeAvailableCapacity, plain > 0 { return Int64(plain) }
         var info = statfs()
         if statfs(real.path, &info) == 0, info.f_bavail > 0 { return Int64(info.f_bavail) * Int64(info.f_bsize) }
-        return important
+        return nil
+    }
+
+    /// Whether `url` (through any link) is on the same volume as the app's Documents, where drive C: lives. An external
+    /// drive is another volume. When either cannot be read, the device is assumed, so its rule stays.
+    static func onDevice(_ url: URL) -> Bool {
+        var here = stat(), home = stat()
+        guard stat(existing(url).path, &here) == 0,
+              stat(existing(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]).path, &home) == 0
+        else { return true }
+        return here.st_dev == home.st_dev
+    }
+
+    /// Bytes the plan's files still have to grow by on disk: each file's size less the room it already holds. A drive without
+    /// sparse files (exFAT) gives a file all of its room when it is created at its final size, so that room is no longer in
+    /// the drive's free figure and must not be asked for again.
+    static func growthBytes(_ plan: BCDContentPlan, stage: URL) -> Int64 {
+        var bytes: Int64 = 0
+        for file in plan.files {
+            var info = stat()
+            let held = lstat(stage.appendingPathComponent(file.path).path, &info) == 0 ? Int64(info.st_blocks) * 512 : 0
+            bytes += max(0, file.size - held)
+        }
+        return bytes
+    }
+
+    /// A refusal for space, in MiB (no path): the next log says which volume and what it reported.
+    static func logSpace(_ needed: Int64, _ available: Int64, device: Bool) {
+        BCDContentLog.write("[content] space needed-mb=\(needed >> 20) free-mb=\(available >> 20) volume=\(device ? "device" : "drive")")
     }
 
     /// Bytes still to be written for the chunks the journal does not list.
@@ -112,7 +161,12 @@ enum BCDContentEngine {
             let journal = try BCDContentJournal(url: journalURL, identity: plan.identity, keep: done)
             let remaining = remainingBytes(plan, done: done)
             if remaining > 0, let available = options.freeSpace(stage), available < remaining + options.spaceMargin {
-                throw BCDContentError.notEnoughSpace(needed: remaining + options.spaceMargin, available: available)
+                let device = options.onDevice(stage)
+                let needed = (device ? remaining : min(remaining, growthBytes(plan, stage: stage))) + options.spaceMargin
+                if available < needed {
+                    logSpace(needed, available, device: device)
+                    throw BCDContentError.notEnoughSpace(needed: needed, available: available)
+                }
             }
             let pending = (0..<plan.chunks.count).filter { !done.contains($0) }.sorted {
                 let a = plan.parts[index.partRanges[$0].lowerBound], b = plan.parts[index.partRanges[$1].lowerBound]
@@ -353,7 +407,12 @@ private actor BCDContentRun {
             sinceSpaceCheck = 0
             let remaining = BCDContentEngine.remainingBytes(plan, done: finishedChunks.union(unsynced))
             if remaining > 0, let available = options.freeSpace(stage), available < min(remaining, 64 << 20) + (64 << 20) {
-                throw BCDContentError.notEnoughSpace(needed: remaining, available: available)
+                let device = options.onDevice(stage)
+                let needed = device ? remaining : min(remaining, BCDContentEngine.growthBytes(plan, stage: stage))
+                if available < min(needed, 64 << 20) + (64 << 20) {
+                    BCDContentEngine.logSpace(needed, available, device: device)
+                    throw BCDContentError.notEnoughSpace(needed: needed, available: available)
+                }
             }
         }
     }

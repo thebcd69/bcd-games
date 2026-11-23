@@ -1,0 +1,350 @@
+[15:49:45.702] [INFO] Checking entitlements...
+[15:49:45.703] [INFO] [build] v0.1.686 (686)
+[15:49:45.703] [INFO] [device] model=iPhone15,3 idiom=phone os=iOS Version 26.5.2 (Build 23F84) ram=5636MB available=4073MB cores=6
+[15:49:45.703] [INFO] [device] address-map=[0x1046cc000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[15:49:45.704] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=0 wildcard=0 lc=1
+[15:49:45.714] [INFO] [device] settings: low-power=0 thermal=serious screen=1290x2796@3.0x max-fps=120 utc-offset=+07:00 free-disk=273GB stikdebug-url=1
+[15:49:45.719] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:49:48.466] [INFO] Requesting JIT with StikDebug...
+[15:49:48.481] [INFO] Opening StikDebug to enable JIT...
+[15:49:58.282] [INFO] [bcd-ui] play local
+[15:49:58.308] [INFO] [bcd] library launch BatmanAK.exe: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=2.0 lc=1
+[15:49:58.350] [INFO] Running full Wine sequence...
+[15:49:58.350] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1046cc000,0xfc0000000) 63GB available=4055MB low-power=0 thermal=serious
+[15:49:58.351] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_MIP_CLAMP_AUTO=2 low-graphics-tip=1 metalfx-upscale=2 swap-mb=3072 swap-min-mb=1 swap-mode=2
+[15:49:58.359] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:49:58.765] [INFO] Allocating 896MB JIT pool via debugger...
+[15:49:58.766] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:49:58.767] [INFO] [jit-debugger] attached=1 at the pool request
+[15:49:58.768] [INFO] [jit-age] attach age=2s source=enable-jit method=stikdebug thermal=2
+[15:49:58.770] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[15:50:05.604] [INFO] RX pool at 0x300000000
+[15:50:05.653] [OK] JIT pool ready (debugger still attached).
+[15:50:05.659] [INFO] BRK suspension lasted 6.89s
+[15:50:05.660] [INFO] Detaching debugger...
+[15:50:05.691] [OK] Debugger detached.
+[15:50:05.693] [OK] [early-detach] rev=ml524 took 33 ms
+[15:50:05.694] [INFO] Starting wineserver...
+[phase] wine-start             t+  7.394s rev=ml526
+[15:50:05.753] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   swap-mb = 3072
+[game-cfg]   swap-mode = 2
+[game-cfg]   swap-min-mb = 1
+[game-cfg]   low-graphics-tip = 1
+[game-cfg]   metalfx-upscale = 2
+[WineProc] Target exe: C:\Batman Arkham Knight\Binaries\Win64\BatmanAK.exe (bundle=arm64ec-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_MIP_CLAMP_AUTO=2 on a GPU without BC sampling: d3d11.dll -> d3d11-src.dll (DXMT source build with BCD's Direct3D 11 patches; system32 + sysx64)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x104af0000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[swap] ml1077 backed 0xfbfe00000+0x200000 (whole reservation, ml1257) (file off 0 MB): 2 MB in 1 extents, peak 2 MB, 0 refused
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[15:50:06.127] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[15:50:06.127] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[15:50:06.127] [Wine init_process] reply_pipe=42, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3148 MB + phys_footprint=947 MB = 4096 MB (hw.memsize says 5636 MB)
+ml992: clamping reported physical memory 5636 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+ml985: map_image_view size=0x4398000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x1000000000
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x140000000+0x4398000 (BatmanAK.exe) → pool 0x300006000 used=0x43a2000/0x38000000 tramp+0x0
+[copy-verify] BatmanAK.exe: OK, 1604 .text pages executable (copy @0x300006000)
+[window] 0x129e30000..0xb30000000 regions=100001 occupied=7781 MB of 41057 MB free=33276 MB maxhole=31974 MB@0x361970000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=1067 MB (peak 1067) internal=1000 MB compressed=65 MB external=120 MB reusable=1 MB (cycle=1)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x3043a0000 used=0x44d8000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3043a0000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 284)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf6a0000+0x421000 (libarm64ecfex.dll) → pool 0x3044db000 used=0x4907000/0x38000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x3044db000)
+[jit-pool] image 0xfbf570000+0x130000 (ucrtbase.dll) → pool 0x304904000 used=0x4a38000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x304904000)
+[jit-pool] image 0xfbf4b0000+0xc0000 (kernel32.dll) → pool 0x304a38000 used=0x4b00000/0x38000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x304a38000)
+[jit-pool] image 0xfbf1c0000+0x2f0000 (kernelbase.dll) → pool 0x304b00000 used=0x4e00000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x304b00000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+ml992: clamping reported physical memory 5636 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+[swap] ml1077 backed 0x111a80000+0x100000 (whole reservation, ml1257) (file off 2 MB): 3 MB in 2 extents, peak 3 MB, 0 refused
+ml992: clamping reported physical memory 5636 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[swap] ml1077 backed 0x124c00000+0x24c000 (whole reservation, ml1257) (file off 3 MB): 5 MB in 3 extents, peak 5 MB, 0 refused
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module BatmanAK.exe (batmanak.exe-0cf3ae09e3784df5): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): FBF0C0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141910000+0x648: 187 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x141910000+0x648: 187 slot(s), 0 data import(s) bound
+D 24 Load module steam_api64.dll (steam_api64.dll-38711e10872f4f0f): FBF090000
+[x64-data-imp] ml1245 importer pe=0xfbf090000 IAT window 0xfbf0a4000+0x2d0: 87 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0xfbf090000 IAT window 0xfbf0a4000+0x2d0: 87 slot(s), 0 data import(s) bound
+D 24 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBEFE0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBEF60000
+[x64-data-imp] ml1245 importer pe=0xfbf090000 IAT window 0xfbf0a4000+0x2d0: 87 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0xfbf090000 IAT window 0xfbf0a4000+0x2d0: 87 slot(s), 0 data import(s) bound
+[swap] ml1077 backed 0x111ec0000+0x100000 (whole reservation, ml1257) (file off 5 MB): 6 MB in 4 extents, peak 6 MB, 0 refused
+[copy-verify] msvcr100.dll: OK, 32 .text pages executable (copy @0x30617c000)
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x3062a0000)
+[copy-verify] GFSDK_PSM.win64.dll: OK, 2 .text pages executable (copy @0x306324000)
+[copy-verify] D3DCOMPILER_46.dll: OK, 223 .text pages executable (copy @0x306337000)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x104af0320 insn=0xb9432100
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x3066f0000)
+[x64-data-imp] ml1245 importer pe=0xfbdc60000 IAT window 0xfbdc68000+0x2b0: 81 slot(s), 3 data import(s) bound
+D 24 Load module DINPUT8.dll (dinput8.dll-fa63f814948e9838): FBCB00000
+[copy-verify] comctl32.dll: OK, 35 .text pages executable (copy @0x3074b8000)
+[file-fail] ml665 #60 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\Batman Arkham Knight\Binaries\Win64\WININET.dll
+E 24 [iOS-xins] tracker=0x3048a9fd8 WININET.dll sec=0xfbc6f0000-0xfbc72b029
+E 24 [iOS-xins] tracker=0x3048a9fd8 WININET.dll sec=0xfbc730000-0xfbc730f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): FBC6E0000
+E 24 [iOS-xins] tracker=0x3048a9fd8 WININET.dll sec=0xfbc6f0000-0xfbc72b029
+E 24 [iOS-xins] tracker=0x3048a9fd8 WININET.dll sec=0xfbc730000-0xfbc730f90
+E 24 [img-map] ml710 #37 intervals-only WININET.dll base=0xfbc6e0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14190f000+0x1000: 494 slot(s), 3 data import(s) bound
+[swap] ml1077 backed 0x12a630000+0x180000 (whole reservation, ml1257) (file off 6 MB): 7 MB in 5 extents, peak 7 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[xp] 15:50:06.905 +0.59 dt=277 cpu=196 (thr 193) P=195 E=0 run=202 pgw=0.0 GHz P=3.40 E=1.27 Minst=2885 IPC=4.35 mJ=535 pin=1013 rdKB=25148 fpMB=1180
+[image-reload] unmapped image 0xfbb9f0000+0xb0000: 1 pool copy marked
+[unixlib] opengl32 (GL-absent stub table) (module 0xfbd230000) -> 64-bit table (0x115ab8d10)
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=0 first=0000000000000000
+[swap] ml1077 backed 0x12c0f0000+0x400000 (whole reservation, ml1257) (file off 7 MB): 11 MB in 6 extents, peak 11 MB, 0 refused
+[xp-names] m30349228 "wine-x18-exc"
+[xp] 15:50:07.212 +0.90 dt=310 cpu=223 (thr 210) P=220 E=2 run=231 pgw=0.0 GHz P=3.34 E=1.78 Minst=2420 IPC=3.27 mJ=599 pin=637 rdKB=4888 fpMB=1256
+[xp] 15:50:07.538 +1.23 dt=325 cpu=231 (thr 220) P=230 E=1 run=236 pgw=0.0 GHz P=3.32 E=0.85 Minst=3425 IPC=4.48 mJ=684 pin=141 rdKB=2984 fpMB=1298
+[xp] 15:50:07.827 +1.51 dt=288 cpu=296 (thr 295) P=294 E=2 run=303 pgw=0.0 GHz P=3.31 E=0.78 Minst=5182 IPC=5.33 mJ=975 pin=16 rdKB=132 fpMB=1298
+[xp] 15:50:08.152 +1.84 dt=325 cpu=332 (thr 332) P=329 E=3 run=341 pgw=0.0 GHz P=3.36 E=0.73 Minst=5335 IPC=4.82 mJ=1031 pin=33 rdKB=52 fpMB=1298
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1046 MB compressed=269 MB external=179 MB reusable=1 MB (cycle=2)
+[xp] 15:50:08.414 +2.10 dt=261 cpu=383 (thr 383) P=378 E=5 run=392 pgw=0.0 GHz P=3.26 E=1.40 Minst=5030 IPC=4.05 mJ=1004 pin=1 rdKB=0 fpMB=1317
+[swap] ml1077 stats: 35 MB file-backed now (peak 35), 12 extents, file used 35 of 131072 MB, backs 12 releases 0 unbacks 0 refused 0 | coverage broad: disk 23 MB of 3072 cap, reservations 12, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 33 MB (peak 33), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1046 MB compressed=269 MB external=180 MB reusable=1 MB (cycle=3)
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1046 MB compressed=269 MB external=180 MB reusable=1 MB (cycle=4)
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1046 MB compressed=269 MB external=180 MB reusable=1 MB (cycle=5)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=3280 full-path-hits=82 component-lookups=12898 shortcut-hits=373 misses=166 scans=12525 entries-scanned=5083749 us-in-lookup=6487968 (64% of the window) slowest=3.686 ms ...night/BmGame/CookedPCConsole/CityZ_06_Ch7bc8_Static_LOD1.upk
+[footprint] rev=ml358 phys=1317 MB (peak 1317) internal=1046 MB compressed=269 MB external=180 MB reusable=1 MB (cycle=6)
+[swap] ml1077 backed 0x1320f0000+0x400000 (whole reservation, ml1257) (file off 39 MB): 43 MB in 14 extents, peak 43 MB, 0 refused
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"atiadlxx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"atiadlxy.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[steam-api] steam_api found no running Steam; process 0020 sees:
+[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=0 RegQueryValueExW(pid, cb=4)=0xc0000034 type=0 cb=0 pid=0 | OpenProcess(0x400)=(not asked) 0 GetExitCodeProcess=(not asked) 0 exit=0 (259 = running) | open without the WOW flag (0x20019)=0
+[swap] ml1077 backed 0x1324f0000+0x44a8000 (whole reservation, ml1257) (file off 43 MB): 108 MB in 14 extents, peak 108 MB, 0 refused
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): FBB060000
+[winios-vk] Vulkan is off for this session (the game's file has no vulkan = moltenvk, or the library is not bundled)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=59040000:01000000 -> 0 hAdapter=0x40000000
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000000 -> 0
+[vmode] synthesized CURRENT = 1920x1080 @60Hz
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"nvcuda.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0xfbb010000+0x13000: 1 pool copy marked
+[win-pos] #3 hwnd=0x10030 after=0x0 flags=0000003c vis={0,0,960,540} surface=0x1154f2c10 rev=ml505 style=04ca0000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10030 class='LaunchUnrealUWindowsClient' text="" rev=ml853
+[win-pos] #4 hwnd=0x10036 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10036 class='IME' text="" rev=ml853
+[win-pos] #5 hwnd=0x10036 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #5 hwnd=0x10036 class='IME' text="Default IME" rev=ml853
+[win-pos] #6 hwnd=0x10030 after=0x0 flags=00000018 vis={0,0,960,540} surface=0x1154f2c10 rev=ml505 style=04ca0000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x10030 class='LaunchUnrealUWindowsClient' text="Batman?: Arkham Knight" rev=ml853
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x800000 type=0x3000 protect=0x40
+[jit-pool] image 0xfbab80000+0x80000 (rtworkq.dll) → pool 0x3093c4000 used=0x9448000/0x38000000 tramp+0x4000
+D 24 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): FBAB80000
+[jit-pool] image 0xfbaae0000+0xa0000 (mfreadwrite.dll) → pool 0x309448000 used=0x94ec000/0x38000000 tramp+0x4000
+D 24 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): FBAAE0000
+[jit-pool] image 0xfbaa40000+0xa0000 (mmdevapi.dll) → pool 0x3094ec000 used=0x9590000/0x38000000 tramp+0x4000
+D 24 Load module MMDevAPI.dll (mmdevapi.dll-57db4935cb1d4a81): FBAA40000
+E CC [thr-term] rev=ml435 deinit #1 tid=0xcc
+[win-name] #7 hwnd=0x20038 class='SplashScreenClass' text="" rev=ml853
+[win-name] #15 hwnd=0x20044 class='Wine IME' text="" rev=ml853
+[win-pos] #16 hwnd=0x20044 after=0x20038 flags=0000181b vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #16 hwnd=0x20044 class='Wine IME' text="" rev=ml853
+0024:err:module:load_dll [dll-missing] rev=ml336 #5 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0xfba6a0000+0x21d000 (APEX_Destructible_x64.dll) → pool 0x309593000 used=0x97b7000/0x38000000 tramp+0x0
+D 24 Load module APEX_Destructible_x64.dll (apex_destructible_x64.dll-56407a11f26d6751): FBA6A0000
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x8000000 type=0x103000 protect=0x40
+[jit-pool] tail FREE rx=0x336ffc000 size=0x1000000 -> free-list rev=ml438
+0024:err:module:load_dll [dll-missing] rev=ml336 #6 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[jit-pool] image 0xfba4d0000+0x1c4000 (APEX_Clothing_x64.dll) → pool 0x3097b6000 used=0x997e000/0x38000000 tramp+0x0
+D 24 Load module APEX_Clothing_x64.dll (apex_clothing_x64.dll-2344f1189c35f787): FBA4D0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #7 L"PhysXUpdateLoader64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #8 L"APEX_ClothingGPU_x64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x159410000+0xa864000 (whole reservation, ml1257) (file off 217 MB): 365 MB in 29 extents, peak 365 MB, 0 refused
+[launch-view] dismissed reason=surface logs=0
+[xp-api-top] 15:50:19.425 4096 samples: msvcr100.dll+0x62158=5734512/s kernelbase.dll+0x68958=4204/s msvcr100.dll+0x39d58=1401/s
+[xp-api-top] 15:50:20.584 4096 samples: msvcr100.dll+0x62158=18902121/s ntdll.dll+0x67dcc=2200404/s ntdll.dll+0x67d10=1749647/s msvcr100.dll+0x63944=806617/s ntdll.dll+0x6784c=450757/s msvcr100.dll+0x73eec=41517/s msvcr100.dll+0x60420=35586/s kernelbase.dll+0x2ec38=35586/s kernelbase.dll+0x63644=23724/s msvcr100.dll+0x39d58=11862/s msvcr100.dll+0x7ad3c=11862/s msvcr100.dll+0x6088c=5931/s msvcr100.dll+0x73d44=5931/s kernelbase.dll+0x2b7c0=5931/s kernelbase.dll+0x636c4=5931/s
+[xp-api-top] 15:50:21.709 4096 samples: msvcr100.dll+0x62158=1530759/s ntdll.dll+0x67dcc=226760/s ntdll.dll+0x67d10=177464/s msvcr100.dll+0x63944=79911/s ntdll.dll+0x6784c=38918/s ntdll.dll+0x71aac=30096/s kernelbase.dll+0x68a34=13491/s kernelbase.dll+0x68958=8302/s 0xfbad9f044=2595/s msvcr100.dll+0x60420=2595/s kernelbase.dll+0x63644=2595/s 0xfbad9ec74=2076/s msvcr100.dll+0x73eec=2076/s msvcr100.dll+0x7bcb4=1557/s kernelbase.dll+0x69424=1557/s msvcr100.dll+0x7ad3c=1038/s kernelbase.dll+0x2b7c0=1038/s 0xfbad847e8=519/s msvcr100.dll+0x73d44=519/s msvcr100.dll+0x750e4=519/s kernelbase.dll+0x2ec38=519/s kernelbase.dll+0x636c4=519/s
+[xp-api-top] 15:50:22.819 1057 samples: msvcr100.dll+0x62158=37148/s ntdll.dll+0x67dcc=8364/s ntdll.dll+0x67d10=4269/s ntdll.dll+0x71aac=3807/s msvcr100.dll+0x63944=2653/s kernelbase.dll+0x68a34=1731/s ntdll.dll+0x6784c=1096/s kernelbase.dll+0x68958=865/s 0xfbad9ec74=288/s 0xfbad9f044=288/s 0xfbad8496c=115/s msvcr100.dll+0x73eec=115/s msvcr100.dll+0x7bcb4=115/s kernelbase.dll+0x63644=58/s kernelbase.dll+0x69424=58/s
+[xp-api-top] 15:50:24.013 213 samples: ntdll.dll+0x71aac=3646/s ntdll.dll+0x67dcc=3485/s kernelbase.dll+0x68a34=1555/s kernelbase.dll+0x68958=911/s ntdll.dll+0x67d10=751/s 0xfbad9ec74=483/s 0xfbad9f044=322/s ntdll.dll+0x6784c=161/s kernelbase.dll+0x69424=107/s
+[xp-api-top] 15:50:25.223 216 samples: ntdll.dll+0x71aac=3810/s ntdll.dll+0x67dcc=3334/s kernelbase.dll+0x68a34=1640/s kernelbase.dll+0x68958=900/s ntdll.dll+0x67d10=794/s 0xfbad9ec74=212/s 0xfbad9f044=212/s kernelbase.dll+0x69424=212/s 0xfbad8496c=106/s msvcr100.dll+0x63944=106/s ntdll.dll+0x6784c=106/s
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b731c80 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16b842440 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "com.apple.uikit.eventfetch-thread" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16b9e9ca0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bf609e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[ios_audio] ml1230 pacing stream=0x1098a5900 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[rip-profile] ml981 gen=1 threads=1 samples=200 buckets=4 span=0x9e0bc [0x140f3b5fb..0x140fd96b7] top: 0x140f3d140=98% 0x140f3b740=1% 0x140fd9680=0% 0x140f3b5c0=0%
+[cpu-split] ml1123 gen=1 running samples=153: x64 JIT 32%, ARM64EC images 67%, native 0%
+[cpu-split] ml1123 image top (PE address/256): 0xfbdd53600=101 0xfbdd53900=2
+[cpu-split] ml1123 native top:
+[15:50:35.761] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[swap] ml1077 backed 0x17f9e0000+0x440000 (whole reservation, ml1257) (file off 576 MB): 575 MB in 48 extents, peak 575 MB, 0 refused
+[freeze] alive t+30s beats=1 gaps=0 iter=120 gen=1 threads=66 resident=1699MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1098a5900 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.7%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[swap] ml1077 backed 0x3897f0000+0x410000 (whole reservation, ml1257) (file off 202 MB): 274 MB in 38 extents, peak 608 MB, 0 refused
+[footprint] rev=ml358 phys=2381 MB (peak 2381) internal=1693 MB compressed=685 MB external=255 MB reusable=1 MB (cycle=19)
+[file-census] r624 28s: case-sensitive=1 full-path-tries=728 full-path-hits=253 component-lookups=2053 shortcut-hits=435 misses=294 scans=1618 entries-scanned=480498 us-in-lookup=686490 (2% of the window) slowest=3.436 ms ...ne/dosdevices/c:/Batman Arkham Knight/BmGame/CookedPCConsole
+[vkmt] tid=0024 OpenAdapterFromLuid luid=59040000:01000000 -> 0 hAdapter=0x40000040
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000040 -> 0
+[win-pos] #17 hwnd=0x10030 after=0x0 flags=0000001e vis={0,0,1600,900} surface=0x1154f2c10 rev=ml505 style=84080000 visible=0 parent=0x10020
+[win-name] #17 hwnd=0x10030 class='LaunchUnrealUWindowsClient' text="Batman?: Arkham Knight" rev=ml853
+[win-pos] #18 hwnd=0x10030 after=0x0 flags=00001963 vis={0,0,1600,900} surface=0x10f35dbc0 rev=ml505 style=94080000 visible=1 parent=0x10020
+[win-name] #18 hwnd=0x10030 class='LaunchUnrealUWindowsClient' text="Batman?: Arkham Knight" rev=ml853
+[win-pos] #19 hwnd=0x10048 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #19 hwnd=0x10048 class='Wine IME' text="" rev=ml853
+[win-pos] #20 hwnd=0x10048 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #20 hwnd=0x10048 class='Wine IME' text="" rev=ml853
+[win-pos] #21 hwnd=0x10048 after=0x1003e flags=0000181b vis={0,0,1,1} surface=0x1154f2c10 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #21 hwnd=0x10048 class='Wine IME' text="" rev=ml853
+E BC [thr-term] rev=ml435 deinit #2 tid=0xbc
+[vkmt] tid=0024 OpenAdapterFromLuid luid=59040000:01000000 -> 0 hAdapter=0x40000080
+[jit-pool] image 0xfb9e30000+0x4d6000 (d3d11.dll) → pool 0x30997f000 used=0x9e5f000/0x38000000 tramp+0x4000
+D 24 Load module d3d11.dll (d3d11.dll-8adc68a988847c21): FB9E30000
+[vkmt] tid=0024 CreateDevice hAdapter=0x40000080 -> 0 hDevice=0x400000c0
+err:   [bc-half] madeira-bcd level 2: the auto clamp from 256 px, and single-level BC textures at half size on a GPU without BC, within 1536 MB of the limit
+[bc-remap] ml678 131 -> 71  n=1  (sRGB-in=1 sRGB-out=1)
+[footprint] rev=ml358 phys=2841 MB (peak 2841) internal=1281 MB compressed=1356 MB external=216 MB reusable=0 MB (cycle=20)
+err:   [bc-decode] ml679 #0 BC1 64x64 level=0 slice=0 -> 4B/texel 16384B
+err:   [bc-decode] ml679 #1 BC1 32x32 level=1 slice=0 -> 4B/texel 4096B
+err:   [bc-decode] ml679 #2 BC1 16x16 level=2 slice=0 -> 4B/texel 1024B
+err:   [bc-decode] ml679 #3 BC1 8x8 level=3 slice=0 -> 4B/texel 256B
+err:   [bc-decode] ml679 #4 BC1 4x4 level=4 slice=0 -> 4B/texel 64B
+err:   [bc-decode] ml679 #5 BC1 2x2 level=5 slice=0 -> 4B/texel 16B
+[bc-remap] ml678 135 -> 71  n=1  (sRGB-in=1 sRGB-out=1)
+[bc-remap] ml678 130 -> 70  n=1  (sRGB-in=0 sRGB-out=0)
+[bc-remap] ml678 134 -> 70  n=1  (sRGB-in=0 sRGB-out=0)
+err:   [bc-census] ml653 periodic: 64 BC resources, 17496 subresources
+err:   [bc-census] ml653   BC1_UNORM n=11 117KB max=128x128 mips=8 arr=1 cube=0 | use def=11 imm=0 dyn=0 stg=0 | data y=11 n=0 | cpu r=0 w=0 | bind srv=11 rt=0 uav=0
+err:   [bc-census] ml653   BC1_UNORM_SRGB n=42 33130KB max=512x512 mips=10 arr=2046 cube=1 | use def=42 imm=0 dyn=0 stg=0 | data y=40 n=2 | cpu r=0 w=0 | bind srv=42 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM n=2 42KB max=128x128 mips=8 arr=1 cube=0 | use def=2 imm=0 dyn=0 stg=0 | data y=2 n=0 | cpu r=0 w=0 | bind srv=2 rt=0 uav=0
+err:   [bc-census] ml653   BC3_UNORM_SRGB n=9 181KB max=512x128 mips=8 arr=1 cube=0 | use def=9 imm=0 dyn=0 stg=0 | data y=9 n=0 | cpu r=0 w=0 | bind srv=9 rt=0 uav=0
+err:   [bc-census] ml653   SRV view fmt 71 (BC1_UNORM) x10
+err:   [bc-census] ml653   TOTAL logical BC bytes = 33471KB
+err:   [bc-stream] ml744 decoded total=0 BC1=0 BC2=0 BC3=0 BC4u=0 BC5u=0 BC7=0 | ALLOC-FAIL=0 | ml745 clamp xlated=0 dropped=0 | ml746 copy xlated=0 dropped=0 (lost=0 refilled=0) paths tex<-tex=0 tex<-stg=0 stg<-tex=0 stg<-stg=0 BCstg-unsup=0 | ml747 BCstg decoded=0 fail=0
+err:   [bc-census] ml653 periodic: 128 BC resources, 18003 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 34467KB
+err:   [bc-census] ml653 periodic: 192 BC resources, 18508 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 35148KB
+err:   [bc-census] ml653 periodic: 256 BC resources, 18948 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 35775KB
+err:   [bc-census] ml653 periodic: 320 BC resources, 19446 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 36395KB
+err:   [bc-census] ml653 periodic: 384 BC resources, 19968 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 37020KB
+[bc-remap] ml678 142 -> 30  n=1  (sRGB-in=0 sRGB-out=0)
+[bc-remap] ml678 131 -> 71  n=512  (sRGB-in=1 sRGB-out=1)
+[footprint] rev=ml1060 fast phys=3021 MB compressed=1396 MB internal=1324 MB
+[bc-remap] ml678 131 -> 71  n=1024  (sRGB-in=1 sRGB-out=1)
+[bc-remap] ml678 130 -> 70  n=512  (sRGB-in=0 sRGB-out=0)
+[mem-burst] rev=624 +335 MB in 254 ms phys=3356 internal=1642 compressed=1317 other=397 | guest commits since the last sample: n=53, 7 MB, biggest 3 MB tid=0024 | swap backed=261 MB | pool head=158 MB tail=144 MB
+[footprint] rev=ml1060 fast phys=3356 MB compressed=1317 MB internal=1642 MB
+[bc-remap] ml678 131 -> 71  n=1536  (sRGB-in=1 sRGB-out=1)
+[footprint] rev=ml1060 fast phys=3472 MB compressed=1312 MB internal=1664 MB
+[bc-remap] ml678 131 -> 71  n=2048  (sRGB-in=1 sRGB-out=1)
+[swap] ml1077 backed 0x16e6e0000+0x100000 (whole reservation, ml1257) (file off 510 MB): 264 MB in 41 extents, peak 608 MB, 0 refused
+[footprint] rev=ml1060 fast phys=3605 MB compressed=1295 MB internal=1700 MB
+[bc-remap] ml678 130 -> 70  n=1024  (sRGB-in=0 sRGB-out=0)
+[bc-remap] ml678 131 -> 71  n=2560  (sRGB-in=1 sRGB-out=1)
+[guest-reserve] #24 0x3afc00000+0xfd0000 hinted=0 tid=0024 prot=0x4 running_total=371MB
+[footprint] rev=ml1060 fast phys=3734 MB compressed=1405 MB internal=1581 MB
+err:   [bc-census] ml653 periodic: 4032 BC resources, 47331 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 204651KB
+[guest-reserve] #25 0x3afc00000+0xfd0000 hinted=0 tid=0024 prot=0x4 running_total=387MB
+[guest-reserve] #26 0x3afc00000+0xfd0000 hinted=0 tid=0024 prot=0x4 running_total=403MB
+err:   [bc-decode] ml679 #29696 BC1 32x32 level=2 slice=0 -> 4B/texel 4096B
+err:   [bc-census] ml653 periodic: 4096 BC resources, 47832 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 205791KB
+err:   [bc-decode] ml679 #30208 BC1 16x16 level=3 slice=0 -> 4B/texel 1024B
+err:   [bc-census] ml653 periodic: 4160 BC resources, 48337 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 206480KB
+err:   [bc-decode] ml679 #30720 BC1 32x32 level=2 slice=0 -> 4B/texel 4096B
+err:   [bc-census] ml653 periodic: 4224 BC resources, 48839 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 207073KB
+err:   [bc-decode] ml679 #31232 BC1 16x8 level=3 slice=0 -> 4B/texel 512B
+err:   [bc-census] ml653 periodic: 4288 BC resources, 49344 subresources
+err:   [bc-census] ml653   TOTAL logical BC bytes = 207653KB
+err:   [bc-decode] ml679 #31744 BC1 16x16 level=3 slice=0 -> 4B/texel 1024B
+err:   [bc-census] ml653 periodic: 4352 BC resources, 49842 subresources
+err:   [bc-census] ml653   SRV view fmt 72 (BC1_UNORM_SRGB) x2830
+err:   [bc-census] ml653   SRV view fmt 77 (BC3_UNORM) x147
+err:   [bc-census] ml653   SRV view fmt 78 (BC3_UNORM_SRGB) x224
+err:   [bc-census] ml653   SRV view fmt 83 (BC5_UNORM) x4
+err:   [bc-census] ml653   RUNTIME OPS on BC textures: UpdateSubresource=810 CopyResource=0 CopySubresourceRegion=0 Map=0
+err:   [bc-census] ml653   TOTAL logical BC bytes = 208344KB
+err:   [bc-decode] ml679 #32256 BC1 16x16 level=4 slice=0 -> 4B/texel 1024B
+[footprint] rev=ml1060 fast phys=3781 MB compressed=1567 MB internal=1466 MB
+[xp-api-top] 15:50:46.277 2246 samples: ntdll.dll+0x67dcc=14052/s ntdll.dll+0x6784c=10107/s msvcrt.dll+0x574b8=6432/s kernelbase.dll+0x6d470=6161/s msvcp100.dll+0x280ec=4810/s msvcp100.dll+0x1a7ac=4702/s msvcp100.dll+0x1702c=4486/s msvcp100.dll+0x2688c=4378/s msvcp100.dll+0x1898c=3621/s 0xfb9e751e8=3567/s 0xfb9e7518c=3513/s msvcr100.dll+0x62158=3351/s 0xfb9e84cd4=3297/s msvcrt.dll+0x2dfc8=3243/s msvcp100.dll+0x18e2c=3189/s 0xfb9e34a74=2919/s 0xfb9e84d30=2756/s 0xfb9e35184=2648/s 0xfb9e8be30=2432/s msvcr100.dll+0x63944=2432/s ntdll.dll+0x67d10=2432/s msvcp100.dll+0x1898c=2270/s msvcrt.dll+0x55c70=2216/s 0xfb9e350e4=1946/s msvcrt.dll+0x2dd7c=1892/s 0xfb9e76e80=1729/s kernelbase.dll+0x68a34=1729/s 0xfb9e76e44=1513/s
+[footprint] rev=ml358 phys=3758 MB (peak 3758) internal=1458 MB compressed=1551 MB external=143 MB reusable=0 MB (cycle=21)
+[swap] ml1077 stats: 271 MB file-backed now (peak 608), 39 extents, file used 536 of 131072 MB, backs 231 releases 192 unbacks 0 refused 0 | coverage broad: disk 174 MB of 3072 cap, reservations 231, holes 19, disk-full refusals 0 | ml1258 churn: 1 sizes, 758 blocks left anonymous | committed data in the file 256 MB (peak 605), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[xp-api-top] 15:50:47.353 4096 samples: msvcrt.dll+0x574b8=40079/s msvcp100.dll+0x1a7ac=35310/s msvcp100.dll+0x1898c=34803/s msvcp100.dll+0x18e2c=34803/s msvcp100.dll+0x280ec=33991/s msvcp100.dll+0x2688c=31759/s msvcp100.dll+0x1702c=31251/s msvcrt.dll+0x2dfc8=22424/s msvcrt.dll+0x2dd7c=17046/s msvcrt.dll+0x55c70=15829/s ntdll.dll+0x67dcc=14814/s msvcr100.dll+0x62158=13495/s msvcp100.dll+0x29364=9538/s ntdll.dll+0x67d10=8422/s msvcp100.dll+0x2a6b0=7508/s msvcr100.dll+0x3960c=7407/s ntdll.dll+0x6784c=6392/s msvcp100.dll+0x82f24=5682/s msvcp100.dll+0x18a54=5682/s msvcp100.dll+0x29214=5175/s 0xfb9ea8634=4972/s msvcr100.dll+0x3977c=4972/s 0xfb9e358ac=4059/s 0xfb9ea8670=3044/s msvcr100.dll+0x63338=2232/s kernelbase.dll+0x68958=2232/s kernelbase.dll+0x68a34=1826/s msvcp100.dll+0x18564=1421/s
+[fault-cost] ml685 emulated-store faults=4 total=0 ms avg=6625 ns dropped=0 (one handler thread serves all threads)
+[xp-api-top] 15:50:48.482 4096 samples: msvcrt.dll+0x574b8=45449/s msvcp100.dll+0x1a7ac=38219/s msvcp100.dll+0x18e2c=37300/s msvcp100.dll+0x2688c=36727/s msvcp100.dll+0x1898c=36268/s msvcp100.dll+0x1702c=36038/s msvcp100.dll+0x280ec=34890/s msvcrt.dll+0x2dfc8=26742/s ntdll.dll+0x67dcc=20314/s msvcrt.dll+0x55c70=19511/s msvcrt.dll+0x2dd7c=18708/s msvcr100.dll+0x62158=14232/s msvcp100.dll+0x29364=11477/s ntdll.dll+0x67d10=11018/s ntdll.dll+0x6784c=9296/s msvcp100.dll+0x2a6b0=8149/s msvcr100.dll+0x3960c=7919/s msvcp100.dll+0x29214=7001/s 0xfb9ea8670=6312/s msvcr100.dll+0x3977c=6083/s msvcp100.dll+0x82f24=5509/s msvcp100.dll+0x18a54=4361/s 0xfb9e358ac=4132/s 0xfb9ea8634=3902/s msvcr100.dll+0x63338=2984/s kernelbase.dll+0x68958=2410/s msvcp100.dll+0x184e0=1951/s kernelbase.dll+0x68a34=1607/s
+[footprint] rev=ml358 phys=3906 MB (peak 3906) internal=1665 MB compressed=1492 MB external=149 MB reusable=0 MB (cycle=22)
+[ios_audio] ml1230 pacing stream=0x1098a5900 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2304..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[fault-cost] ml685 emulated-store faults=4 total=0 ms avg=6625 ns dropped=0 (one handler thread serves all threads)
+[footprint] rev=ml1060 fast phys=3937 MB compressed=1491 MB internal=1697 MB
+[xp-api-top] 15:50:49.641 4096 samples: msvcrt.dll+0x574b8=46086/s msvcp100.dll+0x1898c=39336/s msvcp100.dll+0x1a7ac=38405/s msvcp100.dll+0x18e2c=38172/s msvcp100.dll+0x2688c=38055/s msvcp100.dll+0x1702c=37474/s msvcp100.dll+0x280ec=37241/s msvcrt.dll+0x2dfc8=25370/s msvcrt.dll+0x2dd7c=21181/s ntdll.dll+0x67dcc=19202/s msvcrt.dll+0x55c70=18388/s msvcr100.dll+0x62158=14780/s msvcp100.dll+0x29364=11871/s ntdll.dll+0x67d10=10590/s msvcp100.dll+0x2a6b0=8612/s msvcr100.dll+0x3960c=8496/s msvcp100.dll+0x29214=7797/s msvcp100.dll+0x82f24=6052/s msvcr100.dll+0x3977c=5935/s msvcp100.dll+0x18a54=5935/s ntdll.dll+0x6784c=5586/s 0xfb9ea8634=4190/s 0xfb9ea8670=4073/s 0xfb9e358ac=3724/s 0xfb9ea7d68=2095/s msvcr100.dll+0x63338=1978/s msvcp100.dll+0x182bc=1978/s msvcp100.dll+0x184e0=1978/s
+[footprint] rev=ml1060 fast phys=3956 MB compressed=1502 MB internal=1705 MB
+[thread-sample] ml876 b0 "Game Thread" teb=0xfbffe0000 cpu=44% RUN pc=libsystem_platform.dylib`_platform_memmove+0xb4 lr=Madeira`_ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm8EEE10__dispatchB9nqn220106IONS1_9__variant15 sp=0x1116be900 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=54% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bf5f680 NATIVE (no FEX state) sp-cand=[ ]
+[footprint] rev=ml1060 fast phys=3981 MB compressed=1547 MB internal=1685 MB
+[thread-sample] ml876 b0 "AURemoteIO::IOThread" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16c246ce0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x13fb00000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0xd359fe7f0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x141b pc=0x305f0a2e0 user-sp=0x15459fc90 user-cand=[ BatmanAK.exe+0xc70cf0 BatmanAK.exe+0xc67ef0 ]
+[thread-sample] ml876 b0 "audio_client_timer" teb=0x13faf0000 cpu=0% wait pc=libsystem_kernel.dylib`mach_wait_until+0x8 lr=Madeira`ios_timer_loop+0xa10 sp=0xd35bff970 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0xd pc=0x3095027d8 user-sp=0x15519ffc0 user-cand=[ BatmanAK.exe+0x269d7b0 BatmanAK.exe+0x20045f8 BatmanAK.exe+0x30b5dd0 ]
+[thread-sample] ml876 b0 "" teb=0x13fae0000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0xd35dfe9d0 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x4 pc=0x3043fb1c8 user-sp=0x37bfffa60 user-cand=[ BatmanAK.exe+0x2164760 BatmanAK.exe+0x7c5fe BatmanAK.exe+0x5af796 BatmanAK.exe+0x5af340 BatmanAK.exe+0xfa5a95 ]
+[xp-api-top] 15:50:50.784 4096 samples: msvcrt.dll+0x574b8=42691/s msvcp100.dll+0x1702c=39601/s msvcp100.dll+0x1898c=38113/s msvcp100.dll+0x280ec=35709/s msvcp100.dll+0x18e2c=35251/s msvcp100.dll+0x2688c=34908/s msvcp100.dll+0x1a7ac=34450/s ntdll.dll+0x67dcc=26667/s msvcrt.dll+0x2dfc8=24722/s msvcrt.dll+0x55c70=18312/s msvcrt.dll+0x2dd7c=18198/s msvcr100.dll+0x62158=14993/s ntdll.dll+0x67d10=12246/s msvcp100.dll+0x29364=11903/s ntdll.dll+0x6784c=9156/s msvcp100.dll+0x2a6b0=8469/s msvcp100.dll+0x82f24=6867/s 0xfb9ea8670=6524/s msvcr100.dll+0x3960c=6409/s msvcp100.dll+0x29214=6295/s 0xfb9ea8634=5837/s msvcr100.dll+0x3977c=5608/s 0xfb9e358ac=5379/s msvcp100.dll+0x18a54=5036/s kernelbase.dll+0x68a34=1717/s 0xfb9ea7d2c=1602/s 0xfb9e354c4=1488/s msvcr100.dll+0x63338=1488/s
+[footprint] rev=ml358 phys=3996 MB (peak 3996) internal=1704 MB compressed=1543 MB external=156 MB reusable=0 MB (cycle=23)
+[thread-sample] ml876 b1 "wine-x18-exc" teb=0x0 cpu=52% RUN pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16bf609e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[guest-reserve] #27 0x3c0800000+0xfd0000 hinted=0 tid=0024 prot=0x4 running_total=419MB
+[footprint] rev=ml1060 fast phys=4015 MB compressed=1539 MB internal=1726 MB
+[fault-cost] ml685 emulated-store faults=4 total=0 ms avg=6625 ns dropped=0 (one handler thread serves all threads)
+[footprint] rev=ml1060 fast phys=4035 MB compressed=1535 MB internal=1750 MB
+[xp] 15:50:51.304 +44.97 dt=261 cpu=270 (thr 269) P=267 E=3 run=301 pgw=0.0 GHz P=3.24 E=1.06 Minst=2998 IPC=3.45 mJ=740 pin=77 rdKB=0 fpMB=4035
+[xp] 15:50:51.557 +45.23 dt=253 cpu=262 (thr 262) P=259 E=3 run=296 pgw=0.0 GHz P=3.17 E=1.13 Minst=2907 IPC=3.53 mJ=674 pin=50 rdKB=0 fpMB=4047
+[thread-sample] ml876 burst done
+[footprint] rev=ml1060 fast phys=4060 MB compressed=1530 MB internal=1781 MB
+[xp] 15:50:51.877 +45.55 dt=320 cpu=333 (thr 333) P=328 E=5 run=376 pgw=0.0 GHz P=3.12 E=1.14 Minst=3592 IPC=3.49 mJ=802 pin=53 rdKB=0 fpMB=4062
+[xp-api-top] 15:50:51.877 4096 samples: msvcrt.dll+0x574b8=46418/s msvcp100.dll+0x1702c=39347/s msvcp100.dll+0x2688c=39119/s msvcp100.dll+0x1898c=38663/s msvcp100.dll+0x18e2c=38093/s msvcp100.dll+0x280ec=38093/s msvcp100.dll+0x1a7ac=35127/s msvcrt.dll+0x2dfc8=23608/s msvcrt.dll+0x2dd7c=19503/s ntdll.dll+0x67dcc=18476/s msvcrt.dll+0x55c70=17792/s msvcp100.dll+0x29364=11861/s msvcr100.dll+0x62158=10835/s msvcp100.dll+0x2a6b0=10264/s ntdll.dll+0x67d10=9466/s ntdll.dll+0x6784c=7641/s msvcp100.dll+0x29214=7185/s msvcr100.dll+0x3960c=6957/s msvcr100.dll+0x3977c=6615/s msvcp100.dll+0x18a54=6387/s msvcp100.dll+0x82f24=6273/s 0xfb9e358ac=4904/s 0xfb9ea8634=4790/s 0xfb9ea8670=3307/s msvcr100.dll+0x63338=2281/s kernelbase.dll+0x68a34=1597/s msvcr100.dll+0x63944=1483/s 0xfb9ea7d2c=1369/s
+[xp] 15:50:52.181 +45.85 dt=304 cpu=316 (thr 316) P=311 E=5 run=360 pgw=0.0 GHz P=3.03 E=1.11 Minst=3401 IPC=3.59 mJ=683 pin=45 rdKB=0 fpMB=4073
+[xp] 15:50:52.477 +46.14 dt=295 cpu=303 (thr 303) P=299 E=4 run=348 pgw=0.0 GHz P=3.00 E=1.02 Minst=3288 IPC=3.65 mJ=632 pin=16 rdKB=64 fpMB=4076
+[vkmt] tid=0024 OpenAdapterFromLuid luid=59040000:01000000 -> 0 hAdapter=0x40000100
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000100 -> 0
+info:  [monitor-identity] ml1190 using user32 primary=0x10001 (DXMT_WSI_MONITOR_IDENTITY)
+[xp] 15:50:52.777 +46.44 dt=300 cpu=291 (thr 291) P=287 E=3 run=330 pgw=0.0 GHz P=3.00 E=1.01 Minst=3083 IPC=3.56 mJ=602 pin=116 rdKB=4456 fpMB=4083
+[winios] game window hwnd=0x10030 presents through Metal; its GDI surface is not drawn
+[footprint] rev=ml358 phys=4083 MB (peak 4083) internal=1816 MB compressed=1518 MB external=152 MB reusable=0 MB (cycle=24)
+[winios] game window hwnd=0x10030 not drawn (presents through Metal)
+warn:  [present] ml1175 commitBeforePresent=1 (d3d11.commitBeforePresent=0 records the present into the frame's last chunk)

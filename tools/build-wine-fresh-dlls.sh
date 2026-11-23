@@ -62,10 +62,12 @@ patch-wine-vkd3d-keyword-names.py @W@
 patch-wine-d3dx-hresult.py @W@
 patch-wine-d3dcompile-diag.py @W@
 patch-wine-vkd3d-hlsl-fail-dump.py @W@
+patch-wine-vkd3d-loop-fallback.py @W@
 patch-wine-rpc-np-diag.py @W@
 patch-wine-cpu-error-diag.py @W@
 patch-wine-msgbox-timeout.py @W@
 patch-wine-wintrust-diag.py @W@
+patch-wine-wintrust-root-pin.py @W@
 patch-wine-woa-recheck.py @W@/dlls/ntdll/sync.c @W@/dlls/ntdll/unix/sync.c
 patch-wine-woa-wake-order.py @W@/dlls/ntdll/sync.c
 patch-wine-x64-machine.py @W@

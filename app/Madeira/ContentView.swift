@@ -1463,6 +1463,19 @@ struct ContentView: View {
         var entry = entry
         let isNew = !library.entries.contains { $0.id == entry.id }
         if GameRecommendations.prepare(&entry, new: isNew) { library.save(entry) }
+        // madeira-bcd (2026-11-22): X-Plane 12 at its lowest graphics when the game's settings say `xplane-graphics = lowest`
+        // (XPlaneGraphics.swift): its Resources/settings.txt defaults are lowered before the start, and put back when the line
+        // goes. A Steam game's install folder, else the program's folder; nothing for a game without X-Plane's settings file.
+        do {
+            let folder = entry.steamAppID != nil ? entry.relativePath : (entry.relativePath as NSString).deletingLastPathComponent
+            let root = LibraryModel.drive.appendingPathComponent(folder, isDirectory: true)
+            let own = (entry.gameConfigText ?? "") + "\n" + GameProfile(windowsPath: entry.windowsPath).text
+            let wanted = XPlaneGraphics.wanted(settings: own)
+            let kept = root.appendingPathComponent(XPlaneGraphics.settingsRelative + XPlaneGraphics.originalSuffix).path
+            if wanted || FileManager.default.fileExists(atPath: kept), let line = XPlaneGraphics.prepare(folder: root, wanted: wanted) {
+                LogStore.shared.log(line)
+            }
+        }
         // A Steam game starts through Madeira Dock with its own launch profile (SteamGames.swift),
         // unless its Game details page chose "The game": then its own program starts below, like
         // any library game (SteamDirectStart).
@@ -1551,6 +1564,11 @@ struct ContentView: View {
         // Galaxy client from GOG first and runs this start again. Any other start goes straight on and opens nothing.
         let galaxyEntry = entry
         guard BCDGOGGalaxy.shared.preLaunch(galaxyEntry, retry: { startLibraryEntry(galaxyEntry) }) else { return }
+        // madeira-bcd (branch steam-client, 2026-11-21, milestone M1): Steam for Windows (Valve's own steam.exe in the Wine desktop; experimental,
+        // off unless Settings › BCD Dock › Steam for Windows turns it on; BCDSteamDesktopLive.swift). Its start first waits for BCD's own Steam
+        // connection to log off (it stays off until the session has ended) and writes the registry values, then comes back here once. Last
+        // before the launch is set up, so nothing after it can stop the start and leave the account held. Any other entry goes straight on.
+        guard BCDSteamDesktopLive.preLaunch(&entry, retry: { startLibraryEntry($0) }) else { return }
         entry.configureLaunch()
         if BCDEpic.enabled { BCDEpic.shared.applyLaunch(entry) }   // madeira-bcd (2026-10-22): an Epic game's signed-in start goes through BCD Host (BCDEpicStart.swift)
         // madeira-bcd: the game's own options (LibraryBCD.swift); this run's
@@ -1683,6 +1701,9 @@ struct ContentView: View {
         let paradoxLauncherSession = MadeiraDock.paradoxLauncherSession   // night round 2026-11-11 (D S2): read here, on the main thread
         let eaInstallLines = DockInstallers.eaInstallSession ? BCDLauncherSpec.eaInstallerSessionLines : []   // round 630 (A1 S12): read here, on the main thread
         let windowsDesktopEntry = profile?.desktop == true   // madeira-bcd (2026-10-23): the library's "Windows desktop" entry (no game), for the msiexec line below
+        // madeira-bcd (branch steam-client, 2026-11-21, M1): this launch is a Steam for Windows session (the entry's program is Valve's own
+        // steam.exe in its own folder). False for every other launch, a Dock start included, and then nothing below differs.
+        let steamDesktopSession = profile.map(BCDSteamDesktopLive.isSession) ?? false
         // Link external drives before the server lists dosdevices (Madeira #464 does it in startWineserver; here it runs on the main
         // thread, where ExternalDrives and the Steam models it refreshes live, before the sequence below starts the server).
         ExternalDrives.shared.mountAll()
@@ -1697,6 +1718,10 @@ struct ContentView: View {
                 // writes those). Either one turns a switch on.
                 Self.reassertBCDSwitches(profile)
                 logStore.log("[launch-route] library profile applied")
+                // madeira-bcd (branch steam-client, M1): a Steam for Windows session reads BCD's settings for it (SteamDesktopProfile: the
+                // JIT pool, the swap file, the memory Steam's web helper is told, its Chromium's address slots), with the entry's own lines
+                // after them, from a file of this session's own. Before the pool request below, which reads three of them.
+                if steamDesktopSession { for line in BCDSteamDesktopLive.applySessionSettings() { logStore.log(line) } }
                 // madeira-bcd: a Dock session of one-time installs runs without the game's
                 // address-space holds, which leave its 32-bit setups no room.
                 let installSession = DockInstallers.applyInstallSessionConfig(extra: eaInstallLines)
@@ -1816,6 +1841,14 @@ struct ContentView: View {
             } else {
                 unsetenv("MADEIRA_DOCK_SESSION")
             }
+            // madeira-bcd (branch steam-client, M1): a Steam for Windows session publishes no fixed Steam game identity either
+            // (WineProcessBridge.m): Valve's client gives each game it starts that game's own. Never together with a Dock start; every
+            // other launch clears the flag and is unchanged.
+            if steamDesktopSession && !dockLaunch.dock {
+                setenv(SteamDesktop.sessionVariable, "1", 1)
+            } else {
+                unsetenv(SteamDesktop.sessionVariable)
+            }
             // madeira-bcd (2026-10-22): an Epic game's session gets msiexec in the 64-bit system32 (WineProcessBridge.m):
             // Paradox's launcher stub (Cities: Skylines on Epic, dowser.exe) installs its launcher by running "msiexec"
             // from PATH, and only the 32-bit msiexec is bundled ("executable file not found in %PATH%", build 585).
@@ -1873,7 +1906,10 @@ struct ContentView: View {
             // Off, the game's file has no say, as before.
             let poolAbove = ["1", "on", "true", "yes"].contains((MadeiraConfig.gameValue("pool-above-window") ?? MadeiraConfig.get("pool-above-window") ?? "")
                 .trimmingCharacters(in: .whitespacesAndNewlines).lowercased())
-            let gamePool = poolAbove ? MadeiraConfig.gameValue("pool") : nil
+            // madeira-bcd (branch steam-client, M1): in a Steam for Windows session the pool line of the session's own file counts by
+            // itself (BCD's 1152, or the entry's own line): the session needs the largest pool, and pool-above-window's other half, the
+            // placement of a pair above the window, stays at its default.
+            let gamePool = (poolAbove || steamDesktopSession) ? MadeiraConfig.gameValue("pool") : nil
             if let txt = gamePool ?? MadeiraConfig.get("pool"),
                let mb = Int(txt.trimmingCharacters(in: .whitespacesAndNewlines)),
                mb >= 256, mb <= 1152 {
@@ -2297,6 +2333,8 @@ struct ContentView: View {
                 // ml1330: the pool is allocated once per app run and reused, so this is
                 // the actual size, which the unix side records if a session runs it dry.
                 setenv("MADEIRA_POOL_MB", String(pool.size / 1024 / 1024), 1)
+                // madeira-bcd (branch steam-client, M1): what a Steam for Windows session asked for and got, in one line.
+                if steamDesktopSession { logStore.log(BCDSteamDesktopLive.poolLine(askedMB: poolSizeMB, gotMB: pool.size >> 20)) }
             } else {
                 // ml596: ABORT. "Continuing without it" produced ml595 — a run that
                 // looked like an ARM64EC/optimizer regression but was only Wine
@@ -2917,13 +2955,23 @@ final class TouchControlsModel: ObservableObject {
     @Published var editing = false {            // transient, never persisted
         didSet {
             // ml1970: an ended edit is written back to the custom layout it came from.
-            if !oldValue && editing { editBaseline = controls }
+            if !oldValue && editing {
+                editBaseline = controls
+                selectedIDs = []; alignmentX = nil; alignmentY = nil
+            }
+            if oldValue && !editing {
+                selectedIDs = []; alignmentX = nil; alignmentY = nil
+            }
             if oldValue && !editing { ControlPresetsModel.shared.editingEnded(baseline: editBaseline) }
         }
     }
     /// The Session panel card is open on this window: it takes every touch.
     @Published var sessionPanel = false         // transient
     @Published var selected: UUID?              // transient
+    /// Editor-only marquee selection; never persisted in control profiles.
+    @Published var selectedIDs: Set<UUID> = []   // transient
+    @Published var alignmentX: CGFloat?          // transient guide, not stored
+    @Published var alignmentY: CGFloat?          // transient guide, not stored
     /// ml1970: the named layout (TouchControlPresets.swift) these controls were
     /// loaded from; nil for controls no layout holds.
     @Published var layoutID: String?            { didSet { save() } }
@@ -3132,6 +3180,7 @@ struct TouchControlsOverlay: View {
     @ObservedObject private var feel = BCDTouchFeelModel.shared   // madeira-bcd (round 604): the controls hide when no finger has been on them for the time the player chose
     @ObservedObject private var fold = FoldTabletop.shared
     @State private var pinchBase: Double?
+    @State private var groupPinchBases: [UUID: Double] = [:]
 
     var body: some View {
         GeometryReader { geo in
@@ -3224,16 +3273,29 @@ struct TouchControlsOverlay: View {
     /// BCD (2026-10-18): BCD's bar and editor (BCDTouchLive.swift).
     private var topBar: some View { BCDTouchChromeLive() }
 
-    /// Pinch anywhere scales the SELECTED control. With nothing selected it does
-    /// nothing rather than guessing which one you meant.
+    /// Pinch anywhere to scale the selected control or selected group.
     private var scalePinch: some Gesture {
         MagnificationGesture()
             .onChanged { v in
+                if m.editing && m.selectedIDs.count > 1 {
+                    if groupPinchBases.isEmpty {
+                        groupPinchBases = Dictionary(uniqueKeysWithValues: m.controls
+                            .filter { m.selectedIDs.contains($0.id) && $0.locked != true }
+                            .map { ($0.id, $0.scale) })
+                    }
+                    var updated = m.controls
+                    for i in updated.indices {
+                        guard let base = groupPinchBases[updated[i].id] else { continue }
+                        updated[i].scale = BCDTouchGeometry.clampScale(base * Double(v))
+                    }
+                    if updated != m.controls { m.controls = updated }
+                    return
+                }
                 guard m.editing, let i = m.index(of: m.selected), m.controls[i].locked != true else { return }
                 if pinchBase == nil { pinchBase = m.controls[i].scale }
                 m.controls[i].scale = min(max((pinchBase ?? 1) * Double(v), 0.5), 3.0)
             }
-            .onEnded { _ in pinchBase = nil }
+            .onEnded { _ in pinchBase = nil; groupPinchBases = [:] }
     }
 }
 

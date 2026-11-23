@@ -160,7 +160,7 @@ for rid, (app, folder, prog, word) in want.items():
     lines = [c for c in (r or {}).get("config", []) if isinstance(c, dict) and c["line"].startswith("gl-backend")]   # night round 2026-11-11: Isaac v2 and Mewgenics v2 carry more lines
     check(f"list rule {rid}: Steam {app}, folder {folder!r}, program {prog}, `gl-backend = {word}` from build 632 only",
           r is not None and r["match"] == {"steamAppIDs": [app], "steamFolders": [folder], "programs": [{"name": prog}]}
-          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] in (1, 2, 3) and any("Not tried on a device yet" in n for n in r["notes"]), r)   # round 660: Mewgenics v3, DOOM 3 BFG v2
+          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] in (1, 2, 3, 4) and any("Not tried on a device yet" in n for n in r["notes"]), r)   # round 660: Mewgenics v3, DOOM 3 BFG v2; round 707: Isaac v4
 for rid in ("jetboard-joust", "stardew-valley"):
     lines = [c for c in by[rid]["config"] if isinstance(c, dict) and c["line"].startswith("gl-backend")]
     check(f"list rule {rid}: carries `gl-backend = zink` from build 632 only, its version raised", lines == [{"line": "gl-backend = zink", "minBuild": 632}], by[rid]["config"])
@@ -173,6 +173,7 @@ night_gl += ["x-plane-12"]   # round 668: the owner's X-Plane 12 test, "Couldn't
 night_gl += ["goldsrc-hl-exe"]   # round 668 (G3, merge N074): hw.dll is OpenGL first; v2
 night_gl += ["legacy-of-kain-soul-reaver-1-2-remastered", "unrailed-2-back-on-track"]   # round 669 (B S12, S3)
 night_gl += ["quaver"]   # round 668 (K1 S9): v3, no OpenGL context without a backend (5AZNE6, VVV7PX); zink drew 1,790 frames (44QPTA)
+night_gl += ["fields-of-mistria", "old-school-runescape", "underkeep"]   # round 707: new rows, OpenGL games that stop without a context
 check("no other list rule turns OpenGL on, and none turns it on without minBuild 632 (KOF XIV's experiment: 652)",
       sorted(r["id"] for r in lst["rules"] if any("gl-backend" in (c["line"] if isinstance(c, dict) else c) for c in r["config"]))
       == sorted(list(want) + ["jetboard-joust", "stardew-valley"] + night_gl)

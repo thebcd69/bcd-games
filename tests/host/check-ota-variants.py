@@ -236,6 +236,7 @@ if tool == 'aws':
             if p.is_file(): print('2026-10-06 00:00:00', p.stat().st_size, p.relative_to(bucket))
     elif action == 'rm': stored(rest[0]).unlink()
 elif tool == 'uuidgen': print('00000000-0000-0000-0000-000000000001')
+elif tool == 'sleep': record(['sleep'] + args)   # 2026-11-22: the retry wait is recorded, not slept (it was 2 min of real sleep)
 elif tool == 'security':
     if args[0] == 'find-identity': print('1) FIXTURE_ID')
     elif args[0] == 'cms':
@@ -270,7 +271,7 @@ with tempfile.TemporaryDirectory(prefix='madeira-ota-flow-') as directory:
     tmp = Path(directory)
     commands = tmp / 'bin'; commands.mkdir()
     driver = commands / 'driver'; driver.write_text(tool_double); driver.chmod(0o755)
-    for name in ('aws', 'security', 'plistbuddy', 'codesign', 'ditto', 'uuidgen'):
+    for name in ('aws', 'security', 'plistbuddy', 'codesign', 'ditto', 'uuidgen', 'sleep'):
         (commands / name).symlink_to(driver)
     script = tmp / 'sign-and-publish-ota.sh'
     script.write_text(signer.replace('/usr/libexec/PlistBuddy', str(commands / 'plistbuddy')))
@@ -320,6 +321,10 @@ with tempfile.TemporaryDirectory(prefix='madeira-ota-flow-') as directory:
         assert 'https://fixture.invalid/' not in result.stdout + result.stderr
         calls = [json.loads(line) for line in (case / 'calls.jsonl').read_text().splitlines()]
         assert calls.count(['certificate-import']) == 1, result.stderr
+        # The upload retry's wait (sign-and-publish-ota.sh: five tries, `sleep 30` after each of the first four): exactly four
+        # waits when Madeira2's upload keeps failing, none otherwise, and no other sleep.
+        sleeps = [call for call in calls if call[0] == 'sleep']
+        assert sleeps == ([['sleep', '30']] * 4 if mode == 'second-upload-fails' else []), (mode, sleeps)
         mailed = [call for call in calls if call[0]=='mail']
         if mode == 'success':
             if result.returncode: raise AssertionError(result.stderr)

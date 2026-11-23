@@ -52,9 +52,11 @@ table = table[:table.index("/* ml1244: bind an x64 importer's DATA imports to th
 binder = cut("static void ios_x64_iat_bind_live_data( char *base, size_t size )")
 check("the switch is exactly \"1\", read once", 'const char *s = getenv( "MADEIRA_X64_NOCOPY_DATAIMP" );' in table
       and "cached = (s && s[0] == '1' && !s[1]) ? 1 : 0;" in table)
-check("both marking sites note the image only with the key on",
-      SRC.count("if (ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_note( (uintptr_t)ptr, total_size );") == 2
-      and SRC.count("ios_x64_nocopy_note(") == 3)
+# three marking sites: MADEIRA_X64_IMAGE_NOCOPY, round 625's "the pool can never hold it" and round 707's "the pool has no room for it
+# now" (S1 S1, ios_x64_image_copy_cannot_fit_now); each notes the image only with the key on
+check("every marking site (the key, round 625's and round 707's NOCOPY fallbacks) notes the image only with the key on",
+      SRC.count("if (ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_note( (uintptr_t)ptr, total_size );") == 3
+      and SRC.count("ios_x64_nocopy_note(") == 4)
 dv = cut("static void delete_view( struct file_view *view )")
 check("delete_view forgets a no-copy image (key on only)",
       "if ((view->protect & VPROT_X64DATA) && ios_x64_nocopy_dataimp_enabled()) ios_x64_nocopy_forget( (uintptr_t)view->base );" in dv)

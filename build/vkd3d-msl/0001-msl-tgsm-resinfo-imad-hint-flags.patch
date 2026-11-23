@@ -1,0 +1,312 @@
+--- a/libs/vkd3d/libs/vkd3d-shader/msl.c
++++ b/libs/vkd3d/libs/vkd3d-shader/msl.c
+@@ -52,6 +52,14 @@
+ 
+     bool read_vertex_id;
+ 
++    /* madeira-bcd: thread group shared memory (dcl_tgsm_raw / dcl_tgsm_structured), declared in the kernel and handed to
++     * the main function: MSL allows threadgroup variables only in a kernel's own scope. */
++    struct
++    {
++        unsigned int id, words, stride;
++    } tgsm[16];
++    unsigned int tgsm_count;
++
+     const struct vkd3d_shader_interface_info *interface_info;
+ };
+ 
+@@ -1368,6 +1376,186 @@
+     msl_dst_cleanup(&dst, &gen->string_buffers);
+ }
+ 
++/* madeira-bcd: the stride a shared memory register was declared with (raw: 4). */
++static unsigned int msl_tgsm_stride(struct msl_generator *gen, unsigned int id)
++{
++    unsigned int i;
++
++    for (i = 0; i < gen->tgsm_count; ++i)
++    {
++        if (gen->tgsm[i].id == id)
++            return gen->tgsm[i].stride;
++    }
++    msl_compiler_error(gen, VKD3D_SHADER_ERROR_MSL_INTERNAL,
++            "Internal compiler error: Undeclared thread group shared memory g%u.", id);
++    return 4;
++}
++
++/* madeira-bcd: the word index of element (index, byte offset) of shared memory register `id`. */
++static void msl_print_tgsm_address(struct vkd3d_string_buffer *buffer, struct msl_generator *gen,
++        unsigned int id, const struct vsir_src_operand *index, const struct vsir_src_operand *offset)
++{
++    vkd3d_string_buffer_printf(buffer, "((");
++    if (index)
++    {
++        msl_print_src_with_type(buffer, gen, index, VKD3DSP_WRITEMASK_0, VSIR_DATA_U32);
++        vkd3d_string_buffer_printf(buffer, " * %uu + ", msl_tgsm_stride(gen, id));
++    }
++    msl_print_src_with_type(buffer, gen, offset, VKD3DSP_WRITEMASK_0, VSIR_DATA_U32);
++    vkd3d_string_buffer_printf(buffer, ") >> 2)");
++}
++
++/* madeira-bcd: ld_structured / ld_raw from thread group shared memory. */
++static void msl_ld_tgsm(struct msl_generator *gen, const struct vkd3d_shader_instruction *ins, bool structured)
++{
++    const struct vsir_src_operand *resource = &ins->src[structured ? 2 : 1];
++    struct vkd3d_string_buffer *read, *address;
++    unsigned int id, i, n = 0;
++    struct msl_dst dst;
++    uint32_t mask;
++
++    if (resource->reg.type != VKD3DSPR_GROUPSHAREDMEM)
++    {
++        msl_unhandled(gen, ins);
++        return;
++    }
++    id = resource->reg.idx[0].offset;
++    mask = msl_dst_init(&dst, gen, ins, &ins->dst[0]);
++    address = vkd3d_string_buffer_get(&gen->string_buffers);
++    msl_print_tgsm_address(address, gen, id, structured ? &ins->src[0] : NULL, &ins->src[structured ? 1 : 0]);
++    read = vkd3d_string_buffer_get(&gen->string_buffers);
++    vkd3d_string_buffer_printf(read, "as_type<");
++    msl_print_resource_datatype(gen, read, ins->dst[0].reg.data_type);
++    if (vkd3d_popcount(mask) != 1)
++        vkd3d_string_buffer_printf(read, "%u", vkd3d_popcount(mask));
++    vkd3d_string_buffer_printf(read, ">(");
++    if (vkd3d_popcount(mask) != 1)
++        vkd3d_string_buffer_printf(read, "uint%u(", vkd3d_popcount(mask));
++    for (i = 0; i < VKD3D_VEC4_SIZE; ++i)
++    {
++        if (!(mask & (1u << i)))
++            continue;
++        vkd3d_string_buffer_printf(read, "%sg%u[%s + %uu]", n++ ? ", " : "", id, address->buffer,
++                vsir_swizzle_get_component(resource->swizzle, i));
++    }
++    if (vkd3d_popcount(mask) != 1)
++        vkd3d_string_buffer_printf(read, ")");
++    vkd3d_string_buffer_printf(read, ")");
++    msl_print_assignment(gen, &dst, "%s", read->buffer);
++    vkd3d_string_buffer_release(&gen->string_buffers, read);
++    vkd3d_string_buffer_release(&gen->string_buffers, address);
++    msl_dst_cleanup(&dst, &gen->string_buffers);
++}
++
++/* madeira-bcd: store_structured / store_raw to thread group shared memory. */
++static void msl_store_tgsm(struct msl_generator *gen, const struct vkd3d_shader_instruction *ins, bool structured)
++{
++    const struct vsir_src_operand *value = &ins->src[structured ? 2 : 1];
++    struct vkd3d_string_buffer *address, *component;
++    unsigned int id, i, n = 0;
++
++    if (ins->dst[0].reg.type != VKD3DSPR_GROUPSHAREDMEM)
++    {
++        msl_unhandled(gen, ins);
++        return;
++    }
++    id = ins->dst[0].reg.idx[0].offset;
++    address = vkd3d_string_buffer_get(&gen->string_buffers);
++    msl_print_tgsm_address(address, gen, id, structured ? &ins->src[0] : NULL, &ins->src[structured ? 1 : 0]);
++    for (i = 0; i < VKD3D_VEC4_SIZE; ++i)
++    {
++        if (!(ins->dst[0].write_mask & (1u << i)))
++            continue;
++        component = vkd3d_string_buffer_get(&gen->string_buffers);
++        /* word i takes the value's component at position i (its swizzle) */
++        msl_print_src_with_type(component, gen, value, 1u << i, VSIR_DATA_U32);
++        msl_print_indent(gen->buffer, gen->indent);
++        vkd3d_string_buffer_printf(gen->buffer, "g%u[%s + %uu] = %s;\n", id, address->buffer, i, component->buffer);
++        vkd3d_string_buffer_release(&gen->string_buffers, component);
++        ++n;
++    }
++    vkd3d_string_buffer_release(&gen->string_buffers, address);
++}
++
++/* madeira-bcd: resinfo on a 2D texture (width, height, 0, mip levels), as float, uint or 1 / float. */
++static void msl_resinfo(struct msl_generator *gen, const struct vkd3d_shader_instruction *ins)
++{
++    const struct msl_resource_type_info *resource_type_info;
++    const struct vkd3d_shader_descriptor_info1 *descriptor;
++    enum vkd3d_shader_descriptor_type descriptor_type;
++    struct vkd3d_string_buffer *read, *lod, *name;
++    unsigned int binding = 0, resource_id;
++    const char *type, *rcp;
++    struct msl_dst dst;
++    uint32_t mask;
++    bool uav;
++
++    uav = ins->src[1].reg.type == VKD3DSPR_UAV;
++    descriptor_type = uav ? VKD3D_SHADER_DESCRIPTOR_TYPE_UAV : VKD3D_SHADER_DESCRIPTOR_TYPE_SRV;
++    resource_id = ins->src[1].reg.idx[0].offset;
++    if (!(descriptor = vkd3d_shader_find_descriptor(&gen->program->descriptors, descriptor_type, resource_id))
++            || (descriptor->resource_type != VKD3D_SHADER_RESOURCE_TEXTURE_2D))
++    {
++        msl_compiler_error(gen, VKD3D_SHADER_ERROR_MSL_INTERNAL,
++                "Internal compiler error: resinfo on resource %u is handled for 2D textures only.", resource_id);
++        return;
++    }
++    resource_type_info = msl_get_resource_type_info(VKD3D_SHADER_RESOURCE_TEXTURE_2D);
++    if (!(uav ? msl_get_uav_binding(gen, descriptor, ins->src[1].reg.idx[1].offset, &binding)
++            : msl_get_srv_binding(gen, descriptor, ins->src[1].reg.idx[1].offset, &binding)))
++        msl_compiler_error(gen, VKD3D_SHADER_ERROR_MSL_BINDING_NOT_FOUND,
++                "No descriptor binding specified for %s %u.", uav ? "UAV" : "SRV", resource_id);
++
++    name = vkd3d_string_buffer_get(&gen->string_buffers);
++    if (uav)
++        msl_print_uav_name(name, gen, binding, resource_type_info, descriptor->resource_data_type);
++    else
++        msl_print_srv_name(name, gen, binding, resource_type_info, descriptor->resource_data_type, false);
++    lod = vkd3d_string_buffer_get(&gen->string_buffers);
++    msl_print_src_with_type(lod, gen, &ins->src[0], VKD3DSP_WRITEMASK_0, VSIR_DATA_U32);
++
++    type = ins->flags & VKD3DSI_RESINFO_UINT ? "uint" : "float";
++    rcp = ins->flags & VKD3DSI_RESINFO_RCP_FLOAT ? "1.0f / " : "";
++    mask = msl_dst_init(&dst, gen, ins, &ins->dst[0]);
++    read = vkd3d_string_buffer_get(&gen->string_buffers);
++    vkd3d_string_buffer_printf(read, "as_type<");
++    msl_print_resource_datatype(gen, read, ins->dst[0].reg.data_type);
++    if (vkd3d_popcount(mask) != 1)
++        vkd3d_string_buffer_printf(read, "%u", vkd3d_popcount(mask));
++    if (uav)
++        vkd3d_string_buffer_printf(read, ">(%s4(%s%s(%s.get_width()), %s%s(%s.get_height()), %s(0), %s(1))",
++                type, rcp, type, name->buffer, rcp, type, name->buffer, type, type);
++    else
++        vkd3d_string_buffer_printf(read, ">(%s4(%s%s(%s.get_width(%s)), %s%s(%s.get_height(%s)), %s(0), %s(%s.get_num_mip_levels()))",
++                type, rcp, type, name->buffer, lod->buffer, rcp, type, name->buffer, lod->buffer, type, type, name->buffer);
++    msl_print_swizzle(read, ins->src[1].swizzle, mask);
++    vkd3d_string_buffer_printf(read, ")");
++    msl_print_assignment(gen, &dst, "%s", read->buffer);
++
++    vkd3d_string_buffer_release(&gen->string_buffers, read);
++    vkd3d_string_buffer_release(&gen->string_buffers, lod);
++    vkd3d_string_buffer_release(&gen->string_buffers, name);
++    msl_dst_cleanup(&dst, &gen->string_buffers);
++}
++
++/* madeira-bcd: imad, a * b + c on integers. */
++static void msl_imad(struct msl_generator *gen, const struct vkd3d_shader_instruction *ins)
++{
++    struct msl_src src[3];
++    struct msl_dst dst;
++    uint32_t mask;
++
++    mask = msl_dst_init(&dst, gen, ins, &ins->dst[0]);
++    msl_src_init(&src[0], gen, &ins->src[0], mask);
++    msl_src_init(&src[1], gen, &ins->src[1], mask);
++    msl_src_init(&src[2], gen, &ins->src[2], mask);
++    msl_print_assignment(gen, &dst, "%s * %s + %s", src[0].str->buffer, src[1].str->buffer, src[2].str->buffer);
++    msl_src_cleanup(&src[2], &gen->string_buffers);
++    msl_src_cleanup(&src[1], &gen->string_buffers);
++    msl_src_cleanup(&src[0], &gen->string_buffers);
++    msl_dst_cleanup(&dst, &gen->string_buffers);
++}
++
+ static void msl_ret(struct msl_generator *gen, const struct vkd3d_shader_instruction *ins)
+ {
+     msl_print_indent(gen->buffer, gen->indent);
+@@ -1472,6 +1660,27 @@
+         case VSIR_OP_DCL_INDEXABLE_TEMP:
+             msl_dcl_indexable_temp(gen, ins);
+             break;
++        case VSIR_OP_DCL_TGSM_RAW:
++        case VSIR_OP_DCL_TGSM_STRUCTURED:
++            break;   /* madeira-bcd: declared in the kernel (msl_generator_generate) */
++        case VSIR_OP_LD_STRUCTURED:
++            msl_ld_tgsm(gen, ins, true);
++            break;
++        case VSIR_OP_LD_RAW:
++            msl_ld_tgsm(gen, ins, false);
++            break;
++        case VSIR_OP_STORE_STRUCTURED:
++            msl_store_tgsm(gen, ins, true);
++            break;
++        case VSIR_OP_STORE_RAW:
++            msl_store_tgsm(gen, ins, false);
++            break;
++        case VSIR_OP_RESINFO:
++            msl_resinfo(gen, ins);
++            break;
++        case VSIR_OP_IMAD:
++            msl_imad(gen, ins);
++            break;
+         case VSIR_OP_NOP:
+             break;
+         case VSIR_OP_DEFAULT:
+@@ -2220,6 +2429,8 @@
+         vkd3d_string_buffer_printf(gen->buffer, "    vkd3d_vec4 v_local_thread_id;\n");
+     if (bitmap_is_set(gen->program->io_dcls, VKD3DSPR_LOCALTHREADINDEX))
+         vkd3d_string_buffer_printf(gen->buffer, "    vkd3d_vec4 v_local_thread_index;\n");
++    for (unsigned int t = 0; t < gen->tgsm_count; ++t)   /* madeira-bcd */
++        vkd3d_string_buffer_printf(gen->buffer, "    threadgroup uint g%u[%u];\n", gen->tgsm[t].id, gen->tgsm[t].words);
+     vkd3d_string_buffer_printf(gen->buffer, "\n");
+ 
+     msl_generate_entrypoint_prologue(gen);
+@@ -2241,6 +2452,8 @@
+         vkd3d_string_buffer_printf(gen->buffer, ", v_local_thread_index");
+     if (gen->program->descriptors.descriptor_count)
+         vkd3d_string_buffer_printf(gen->buffer, ", descriptors");
++    for (unsigned int t = 0; t < gen->tgsm_count; ++t)   /* madeira-bcd */
++        vkd3d_string_buffer_printf(gen->buffer, ", g%u", gen->tgsm[t].id);
+     vkd3d_string_buffer_printf(gen->buffer, ");\n\n");
+ 
+     msl_generate_entrypoint_epilogue(gen);
+@@ -2254,6 +2467,7 @@
+ {
+     struct vkd3d_shader_instruction *ins;
+     struct vsir_program_iterator it;
++    unsigned int i;   /* madeira-bcd */
+ 
+     MESSAGE("Generating a MSL shader. This is unsupported; you get to keep all the pieces if it breaks.\n");
+ 
+@@ -2261,7 +2475,8 @@
+     vkd3d_string_buffer_printf(gen->buffer, "#include <metal_stdlib>\n");
+     vkd3d_string_buffer_printf(gen->buffer, "using namespace metal;\n\n");
+ 
+-    if (gen->program->global_flags & ~(VKD3DSGF_REFACTORING_ALLOWED | VKD3DSGF_FORCE_EARLY_DEPTH_STENCIL))
++    if (gen->program->global_flags & ~(VKD3DSGF_REFACTORING_ALLOWED | VKD3DSGF_FORCE_EARLY_DEPTH_STENCIL
++            | VKD3DSGF_SKIP_OPTIMIZATION | VKD3DSGF_ENABLE_MINIMUM_PRECISION))   /* madeira-bcd: both are hints only */
+         msl_compiler_error(gen, VKD3D_SHADER_ERROR_MSL_INTERNAL,
+                 "Internal compiler error: Unhandled global flags %#"PRIx64".", (uint64_t)gen->program->global_flags);
+ 
+@@ -2301,6 +2516,34 @@
+     msl_generate_output_struct_declarations(gen);
+     msl_generate_immediate_constant_buffers(gen);
+ 
++    /* madeira-bcd: thread group shared memory, declared in the kernel (MSL allows it there only) */
++    it = vsir_program_iterator(&gen->program->instructions);
++    for (ins = vsir_program_iterator_head(&it); ins; ins = vsir_program_iterator_next(&it))
++    {
++        if (ins->opcode != VSIR_OP_DCL_TGSM_RAW && ins->opcode != VSIR_OP_DCL_TGSM_STRUCTURED)
++            continue;
++        if (gen->tgsm_count == ARRAY_SIZE(gen->tgsm))
++        {
++            msl_compiler_error(gen, VKD3D_SHADER_ERROR_MSL_INTERNAL,
++                    "Internal compiler error: Too many thread group shared memory declarations.");
++            break;
++        }
++        if (ins->opcode == VSIR_OP_DCL_TGSM_RAW)
++        {
++            gen->tgsm[gen->tgsm_count].id = ins->declaration.tgsm_raw.reg.reg.idx[0].offset;
++            gen->tgsm[gen->tgsm_count].words = ins->declaration.tgsm_raw.byte_count / 4;
++            gen->tgsm[gen->tgsm_count].stride = 4;
++        }
++        else
++        {
++            gen->tgsm[gen->tgsm_count].id = ins->declaration.tgsm_structured.reg.reg.idx[0].offset;
++            gen->tgsm[gen->tgsm_count].words = ins->declaration.tgsm_structured.byte_stride
++                    * ins->declaration.tgsm_structured.structure_count / 4;
++            gen->tgsm[gen->tgsm_count].stride = ins->declaration.tgsm_structured.byte_stride;
++        }
++        ++gen->tgsm_count;
++    }
++
+     vkd3d_string_buffer_printf(gen->buffer,
+             "static void %s_main(thread vkd3d_vec4 *v, "
+             "thread vkd3d_vec4 *o",
+@@ -2322,6 +2565,8 @@
+         vkd3d_string_buffer_printf(gen->buffer, ", thread vkd3d_vec4 &v_local_thread_index");
+     if (gen->program->descriptors.descriptor_count)
+         vkd3d_string_buffer_printf(gen->buffer, ", constant descriptor *descriptors");
++    for (i = 0; i < gen->tgsm_count; ++i)
++        vkd3d_string_buffer_printf(gen->buffer, ", threadgroup uint *g%u", gen->tgsm[i].id);   /* madeira-bcd */
+     vkd3d_string_buffer_printf(gen->buffer, ")\n{\n");
+ 
+     ++gen->indent;

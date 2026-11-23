@@ -187,6 +187,31 @@ int main(void) {
     uint64_t c1 = bcd_frame_now_ticks();
     CHECK(c1 >= c0, "the clock does not go back");
 
+    /* frames made by frame generation: a ring of their own, never the game's */
+    {
+        bcd_frame_summary before, after;
+        uint64_t ring_before = bcd_frame_ring_count(), made_before = bcd_frame_made_count(), got[64];
+        bcd_frame_reader mr = bcd_frame_made_reader_start(), gr = bcd_frame_reader_start();
+        uint64_t lost = 0;
+        uint32_t n, k;
+        int ordered = 1;
+        bcd_frame_stats_read(&before);
+        for (k = 0; k < 10; k++) bcd_frame_made_push_n(1);
+        bcd_frame_made_push_n(3);
+        bcd_frame_made_push_n(0);
+        bcd_frame_stats_read(&after);
+        CHECK(bcd_frame_made_count() == made_before + 13 && bcd_frame_ring_count() == ring_before,
+              "frames made go into their own ring (13 of them), none into the game's");
+        CHECK(after.frames == before.frames && after.active_us == before.active_us && after.worst_us == before.worst_us,
+              "... and the session's statistics (the game's frame times) do not see them");
+        n = bcd_frame_made_drain(&mr, got, 64, &lost);
+        for (k = 1; k < n; k++) ordered = ordered && got[k] > got[k - 1];
+        CHECK(n == 12 && lost == 0 && ordered, "a reader gets them in order, every one but the newest (left for its next call), three at once one tick apart");
+        CHECK(bcd_frame_ring_drain(&gr, got, 64, &lost) == 0, "the game's reader gets none of them");
+        bcd_frame_made_push_n(1);
+        CHECK(bcd_frame_made_drain(&mr, got, 64, &lost) == 1, "the newest comes with the next call");
+    }
+
     printf(failures == 0 ? "bcd_frame_ring_test: PASS\n" : "bcd_frame_ring_test: FAILED\n");
     return failures == 0 ? 0 : 1;
 }

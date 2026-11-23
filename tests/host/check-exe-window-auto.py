@@ -147,12 +147,26 @@ check("the old pair test stays for every other game: a single run below the wind
       "if let s = singleAt, pairHigh || s.base + s.size <= exeWinBase {" in stik and "aFit >= vm_address_t(pairHigh ? 128 : 256) << 20" in stik)
 check("the log line for a pair below the window is word for word what it was",
       '"below the window, where the pool cannot split"' in stik and "pool-pair = 0 turns this off)" in stik)
-check("the game's own pool line counts only with pool-above-window",
-      'let gamePool = poolAbove ? MadeiraConfig.gameValue("pool") : nil' in cv and "if let txt = gamePool ?? MadeiraConfig.get(\"pool\")," in cv)
+# Branch steam-client (2026-11-21, M1): a Steam for Windows session is the one other launch whose own pool line counts (its settings
+# file sets pool = 1152; tests/host/check-steam-desktop.py); steamDesktopSession is false for every other launch.
+check("the game's own pool line counts only with pool-above-window (or in a Steam for Windows session, whose settings file sets it)",
+      'let gamePool = (poolAbove || steamDesktopSession) ? MadeiraConfig.gameValue("pool") : nil' in cv
+      and 'let steamDesktopSession = profile.map(BCDSteamDesktopLive.isSession) ?? false' in cv
+      and "if let txt = gamePool ?? MadeiraConfig.get(\"pool\")," in cv)
 import json
 recs = json.loads((R / "recommended/recommendations.json").read_text())["rules"]
 rules_py = (R / "build/tools/autotune_rules.py").read_text()
-check("no recommended list and no auto-tune rule sets exe-window-auto", "exe-window-auto" not in json.dumps(recs) + rules_py)
+# round 707 (agent S1 S22): a rule may name the key's log words in its signals ("(exe-window-auto" in exe-window-fixed-base's none); what
+# no list and no rule may do is SET it, so the lines are read, not the whole text
+import importlib.util
+_spec = importlib.util.spec_from_file_location("autotune_rules", R / "build/tools/autotune_rules.py")
+_rules = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_rules)
+_list_lines = [(c["line"] if isinstance(c, dict) else c) for r in recs for c in r.get("config", []) + r.get("smallRAMConfig", [])]
+check("no recommended list and no auto-tune rule sets exe-window-auto",
+      not any(l.strip().startswith("exe-window-auto") for l in _list_lines)
+      and not any(l.strip().startswith("exe-window-auto") for r in _rules.RULES for l in r.get("lines", []))
+      and "exe-window-auto" not in json.dumps(recs))
 check("pool-above-window is set by The Adventures of Elliot's list (build 603), Persona 5 Royal's (round 677, G2 S6: a 416 MB window cut its pool to 304 MB) "
       "and by no other list and no auto-tune rule",
       sorted(r["id"] for r in recs if "pool-above-window" in json.dumps(r["config"])) == ["persona-5-royal", "the-adventures-of-elliot"] and "pool-above-window" not in rules_py)

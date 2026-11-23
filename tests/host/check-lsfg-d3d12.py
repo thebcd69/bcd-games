@@ -201,6 +201,9 @@ static void *GetProcAddress(HMODULE m, const char *name) {
   if (!g_have_bridge) return NULL;
   return !strcmp(name, "DXMTLsfgBegin") ? (void *)fake_begin : !strcmp(name, "DXMTLsfgRun") ? (void *)fake_run : !strcmp(name, "DXMTLsfgAbort") ? (void *)fake_abort : NULL;
 }
+/* winemetal's MadeiraCtl (build 707: op 31 marks the next present as a frame made, tools/patch-winemetal-frames-made.py) */
+struct madeira_ctl_args { unsigned op, len; unsigned long long ptr, ret; };
+static void MadeiraCtl(struct madeira_ctl_args *a) { if (a->op == 31) op("op 31: the next present is a frame made"); else op("op %u", a->op); }
 /* Metal */
 static obj_handle_t g_next_cb = 1; static int g_no_cb, g_no_drawable_after = 99, g_drawables, g_passes_done = 1;
 static UINT64 g_event[8];
@@ -277,8 +280,9 @@ int main(int argc, char **argv) {
   g_begin_answer = 1; g_run_answer = 2; reset();
   expect(present(&sc, &back) == 2 && !strcmp(g_ops,
          "bridge: begin 1920x1080 format 87 | cb1: copy 40 -> 50 (1920x1080) | cb1: signal event 1 = 2 | cb1: commit | bridge: run | CPU waits up to 40 ms for event 2 = 1 | "
-         "cb2: wait event 2 = 1 | cb2: copy 60 -> 1901 (1920x1080) | cb2: present drawable 901 | cb2: commit | "
-         "cb3: wait event 2 = 1 | cb3: copy 61 -> 1902 (1920x1080) | cb3: signal event 3 = 1 | cb3: present drawable 902 | cb3: commit | "),
+         "cb2: wait event 2 = 1 | cb2: copy 60 -> 1901 (1920x1080) | op 31: the next present is a frame made | cb2: present drawable 901 | cb2: commit | "
+         "cb3: wait event 2 = 1 | cb3: copy 61 -> 1902 (1920x1080) | cb3: signal event 3 = 1 | op 31: the next present is a frame made | "
+         "cb3: present drawable 902 | cb3: commit | "),
          "two generated pictures: the game's picture is copied, signalled and committed before the passes run; each generated picture goes out from a buffer of its own after the passes' event; the last signals done");
   g_run_answer = 1; g_passes_done = 0; reset();
   expect(present(&sc, &back) == 1 && strstr(g_ops, "CPU waits up to 40 ms") && strstr(g_ops, "CPU signals event 3 = 2") && !strstr(g_ops, "present drawable")
@@ -318,7 +322,8 @@ int main(int argc, char **argv) {
             print("\n".join(l for l in b.stderr.splitlines() if "error" in l)[:3000])
 
 swift = (R / "app/Madeira/BCDLossless.swift").read_text()
-check("the game page's note names Direct3D 12 too", "For Direct3D 11 and 12 games." in swift)
+check("the game page's note names Direct3D 12 too (and, since build 711's text, Vulkan games on KosmicKrisp)",
+      "For Direct3D 11 and 12 games, and for Vulkan games on KosmicKrisp" in swift)
 
 print("FAILED: Lossless Scaling frame generation, Direct3D 12" if failures else "PASS: Lossless Scaling frame generation, Direct3D 12")
 sys.exit(1 if failures else 0)

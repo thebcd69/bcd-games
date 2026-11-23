@@ -2,6 +2,8 @@
 // Copyright 2026 RageMC
 // From bcd-games pull request #57 (RageMC, 2026-11-16). The shim's self-test on a Mac with a Metal 4 GPU: build.sh --test.
 // Modified by BCD (thebcd69), 2026-11-20: the compile census cases (quiet when idle, a running compile named, the finished one counted).
+// Modified by BCD (thebcd69), 2026-11-22: a library request without MSL (nil, empty) is refused at once with an error, never sent to
+// Metal's compiler (which asserts on a nil source on a Mac), and counted in the census.
 #import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
 extern int kkr_fake_fails;
@@ -36,9 +38,19 @@ int main(void) { @autoreleasepool {
     id l3 = [c newLibraryWithDescriptor:d3 error:nil];
     printf("size-opt case: lib=%s level=%ld\n", l3 ? "ok" : "nil", (long)d3.options.optimizationLevel);
     ok &= l3 != nil && d3.options.optimizationLevel == MTLLibraryOptimizationLevelSize;
+    MTL4LibraryDescriptor *none = [MTL4LibraryDescriptor new];   /* source nil: Metal itself would assert here */
+    CFAbsoluteTime t0 = CFAbsoluteTimeGetCurrent(); e = nil;
+    id ln = [c newLibraryWithDescriptor:none error:&e];
+    MTL4LibraryDescriptor *blank = [MTL4LibraryDescriptor new]; blank.source = @""; NSError *e2 = nil;
+    id lb = [c newLibraryWithDescriptor:blank error:&e2];
+    double took = CFAbsoluteTimeGetCurrent() - t0;
+    printf("no-MSL case: nil source lib=%s err=%s; empty source lib=%s err=%s; %.3f s\n", ln ? "ok" : "nil",
+           e ? e.localizedDescription.UTF8String : "none", lb ? "ok" : "nil", e2 ? "refused" : "none", took);
+    ok &= ln == nil && lb == nil && e != nil && e2 != nil && [e.localizedDescription containsString:@"without MSL"] && took < 0.5;
     char line[700];
     kkr_report(line, sizeof line);   /* the cases above */
-    printf("census after the cases above: %s\n", line); ok &= strstr(line, "[kk-retry] compiles in the last 10 s: library ") != NULL && strstr(line, "in flight 0") != NULL;
+    printf("census after the cases above: %s\n", line); ok &= strstr(line, "[kk-retry] compiles in the last 10 s: library ") != NULL && strstr(line, "in flight 0") != NULL
+        && strstr(line, "; 2 without MSL refused") != NULL;
     kkr_report(line, sizeof line);
     printf("census when idle: \"%s\"\n", line); ok &= line[0] == 0;
     kkr_overdue_s = 0.3; kkr_test_delay = 1200000;

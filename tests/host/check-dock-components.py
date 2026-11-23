@@ -22,16 +22,28 @@ assert 'static let origin = "https://client-update.akamai.steamstatic.com/"' in 
 pins = re.findall(r'Package\(file: "([^"]+)", bytes: ([0-9_]+),\s*sha256: "([0-9a-f]+)"\)', text)
 # Round 660 (M139, owner 2026-11-15): two client builds, January 2026 (three win32-manifest packages, the default) and September 2026 (two
 # win64-manifest packages: bins_win64 with steamclient.dll and steamclient64.dll, steam_win64 with steam.exe).
-assert len(pins) == 5 and all(len(s) == 64 and int(b.replace('_', '')) > 0 and '/' not in f for f, b, s in pins), pins
-assert [f.split('.zip')[0] for f, _, _ in pins] == ['bins_win32', 'bins_win64_win32', 'steam_win32', 'bins_win64', 'steam_win64_steamrow'], pins
+# 2026-11-21: a third, November 2026 (Valve's win64 manifest 1794536281: the same two kinds of package). January 2026 stays the default.
+assert len(pins) == 7 and all(len(s) == 64 and int(b.replace('_', '')) > 0 and '/' not in f for f, b, s in pins), pins
+assert [f.split('.zip')[0] for f, _, _ in pins] == ['bins_win32', 'bins_win64_win32', 'steam_win32', 'bins_win64', 'steam_win64_steamrow',
+                                                    'bins_win64', 'steam_win64_steamrow'], pins
+assert len({f for f, _, _ in pins}) == 7 and len({s for _, _, s in pins}) == 7, 'two builds share a package'
+# the app's ZIP reader takes at most 64 MiB a package (SteamRuntimeFiles.unpack); a larger pin could never be installed
+assert all(int(b.replace('_', '')) <= 64 * 1024 * 1024 for _, b, _ in pins), pins
+assert pins[5] == ('bins_win64.zip.119a215939f1426cff28bdf03a5c55fcd865720c', '64_658_652',
+                   '5c9337cc6712adc696db81d483cc63663559bcf8604539f6b745883f505526d6'), pins[5]
+assert pins[6] == ('steam_win64_steamrow.zip.42bca491d43dcfea62720044b1b8abdbb185b3fc', '2_696_423',
+                   '3f23dea515f9ef1470fd69283603f6852a823598de0b11f743f97592e27bf49f'), pins[6]
 clients = re.findall(r'\], clientSHA256: "([0-9a-f]{64})"\)', text)
-assert len(clients) == 2 and clients[0].startswith('71b391fe9f3e') and clients[1].startswith('caba4826aa35'), clients
-assert 'UserDefaults.standard.integer(forKey: buildKey) == september.id ? september : january' in text
-print('PASS: two client builds, January 2026 (3 packages) the default and September 2026 (2 packages) only when Settings chose it')
+assert len(clients) == 3 and clients[0].startswith('71b391fe9f3e') and clients[1].startswith('caba4826aa35') \
+    and clients[2] == '669fa08e259277fbf5a1dfe15ce88afe734e89151194304b44d92f418dcc985b', clients
+assert 'static let builds = [january, september, november]' in text
+assert 'return builds.first { $0.id == id } ?? january' in text and 'let id = UserDefaults.standard.integer(forKey: buildKey)' in text
+print('PASS: three client builds, January 2026 (3 packages) the default, September 2026 and November 2026 (2 packages each) only when '
+      'Settings chose one')
 layouts = root / 'madeira-dock/src/client_layout.c'
 if layouts.exists():
     assert all(f'"{c}"' in layouts.read_text() for c in clients), 'a pinned client DLL is not a build the Dock host supports'
-    print('PASS: both pinned client DLLs are builds the pinned Dock host supports')
+    print('PASS: every pinned client DLL is a build the pinned Dock host supports')
 else:
     print('SKIP: madeira-dock not checked out; client pin cross-check not run')
 assert 'url?.host == "client-update.akamai.steamstatic.com"' in text and 'url?.scheme == "https"' in text
@@ -134,6 +146,36 @@ if mode == "registry" {
         state = repair()
         assert(state[0] == "system.reg=left-alone(Software\\\\Valve\\\\Steam\\InstallPath)", "\(state)")
         assert(text(system) == differing)
+        // Branch steam-client: values the real desktop client wrote for its own folder (Steam's lower-case, slash form and the
+        // backslash form) are put back to the Dock's; unrelated values in the same section stay, and a second run is ok.
+        assert(SteamRuntimeFiles.namesDesktopClient("c:/program files (x86)/steam desktop"))
+        assert(SteamRuntimeFiles.namesDesktopClient("C:\\Program Files (x86)\\Steam Desktop\\steamclient64.dll"))
+        assert(!SteamRuntimeFiles.namesDesktopClient("C:\\Program Files (x86)\\Steam") && !SteamRuntimeFiles.namesDesktopClient("C:\\Program Files (x86)\\Steam Desktops"))
+        assert(!SteamRuntimeFiles.namesDesktopClient("D:\\Steam Desktop"))
+        let desktopUser = "WINE REGISTRY Version 2\n\n[Software\\\\Valve\\\\Steam] 1700000000\n\"Language\"=\"english\"\n" +
+            "\"SteamPath\"=\"c:/program files (x86)/steam desktop\"\n\"SteamExe\"=\"c:/program files (x86)/steam desktop/steam.exe\"\n\n" +
+            "[Software\\\\Valve\\\\Steam\\\\ActiveProcess] 1700000000\n\"pid\"=dword:00000000\n" +
+            "\"SteamClientDll\"=\"C:\\\\Program Files (x86)\\\\Steam Desktop\\\\steamclient.dll\"\n" +
+            "\"SteamClientDll64\"=\"C:\\\\Program Files (x86)\\\\Steam Desktop\\\\steamclient64.dll\"\n"
+        try Data(desktopUser.utf8).write(to: user)
+        try fm.removeItem(at: user.appendingPathExtension("dock-setup-bak"))
+        try Data("WINE REGISTRY Version 2\n".utf8).write(to: system)
+        state = repair()
+        assert(state[1] == "user.reg=put-back(sections 0, values 0, desktop-client 4)", "\(state)")
+        let back = text(user)
+        assert(back.contains("\"SteamPath\"=\"C:\\\\Program Files (x86)\\\\Steam\"\n") && back.contains("\"SteamExe\"=\"C:\\\\Program Files (x86)\\\\Steam\\\\steam.exe\""))
+        assert(back.contains("\"SteamClientDll64\"=\"C:\\\\Program Files (x86)\\\\Steam\\\\steamclient64.dll\"") && !back.lowercased().contains("steam desktop"))
+        assert(back.contains("\"Language\"=\"english\"") && back.contains("\"pid\"=dword:00000000"))
+        assert(bytes(user.appendingPathExtension("dock-setup-bak")) == Data(desktopUser.utf8))
+        assert(repair() == ["system.reg=ok", "user.reg=ok"])
+        // The client download and the change between builds (SteamRuntimeInstaller.prepare) take those values the same way: its rule
+        // for a value it may replace says yes to one that names the desktop client's folder. Without it the folder's own steam.exe made
+        // the value a live client's, and the setup stopped as a conflict.
+        let setUp = try SteamRuntimeFiles.registry(desktopUser, machine: false, stale: { SteamRuntimeFiles.namesDesktopClient($0) })
+        assert(!setUp.lowercased().contains("steam desktop") && setUp.contains("\"SteamPath\"=\"C:\\\\Program Files (x86)\\\\Steam\"\n"))
+        assert(setUp.contains("\"Language\"=\"english\"") && setUp.contains("\"pid\"=dword:00000000"))
+        do { _ = try SteamRuntimeFiles.registry(desktopUser, machine: false, stale: { _ in false }); fatalError("the desktop client's values were no conflict") }
+        catch SteamRuntimeFiles.Failure.conflict { }
         // A file that is not a Wine registry is left as it is.
         try Data("garbage".utf8).write(to: system)
         state = repair()
@@ -208,3 +250,8 @@ repair = content.index('SteamRuntimeFiles.repairRegistry(prefix: MadeiraDock.pre
 assert content.index('DockInstallers.prepare(game, drive: MadeiraDock.drive') < repair < content.index('DockCEGService.prepare(game, drive: MadeiraDock.drive') < content.index('runWineFullSequence(profile: profile)', repair)
 assert 'if !DockInstallers.installsOnly, SteamSignIn.flag("MADEIRA_DOCK_REGISTRY_REPAIR", default: true)' in content
 print('PASS: startDock repairs the Steam registry sections after the installs plan and before the CEG service preparation')
+# Branch steam-client (2026-11-21): the client download and the change between builds put a value that names the desktop client's
+# folder back too (the registry phase above runs the rule); before, such a value stopped them with Failure.conflict.
+assert ('let stale: (String) -> Bool = { value in\n            if SteamRuntimeFiles.namesDesktopClient(value) { return true }\n'
+        '            guard value.lowercased().hasPrefix("c:\\\\") else { return false }') in text
+print("PASS: the client setup puts the desktop client's discovery values back instead of stopping on them")

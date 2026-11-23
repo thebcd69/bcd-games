@@ -243,6 +243,23 @@ jobs:
       - name: Check Settings › Feedback
         run: python3 tests/host/check-feedback.py --require-swift
 
+      # Settings › Recommended settings (round 707, owner 2026-11-22): the model, stores, search, which build has a line, over
+      # recommended/recommendations.json.
+      - name: Check the recommended settings catalog
+        run: python3 tests/host/check-recommended-catalog.py --require-swift
+
+      # Settings › Memory & performance › CPU limit in the background (round 707, A2 F11).
+      - name: Check the background CPU limit row
+        run: python3 tests/host/check-background-cpu.py --require-swift
+
+      # Settings › Feedback › Attach my last game's log (round 707, A2 F15).
+      - name: Check the feedback log attachment
+        run: python3 tests/host/check-feedback-attach.py --require-swift
+
+      # End the game now (round 707, G1 S15): 45 s after a Close that did nothing.
+      - name: Check End the game now
+        run: python3 tests/host/check-session-force-end.py --require-swift
+
       # A newer BCD, said at most once a day (BCDUpdateCheck.swift, BCDUpdateNotice.swift): the source's shape
       # as tools/update-altsource.py writes it, the build compare, the day key, one host with a size cap, the
       # alert only over the library with OK alone, env.MADEIRA_UPDATE_CHECK = 0.
@@ -1600,11 +1617,21 @@ jobs:
 
       # madeira-bcd (KosmicKrisp; docs/VULKAN.md): Mesa's Vulkan on Metal 4 as a third dylib in app/Madeira/gl/, for a game whose own file says
       # vulkan = kosmickrisp (iOS 26 and a Metal 4 GPU; every other game and every other device never loads it). build-kosmickrisp-bcd.sh fetches the
-      # sources by checksum or commit (Mesa b39d173c with the Playport authors' 31 patches and BCD's four; SPIRV-Tools and SPIRV-LLVM-Translator for the build
+      # sources by checksum or commit (Mesa b39d173c with the Playport authors' 31 patches and BCD's five; SPIRV-Tools and SPIRV-LLVM-Translator for the build
       # machine's compilers) and needs Homebrew's llvm. The result is cached on the scripts and the patches. A failure here only warns: no list and
       # no auto-tune rule turns this driver on, and a bundle without it keeps Vulkan off for such a game and says so in the log.
       - name: Check the KosmicKrisp build routes
         run: python3 tests/host/check-playport-mesa-profile.py
+      # madeira-bcd (build 703; X-Plane 12: Apple frame interpolation had no effect on a Vulkan game): BCD's 0036 adds Apple's VideoToolbox frame
+      # interpolation to KosmicKrisp's Metal WSI with MADEIRA_VT_INTERP only. The check takes the module out of the patch, compiles its rules and the
+      # module for iOS 26, and runs it on this Mac against a real Metal device and VideoToolbox (a moving bar; every picture checked at its phase).
+      - name: Check Apple frame interpolation in KosmicKrisp
+        run: python3 tests/host/check-kk-vt-interp.py
+      # madeira-bcd (build 706; X-Plane 12): Lossless Scaling's frame generation in KosmicKrisp's present, on 0036's stand-ins and worker
+      # (wsi_common_metal_lsfg.m, GPL-3.0-or-later, the pass chain of BCD's DXMT port). With the app's MADEIRA_LSFG_HOST_CTL only. The check
+      # compares the chain with DXMT's and runs the driver's code on this Mac with shaders of its own (Lossless Scaling's are not in BCD).
+      - name: Check Lossless Scaling in KosmicKrisp
+        run: python3 tests/host/check-kk-lsfg.py
       - name: Restore KosmicKrisp (Mesa's Vulkan on Metal 4)
         id: kkcache
         uses: actions/cache/restore@v4
@@ -1647,6 +1674,19 @@ jobs:
       - name: Put the kk-retry shim in front of KosmicKrisp
         continue-on-error: true
         run: bash build/mesa-ios/kk-retry/build.sh
+
+      # madeira-bcd (build 706): the shader translator for Lossless Scaling on a Vulkan game, gl/libbcd-dxbc-msl.dylib: Wine's vkd3d-shader
+      # (libs/vkd3d, LGPL-2.1-or-later) with BCD's MSL additions (build/vkd3d-msl), built from a copy of that folder. The app loads it only
+      # when a vulkan = kosmickrisp game starts with Lossless Scaling on, to turn the person's own shaders into Metal for the driver. A
+      # failure here only warns: such a game then gets no Lossless Scaling, and the log says why.
+      - name: Check the shader translator (vkd3d-shader's MSL target)
+        run: python3 tests/host/check-vkd3d-msl.py --wine wine
+      - name: Build the shader translator for iOS
+        continue-on-error: true
+        run: |
+          bash build/vkd3d-msl/build.sh wine app/Madeira/gl ios
+          mv -f app/Madeira/gl/libbcd-dxbc-msl.LICENSE.txt app/Madeira/licenses/libbcd-dxbc-msl.LICENSE.txt
+          mv -f app/Madeira/gl/libbcd-dxbc-msl.SOURCE.txt app/Madeira/licenses/libbcd-dxbc-msl.SOURCE.txt
 
       # Round 669 (bcd-games #57, RageMC; MoltenVK commits after v1.4.2, open MoltenVK pull requests and github.com/nivogli/MoltenVK; build/moltenvk-ios/
       # build-patched.sh): a second, PATCHED MoltenVK as gl/libMoltenVK_patched.dylib, for a game whose own file says vulkan = moltenvk-patched (Zink
@@ -1773,6 +1813,13 @@ jobs:
         run: |
           python3 tests/host/check-globalroot.py
           python3 tools/patch-wine-globalroot.py wine/dlls/ntdll/unix/file.c
+
+      # Round 707 (M3 S2; DOOM 3: BFG Edition 705H3D): glIsSync(0) and glDeleteSync(0) on BCD's OpenGL no longer read through NULL in
+      # opengl32's unix side (get_unix_sync); only gl-backend = zink / gles sessions reach it.
+      - name: Check and patch opengl32's NULL sync
+        run: |
+          python3 tests/host/check-gl-null-sync.py
+          python3 tools/patch-wine-gl-null-sync.py wine
 
       - name: Check and patch opt-in app-local DLL reads
         run: |
@@ -2074,6 +2121,15 @@ jobs:
           python3 tests/host/check-vkd3d-hlsl-fail-dump.py
           python3 tools/patch-wine-vkd3d-hlsl-fail-dump.py wine
 
+      # madeira-bcd (round 707, S.T.A.L.K.E.R. Call of Pripyat 13CYSY): env.MADEIRA_HLSL_LOOP_FALLBACK = 1 (or a copy count from 8 to 256; a game's
+      # row sets it) writes a loop vkd3d-shader cannot unroll (a trip count read from a texture) as that many guarded copies of its body for a
+      # Shader Model 1-3 target, whose writer has no loop instruction ("E5017 ... Instruction type HLSL_IR_LOOP": accum_volumetric_sun, the R2
+      # sun shafts). Off by default and below Shader Model 4 only; a source that compiled before is byte for byte the same. The i386 farm builds it.
+      - name: Patch wine vkd3d-shader to write a loop it cannot unroll as guarded copies (opt-in)
+        run: |
+          python3 tests/host/check-vkd3d-loop-fallback.py
+          python3 tools/patch-wine-vkd3d-loop-fallback.py wine
+
       # madeira-bcd (build 660, Madeira #575: Wine fork commits 8be7412f882 + ddf92babc5b by 125hz, in the wine submodule): vkd3d-shader's
       # fx_2_0 writer emits sampler state blocks, pass assignments and their resource records; an effect compiled from text at run time
       # (D3DXCreateEffect) stopped at "E5017 ... Writing fx_2_0 sampler objects initializers is not implemented" / "Write pass
@@ -2108,6 +2164,14 @@ jobs:
       # "Failed to load SteamAPI" after a signature check). Log only, on failure paths, capped. Same reach as the step above.
       - name: Patch wine wintrust diagnostics
         run: python3 tools/patch-wine-wintrust-diag.py wine
+
+      # madeira-bcd (round 707, M3 S18): env.MADEIRA_CODESIGN_ROOTS = 1 trusts the code-signing root VeriSign Class 3 Public Primary CA - G5
+      # (pinned by its SHA-256) for wintrust's own signer chains only, never the root store (METAL GEAR SOLID V's steam_api64.dll). Same reach.
+      - name: Patch wine wintrust code-signing root pin
+        run: python3 tools/patch-wine-wintrust-root-pin.py wine
+
+      - name: Check the wintrust code-signing root pin
+        run: python3 tests/host/check-wintrust-root-pin.py
 
       - name: Check the 64-bit rebuild patches
         run: python3 tests/host/check-wine-pe-patches.py
@@ -2536,6 +2600,26 @@ jobs:
         run: |
           python3 tools/patch-wine-vulkan-suboptimal.py
           grep -q MADEIRA_VK_HOST_SUBOPTIMAL wine/dlls/win32u/vulkan.c
+
+      # madeira-bcd (2026-11-22, build 702; X-Plane 12: "başından beri bu oyunda FPS sayacımız çalışmıyor"): a Windows Vulkan game's presents go
+      # into the frame-time ring (BCDFrameRing.c) for the HUD's FPS and the [session] line, as DXMT's and OpenGL's do. Written into the checked-out
+      # tree like the change above (the Wine pin and its caches stay). The check runs first, on copies: once, idempotent, every order with the
+      # other two scripts that change win32u/vulkan.c, the block compiled on the host, the wiring.
+      - name: Check and patch Wine's win32u Vulkan present (frame ring)
+        run: |
+          python3 tests/host/check-vk-present-ring.py --require-wine
+          python3 tools/patch-wine-vulkan-frame-ring.py
+          grep -q "madeira-bcd frame ring (Vulkan)" wine/dlls/win32u/vulkan.c
+
+      # madeira-bcd (2026-11-22, build 703; X-Plane 12 drew its menu at the screen's 120 with the limit at 60): the app's frame-rate limit (60 / 40 /
+      # 30 FPS, the vsync mode) holds a Windows Vulkan game's presents too, in win32u before the host's present (build/win32u-unix/vulkan_ios.c,
+      # madeira_vk_fps_cap_pace); MADEIRA_VK_FPS_CAP=0 turns it off. The check runs first: the patch in every order with the other three that change
+      # win32u/vulkan.c, and the pacing timed on the runner.
+      - name: Check and patch Wine's win32u Vulkan present (frame-rate limit)
+        run: |
+          python3 tests/host/check-vk-fps-cap.py --require-wine
+          python3 tools/patch-wine-vulkan-fps-cap.py
+          grep -q "madeira-bcd fps cap (Vulkan)" wine/dlls/win32u/vulkan.c
 
       # madeira-bcd (night round 2026-11-11, FINAL FANTASY VII (2013) 9J06NQ, G4 S13): NtGdiEnumFonts cut a face name longer than the 32-WCHAR
       # field of its LOGFONTW (Qt 4 hands gdi32 a 32-character name without a terminator, length 33); the iOS SDK's fortified memcpy aborted
@@ -3224,6 +3308,19 @@ jobs:
       - name: Patch DXMT D3D9 index-buffer range refresh
         run: python3 tools/patch-dxmt-d9-ib-range.py
 
+      # Resident Evil 4 (2005, B1TDSR build 686: 4 FPS): the game locks one dynamic vertex buffer 210 times a frame, 1 to 256 bytes each, and
+      # every draw after a lock copied the whole ~3.8 MB mirror ("buffer refresh per frame: vb whole 206.5 (787.72 MB)"). DXMT_D9_VB_RANGE
+      # (OFF unless env.DXMT_D9_VB_RANGE = 1; "[vb-range] madeira-bcd on/off" in the log) copies only the vertex bytes a non-indexed draw
+      # reads, with the index-buffer range's state machine; instancing, indexed and user-pointer draws and every doubtful stream keep the whole
+      # copy. The census line gets the vertex range fields. The check runs the bookkeeping against a model of the GPU generations. Right after
+      # the index-buffer patch (it reuses that patch's header and extends its census line and BuildDrawCapture); before the i386 farm key, which
+      # hashes it, and the 64-bit Direct3D 9 build (both compile the patched dxmt/src/d3d9).
+      - name: Check DXMT D3D9 vertex-buffer range refresh
+        run: python3 tests/host/check-dxmt-d9-vb-range.py
+
+      - name: Patch DXMT D3D9 vertex-buffer range refresh
+        run: python3 tools/patch-dxmt-d9-vb-range.py
+
       # Far Cry 2 (Z7CADQ, round 624 agent D2 S16): with MADEIRA_FRAME_STATS (off by default) GetData times its park on the GPU
       # fence and [d3d9-query] gets a third line, parked ms a frame and issue-to-complete percentiles. Without it nothing changes.
       # After the index-range patch (same census file); before the i386 farm key, which hashes it.
@@ -3318,6 +3415,13 @@ jobs:
 
       - name: Patch DXMT Lossless Scaling frame generation (opt-in)
         run: python3 tools/patch-dxmt-lsfg.py
+
+      # madeira-bcd (build 707; the in-game HUD's "15+15"): the presents of Lossless Scaling's generated frames carry a mark, and the
+      # encode thread tells winemetal right before each (MadeiraCtl op 31): they go into the app's ring of frames made, not the frame
+      # ring, so the HUD writes them after the game's rate and the frame times stay the game's. Every other present is encoded as
+      # before. After the Lossless Scaling patch, before the i386 farm key (d3d11-src.dll gets it through BCD_PATCHES).
+      - name: Patch DXMT to mark the frames frame generation made
+        run: python3 tools/patch-dxmt-frames-made.py
 
       # env.MADEIRA_DXMT_FAULT_INFO = 1 (off by default): command buffers with
       # encoder execution status, labelled encoders and a [fault-enc] line after
@@ -3743,6 +3847,15 @@ jobs:
 
       - name: Patch winemetal VideoToolbox frame interpolation (experiment, opt-in)
         run: python3 tools/patch-winemetal-vt-interp.py
+
+      # madeira-bcd (build 707; the in-game HUD's "15+15"): every frame made by frame generation goes into the app's ring of frames made
+      # (bcd_frame_made_push_n), never into the frame ring: a present marked by MadeiraCtl op 31 (DXMT's and the Direct3D 12 bridge's
+      # Lossless Scaling frames), VideoToolbox's pictures and MetalFX's interpolated frame where they are shown. Without frame generation
+      # every present goes into the frame ring as before. After the VideoToolbox patch.
+      - name: Check the frames frame generation made
+        run: python3 tests/host/check-frames-made.py
+      - name: Patch winemetal to count the frames frame generation made apart
+        run: python3 tools/patch-winemetal-frames-made.py
 
       # madeira-bcd: env.MADEIRA_X64_MACHINE = 1 (off by default): a 32-bit program that asks which machine is native
       # (IsWow64Process2, PROCESSOR_ARCHITEW6432) hears AMD64 instead of ARM64 (BeamNG.drive's launcher starts its
@@ -4237,6 +4350,18 @@ jobs:
       - name: Check guard history and commit guard clear
         run: python3 tests/host/check-guard-hist.py
 
+      # Round 707 (M4 S7; Half-Life 2): env.MADEIRA_GUARD_NEIGHBOUR_PASS = 1, a store beside a guard page in the same 16 KB host page passes.
+      - name: Check the guard neighbour pass
+        run: python3 tests/host/check-guard-neighbour-pass.py
+
+      # Round 707 (G1 S7; Buckshot Roulette): env.MADEIRA_CHILD_ARGS reads a program name with a blank.
+      - name: Check MADEIRA_CHILD_ARGS names
+        run: python3 tests/host/check-child-args-name.py
+
+      # Round 707 (G1 S23; MemeticBox): a click on a game window's frame no longer freezes the game in its size/move loop.
+      - name: Check the size/move loop drains input
+        run: python3 tests/host/check-move-loop-input-wake.py
+
       # madeira-bcd (night round 2026-11-11, G6 S7: The Binding of Isaac, a 32-bit program's 1 GB reservation placed outside its window): [jumbo-wow] says where it went (log only) and
       # env.MADEIRA_WOW_JUMBO_INSIDE (default off) refuses a placement outside the window; the two helpers compiled on the host.
       - name: Check 32-bit jumbo reservations
@@ -4427,6 +4552,12 @@ jobs:
       # the patch, the licences, the policy, the catalog, the rule, the fixture and the row; a built DLL is checked too when one is at hand.
       - name: Check the DirectX Shader Compiler opt-in DLL
         run: python3 tests/host/check-dxcompiler-optin.py
+
+      # M1-S10 (build 708): env.MADEIRA_OPTIN_DLLS = icuuc,icuin: BCD's ICU4C 78.3 (ARM64EC, tools/build-icu-optin.sh) for Qt 6 programs, whose Qt6Core.dll
+      # imports icuuc.dll and icuin.dll (Bloodborne's launcher): the pins, the trim rules, the probe, the licence, the policy, the rules, the fixtures, the
+      # row; a built pair is checked too when one is at hand.
+      - name: Check the ICU opt-in DLLs
+        run: python3 tests/host/check-icu-optin.py
 
       # madeira-bcd (round 2026-11-11, G7 S1): combase-optin.dll (env.MADEIRA_OPTIN_DLLS = combase): a thread that never started COM
       # uses a process MTA that is created on first need (Unreal Engine 5's FAsyncLoadingThread: Meccha Chameleon, Hubert).
@@ -5010,6 +5141,10 @@ jobs:
       - name: Check D3D12 attachless split
         run: python3 tests/host/check-d3d12-attachless-split.py
 
+      # ExecuteIndirect signatures with several arguments per record, expanded from CPU-written records (Teardown, build 687): indirect-expand.
+      - name: Check D3D12 indirect expand
+        run: python3 tests/host/check-d3d12-indirect-expand.py
+
       - name: Build madeira_d3d12.dll from source
         env:
           MAD_BUILD_ID: ipa ${{ steps.bn.outputs.n }}
@@ -5195,6 +5330,30 @@ jobs:
         with:
           path: build/dxc-win/out
           key: dxc-win-x64-v1-${{ hashFiles('build/dxc-win/0001-mingw-w64-build.patch', 'build/dxc-win/mingw-x86_64.cmake', 'tools/build-dxcompiler.sh') }}
+
+      # M1-S10 (build 708): icuuc-optin.dll and icuin-optin.dll, ICU4C 78.3 (Unicode licence) built for ARM64EC from the release tarball in Debian's
+      # archive (SHA-256 checked; tools/build-icu-optin.sh) for Qt 6 programs. Only build/icu-win/out (the two stripped DLLs and their stamp, about
+      # 14 MB) is cached; a miss builds them (a native ICU for its tools and the probe that judges the trimmed data, then the two DLLs: a few minutes).
+      # The script ships the current DLLs on a hit too. A failure only loses the DLLs; the check below then names the list line and rule that want them.
+      - name: Restore ICU (icuuc.dll and icuin.dll, ARM64EC)
+        id: icucache
+        uses: actions/cache/restore@v4
+        with:
+          path: build/icu-win/out
+          key: icu-win-arm64ec-v1-${{ hashFiles('tools/build-icu-optin.sh', 'build/icu-win/trim-data.py', 'build/icu-win/icu-probe.c', 'build/icu-win/icu-probe.expected', 'build/icu-win/check-icu-dlls.py', 'build/icu-win/ICU-LICENSE.txt') }}
+
+      - name: Build ICU and ship it as icuuc-optin.dll and icuin-optin.dll
+        if: env.MINGW_OK == '1'
+        continue-on-error: true
+        run: bash tools/build-icu-optin.sh
+
+      - name: Save ICU (icuuc.dll and icuin.dll, ARM64EC)
+        if: steps.icucache.outputs.cache-hit != 'true' && hashFiles('build/icu-win/out/icuuc.dll') != ''
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: build/icu-win/out
+          key: icu-win-arm64ec-v1-${{ hashFiles('tools/build-icu-optin.sh', 'build/icu-win/trim-data.py', 'build/icu-win/icu-probe.c', 'build/icu-win/icu-probe.expected', 'build/icu-win/check-icu-dlls.py', 'build/icu-win/ICU-LICENSE.txt') }}
 
       # Round 624 (agent E2 S3): the step that builds the opt-in DLLs may fail without failing the build; a DLL a game list or an
       # auto-tune rule names in env.MADEIRA_OPTIN_DLLS (Glyphica's kernelbase-optin.dll, build 624) must not go missing silently.
@@ -5811,6 +5970,19 @@ jobs:
       # the setup; the production ZIP reader and registry writer run on the host.
       - name: Check BCD Dock's client components setup
         run: python3 tests/host/check-dock-components.py
+
+      # madeira-bcd (branch steam-client, 2026-11-21, milestone M1): Steam for Windows, experimental and off unless switched on (Valve's own
+      # Steam client in a Wine desktop). Valve's client manifest read into packages; the installer on a stand-in host (sizes, SHA-256, a dropped
+      # connection taken up again, BCD Dock's folder as it was); the update host's rules against a server on the runner; the session's settings,
+      # the registry values with BCD Dock's own check afterwards, the log watch, and the wiring of the session. Fixtures are made at run time.
+      - name: Check Steam for Windows (experimental)
+        run: python3 tests/host/check-steam-desktop.py
+
+      # madeira-bcd (2026-11-22, build 701): X-Plane 12 at its lowest graphics settings (xplane-graphics = lowest, XPlaneGraphics.swift):
+      # the defaults of its Resources/settings.txt lowered before a start (all configs but safe mode, every other byte kept), X-Plane's own
+      # file kept and put back, an update's new file, and the wiring (launch hook, project, catalog, list line, CI). A made-up fixture only.
+      - name: Check X-Plane 12's lowest graphics defaults
+        run: python3 tests/host/check-xplane-graphics.py
 
       # madeira-bcd (upstream port 2026-10-25): the window census of a Dock start under AddressSanitizer and ThreadSanitizer, the born-
       # minimized restore, and env.MADEIRA_RESTORE_BORN_MINIMIZED_LATE = 1 (the restore goes on after the starting screen; off unless

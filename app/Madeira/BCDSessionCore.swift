@@ -43,6 +43,9 @@ struct BCDSessionSummary: Equatable {
     var upscale: String?
     var cap: Int?
     var partial = false
+    /// Frames frame generation made besides the game's own this session (Apple interpolation, Lossless Scaling, MetalFX; build 707):
+    /// never in `frames`, `avg` or the lows, which are the game's.
+    var made: UInt64 = 0
 
     static let thermalWords = ["nominal", "fair", "serious", "critical"]
 
@@ -69,6 +72,7 @@ struct BCDSessionSummary: Equatable {
         if let renderSize, !renderSize.isEmpty { parts.append("res=" + Self.token(renderSize)) }
         if let upscale, !upscale.isEmpty { parts.append("mfx=" + Self.token(upscale)) }
         if let cap { parts.append("cap=\(cap)") }
+        if made > 0 { parts.append("made=\(made)") }
         // The name goes last: it may have spaces, and a line is read to its end.
         parts.append("game=" + game.replacingOccurrences(of: "\n", with: " "))
         return "[session] " + parts.joined(separator: " ")

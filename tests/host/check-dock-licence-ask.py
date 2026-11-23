@@ -20,7 +20,10 @@ Checks (the Dock source is madeira-dock/ of this tree or ~/madeira-bcd/madeira-d
     the licence is there; the moment it arrives before 5 s; the old moment after that); where today's start fails (entitled but not listed:
     35; an unreadable list: 36; never licensed: 34 after the deadline), the patched one fails with the same code at the same moment with the
     identical events; from 5 s after the sign-in the two loops give identical events; MADEIRA_DOCK_LICENCE_WAIT_MS=5000 gives the old timing
-    exactly, 0 asks at once, a bad value means 500, 20000 waits longer on request.
+    exactly, 0 asks at once, a bad value means 500, 20000 waits longer on request;
+  - 2026-11-21: the loop asks through the client build's own slots (layout->slot_subscribed, layout->slot_subscriptions). The scripted client
+    answers at 181 and 182 as the January and September 2026 clients do; the same 16 scenarios run again with the November 2026 client's slots
+    (182 and 183, nothing at 181: a call through the old number would end the run) and give the identical results, moments and events.
 """
 from pathlib import Path
 import difflib, importlib.util, re, shutil, subprocess, sys, tempfile
@@ -173,9 +176,11 @@ static int offline_session(HMODULE module, void *engine, void *client_user, cons
     (void)module; (void)engine; (void)client_user; (void)api; (void)o; (void)pipe; (void)user; (void)id; (void)app; (void)layout; (void)use_list;
     return 50;
 }
+/* the client build's slots for the two ownership questions: 181 and 182 (January and September 2026) unless argv names others */
+static struct dock_client_layout slots;
 static int run_loop(const struct sh_observer *o, const struct sh_api *api, void **v, void *client_user, bool use_list)
 {
-    HMODULE module = NULL; void *engine = NULL; const struct dock_client_layout *layout = NULL;
+    HMODULE module = NULL; void *engine = NULL; const struct dock_client_layout *layout = &slots;
     int32_t pipe = 1, user = 1; uint64_t id = 76561197960265729ULL; unsigned long app = app_id;
     bool offline_abi = false; int result = 0;
     (void)module; (void)engine; (void)layout; (void)id; (void)pipe; (void)user; (void)offline_abi;
@@ -185,12 +190,16 @@ done:
 }
 int main(int argc, char **argv)
 {
-    /* argv: signin entitled listed bad_list_until use_list */
+    /* argv: signin entitled listed bad_list_until use_list [slot_subscribed slot_subscriptions] */
     if (argc < 6) return 2;
     signin_at = atol(argv[1]); entitled_at = atol(argv[2]); listed_at = atol(argv[3]); bad_list_until = atol(argv[4]);
     bool use_list = atoi(argv[5]) != 0;
-    void *vt[300] = {0};
-    vt[4] = (void *)fn_true; vt[6] = (void *)fn_true; vt[181] = (void *)fn_subscribed; vt[182] = (void *)fn_subscriptions;
+    slots.slot_subscribed = argc > 7 ? (unsigned)atoi(argv[6]) : 181;
+    slots.slot_subscriptions = argc > 7 ? (unsigned)atoi(argv[7]) : 182;
+    if (slots.slot_subscribed < 100 || slots.slot_subscriptions >= 300 || slots.slot_subscribed == slots.slot_subscriptions) return 2;
+    void *vt[300] = {0};   /* every other slot stays empty: a call through a slot of another build ends the run */
+    vt[4] = (void *)fn_true; vt[6] = (void *)fn_true;
+    vt[slots.slot_subscribed] = (void *)fn_subscribed; vt[slots.slot_subscriptions] = (void *)fn_subscriptions;
     void **v = vt;
     struct sh_observer obs = { now_ms, sleep_ms, ev };
     struct sh_api api = {0}; api.logged_on = logged_on; api.get_callback = get_callback; api.free_callback = free_callback;
@@ -238,7 +247,7 @@ int main(int argc, char **argv)
                 "wait-20000-ready":         (2000, 0, 0, -1, 1, {"MADEIRA_DOCK_LICENCE_WAIT_MS": "20000"}),
             }
 
-            def play(label, name):
+            def play(label, name, slots=()):
                 s = S[name]
                 import os
                 env = {k: v for k, v in os.environ.items() if not k.startswith("MADEIRA_DOCK_")}
@@ -246,7 +255,7 @@ int main(int argc, char **argv)
                 env.update(s[5])
                 if not s[4]:
                     env["MADEIRA_DOCK_LIST_ENTITLEMENT"] = "0"
-                r = subprocess.run([str(outs[label]), *map(str, s[:4]), str(s[4])], capture_output=True, text=True, env=env, timeout=120)
+                r = subprocess.run([str(outs[label]), *map(str, s[:4]), str(s[4]), *map(str, slots)], capture_output=True, text=True, env=env, timeout=120)
                 parts = r.stdout.strip().split("|", 4)
                 return dict(result=int(parts[0]), launches=int(parts[1]), launch=int(parts[2]), end=int(parts[3]), events=parts[4]) if len(parts) == 5 else {"error": r.stdout + r.stderr}
 
@@ -291,6 +300,17 @@ int main(int argc, char **argv)
                 check("0 asks at once", p["wait-0-ready"]["launch"] - 2000 < 40, p["wait-0-ready"])
                 check("a value that is no number in 0..30000 means 500 ms", 500 <= p["wait-bad-values"]["launch"] - 2000 < 540, p["wait-bad-values"])
                 check("20000 waits that long when asked (the player's own choice)", 20000 <= p["wait-20000-ready"]["launch"] - 2000 < 20100, p["wait-20000-ready"])
+                # 2026-11-21: the client build's own slots. The November 2026 client has the two methods at 182 and 183; the scripted client
+                # then has nothing at 181, so a call through the earlier builds' number could not go unnoticed.
+                moved = {name: (play("original", name, (182, 183)), play("patched", name, (182, 183))) for name in S}
+                check("with the November 2026 client's slots (182, 183) every scenario gives the identical result, moments and events, "
+                      "original and patched", all(moved[n] == res[n] and "error" not in moved[n][0] for n in S),
+                      [n for n in S if moved[n] != res[n]][:4])
+                source = (dock / "src/session.c").read_text()
+                check("the Dock's session asks through the build's slots everywhere (no 181, 182, 214 or 215 left as a number)",
+                      not re.search(r"v\[(181|182|214|215)\]", source) and "v[layout->slot_subscribed]" in source
+                      and "v[layout->slot_subscriptions]" in source and "v[layout->slot_can_offline]" in source
+                      and "v[layout->slot_logon_offline]" in source)
 
 print("PASS: Dock licence ask (500 ms, nothing fails earlier)" if ok else "FAILED: Dock licence ask")
 sys.exit(0 if ok else 1)

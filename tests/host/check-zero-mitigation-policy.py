@@ -257,6 +257,17 @@ check('the rule stands before "standard" (the last rule), after it only the roun
          'turbodismount2', 'mega-man-battle-network-legacy-collection-vol-1', 'far-cry-primal', 'demon-slayer-hinokami-chronicles-2',
          'slime-rancher', 'snapshot', 'the-long-dark', 'windbound-epic', 'frostpunk-epic', 'assassins-creed-mirage', 'thief-deadly-shadows',
          'nunholy']   # round 677: the new rows
+      + ['battlefield-4', 'mass-effect-andromeda', 'need-for-speed-2015', 'need-for-speed-heat', 'star-wars-jedi-fallen-order', 'the-sims-4',
+         'mass-effect-legendary-edition', 'unravel', 'vrchat', 'dont-starve', 'echo-weaver', 'pes-2021', 'naruto-ultimate-ninja-storm',
+         'dragonsword-awakening', 'ultimate-marvel-vs-capcom-3', 'batman-arkham-asylum-epic', 'detroit-become-human',
+         'metro-exodus-enhanced-edition', 'bright-memory-infinite', 'resident-evil-4-2023', 'shadow-of-the-tomb-raider', 'little-nightmares',
+         'cryptid-park', 'old-school-runescape', 'slow-roads', 'underkeep', 'we-steal-from-old-people', 'fields-of-mistria',
+         'bloodborne-launcher', 'half-life-2']   # round 707: the new rows
+      + ['resident-evil-4-2005']   # build 710: Resident Evil 4 (2005), DXMT_D9_VB_RANGE (B1TDSR)
+      + ['alan-wake', 'blur', 'ultra-street-fighter-iv', 'mount-and-blade-warband', 'team-fortress-2', 'garrys-mod', 'left-4-dead-2',
+         'half-life-2-deathmatch', 'call-of-duty-modern-warfare-3', 'skyrim-2011', 'splinter-cell-double-agent']   # build 711: the owner's
+         # decision, every game whose logs show the whole vertex buffer copy gets DXMT_D9_VB_RANGE
+      + ['teardown']   # build 712: pull request #67, indirect-expand
       + ['standard'])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)

@@ -31,7 +31,9 @@ extension BCDSettingsBackends {
                                                                   backHook: BCDSettingsSectionBack.shared.hook)) },
                                 .dock: { AnyView(BCDDockLiveSection(startDock: { BCDLiveStore.shared.startDock($0, $1) },
                                                                     backHook: BCDSettingsSectionBack.shared.hook)) },
-                            ])
+                            ],
+                            // Recommended settings: the rules of the list in use, read-only (BCDRecommendedCatalogLive.swift).
+                            recommended: BCDRecommendedLive())
     }
 }
 
@@ -46,6 +48,7 @@ private enum BCDLiveKey {
     static let backgroundRun = "background-run"                // BackgroundRun.swift: minutes; absent = 0 = off
     static let backgroundDownload = "background-download"      // minutes; absent = off
     static let backgroundSound = "background-sound"            // "1" = the game stays audible; absent = muted
+    static let backgroundCPU = BCDBackgroundCPU.key            // percent of one core while kept running; absent = 50 (BackgroundRun.cpuPercent)
     static let desktopSize = "desktop-size"
     static let frameCap = "env.MADEIRA_FPS_CAP"
     static let promote = "env.MADEIRA_PROMOTE"
@@ -70,6 +73,7 @@ private enum BCDLiveKey {
     @Published private(set) var backgroundGame = ""
     @Published private(set) var backgroundDownload = ""
     @Published private(set) var backgroundSound = false
+    @Published private(set) var backgroundCPU = ""
     @Published private(set) var restartNeeded = false
     @Published private(set) var extensionTestRunning = false
     @Published private(set) var extensionTestLine: String?
@@ -132,6 +136,7 @@ private enum BCDLiveKey {
         backgroundGame = Self.minutes(MadeiraConfig.get(BCDLiveKey.backgroundRun))
         backgroundDownload = Self.minutes(MadeiraConfig.get(BCDLiveKey.backgroundDownload))
         backgroundSound = MadeiraConfig.get(BCDLiveKey.backgroundSound) == "1"
+        backgroundCPU = BCDBackgroundCPU.rowValue(MadeiraConfig.get(BCDLiveKey.backgroundCPU))
     }
 
     /// bcd.cfg's minutes as the rows show them: "" for none, 0 or something that is not a number (BackgroundRun reads those as off).
@@ -198,6 +203,15 @@ private enum BCDLiveKey {
     func setBackgroundDownload(_ minutes: String) {
         MadeiraConfig.set(BCDLiveKey.backgroundDownload, Self.minutes(minutes).isEmpty ? nil : Self.minutes(minutes))
         LogStore.shared.log("[runtime-settings] background-download=\(Self.minutes(minutes).isEmpty ? "off" : Self.minutes(minutes))")
+        read()
+    }
+
+    /// The standard is no line at all, which is what the engine did before this row (BackgroundRun.cpuPercent: 50); BackgroundRun reads the key
+    /// each time BCD is left, so no restart.
+    func setBackgroundCPU(_ percent: String) {
+        let stored = BCDBackgroundCPU.stored(percent)
+        MadeiraConfig.set(BCDLiveKey.backgroundCPU, stored)
+        LogStore.shared.log("[runtime-settings] background-cpu=\(stored.map { "\($0)%" } ?? "standard")")
         read()
     }
 
@@ -1075,8 +1089,8 @@ struct BCDLiveSwitch {
 // MARK: - Feedback
 
 /// Settings › Feedback on the engine: FeedbackUpload.swift sends the message, LogUpload.swift the log
-/// that goes with it ("Attach my newest log"). The log is sent first and its code goes into the
-/// message; a log that was sent for this message is not sent again when the message is retried.
+/// that goes with it ("Attach my last game's log": on for a bug report unless turned off, BCDFeedbackAttach.swift). The log is sent
+/// first and its code goes into the message; a log that was sent for this message is not sent again when the message is retried.
 @MainActor final class BCDFeedbackLive: BCDFeedbackBackend {
     let draft = BCDFeedbackDraft()
     @Published private(set) var newestLog: BCDFeedbackLog?
@@ -1100,9 +1114,9 @@ struct BCDLiveSwitch {
             newestLog = BCDFeedbackLog(name: url.lastPathComponent, date: LogUpload.modified(url), bytes: Int64(LogUpload.size(url)),
                                        hasGame: LogUpload.hasGame(url))
         } else {
+            // No log: nothing is attached (send() needs one), and the person's stored choice for bug reports is left as it is.
             newest = nil
             newestLog = nil
-            draft.attachLog = false
         }
         sent = FeedbackUpload.history.map {
             BCDSentFeedback(code: $0.code, kind: BCDFeedbackKind(rawValue: $0.kind) ?? .other, date: $0.date, line: $0.line)
@@ -1126,7 +1140,7 @@ struct BCDLiveSwitch {
                 attached = (file.path, file.date, file.bytes, code)
                 post(kind, text, log: code)
             case .failure(let error):
-                state = .failed("Your log was not sent: \(error.localizedDescription) Your message is still here. Turn off \u{201C}Attach my newest log\u{201D} to send it alone.")
+                state = .failed(BCDFeedbackAttach.logFailed(error.localizedDescription))
             }
         }
     }

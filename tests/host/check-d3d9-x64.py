@@ -172,13 +172,15 @@ carry = [r["id"] for r in recs["rules"] if "MADEIRA_D3D9_X64" in json.dumps(r["c
 # Build 652: Far Cry 4's hardware detection reads the Direct3D 9 adapter (Wine's d3d9 without OpenGL gave an empty one); its rule starts with 635.
 check("only Darksiders II Deathinitive Edition's, MudRunner's, Indivisible's, Counter-Strike: Source's, (round 602) PICO PARK's, Don't Starve Together's and A Hat in Time's, (round 624) No More Room in Hell's and (build 652) Far Cry 4's lists carry the line",
       carry == ["darksiders-ii-deathinitive", "mudrunner", "indivisible", "counter-strike-source", "pico-park", "dont-starve-together", "a-hat-in-time",
-                "no-more-room-in-hell", "outlast", "far-cry-4", "baba-is-you"])   # night round 2026-11-11 (agent G1 S11): Baba Is You
+                "no-more-room-in-hell", "outlast", "far-cry-4", "baba-is-you",   # night round 2026-11-11 (agent G1 S11): Baba Is You
+                "ultimate-marvel-vs-capcom-3"])   # round 707 (agent M2 S11): UMvC3's 64-bit Direct3D 9 probe fails on Wine's d3d9 without GL
 _nm = next(r for r in recs["rules"] if r["id"] == "no-more-room-in-hell")
 # round 632 (ajan63 W13): v2 adds the opt-in directory listing cache after it, from build 632 (check-game-recommendations.py)
 check("no-more-room-in-hell: the line is from build 598 only, after the standard line",
       _nm["config"][2:4] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}]
-      and _nm["config"][4:] == [{"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632}, {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 652}]
-      and _nm["version"] == 3)   # v3 (night round 2026-11-11, agent T2 S-NM1): the steamclient64.dll copy that the translation pool could not hold
+      and _nm["config"][4:] == [{"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632}, {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 652},
+                                {"line": "env.DXMT_D9_VB_RANGE = 1", "minBuild": 710}]   # v4 (build 711): the vertex range of Resident Evil 4's change
+      and _nm["version"] == 4)   # v3 (night round 2026-11-11, agent T2 S-NM1): the steamclient64.dll copy that the translation pool could not hold
 for _id in ("pico-park", "dont-starve-together", "a-hat-in-time"):
     r_ = next(r for r in recs["rules"] if r["id"] == _id)
     # round 630 (agent A1 S9): Don't Starve Together v2 also skips DirectX's setup in its one-time installs, from build 626
@@ -196,8 +198,9 @@ check("Counter-Strike: Source (round 2026-10-24): Steam 240, the folder and cstr
       and css["config"] == ["# BCD's recommended settings for Counter-Strike: Source.",
                             "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
                             "env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598},
-                            {"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632}]
-      and css["version"] == 2)
+                            {"line": "env.MADEIRA_DIRCACHE = 1", "minBuild": 632},
+                            {"line": "env.DXMT_D9_VB_RANGE = 1", "minBuild": 710}]   # v3 (build 711): the vertex range of Resident Evil 4's change
+      and css["version"] == 3)
 ds = next(r for r in recs["rules"] if r["id"] == "darksiders-ii-deathinitive")
 check("its match is Steam 388410, the folder and darksiders2.exe; the line is from build 595 only",
       ds["match"] == {"steamAppIDs": [388410], "steamFolders": ["darksiders ii deathinitive edition"], "programs": [{"name": "darksiders2.exe"}]}
@@ -218,7 +221,8 @@ others = [r["id"] for r in recs["rules"] if r["id"] not in ("darksiders-ii-death
                                                            "need-for-speed-shift",   # night round 2026-11-11 (G8 S13, D S19): the last-calls ring
                                                            "far-cry-4",   # build 652: env.MADEIRA_D3D9_X64 = dxmt
                                                            "final-fantasy-xiii", "anodyne",   # round 668: the D3D9 last-calls ring (FF XIII K1 S6, Anodyne T1)
-                                                           "thief-deadly-shadows")   # round 677 (A1 S11): env.MADEIRA_D3D8 = d3d9
+                                                           "thief-deadly-shadows",   # round 677 (A1 S11): env.MADEIRA_D3D8 = d3d9
+                                                           "dont-starve", "ultimate-marvel-vs-capcom-3")   # round 707: Don't Starve's env.MADEIRA_D3D9 = emulated (G1 S10), UMvC3's D3D9_X64
           and "d3d9" in json.dumps(r["config"]).lower()]
 check("no other list names d3d9 (the Direct3D 9 default of build 602 comes from the game's folder, BCDGraphicsDefaults.swift, not from a list)", others == [])
 print("note: the list's own version is not bumped here (the release does it); the rule's lines carry minBuild 595, so older builds skip it")

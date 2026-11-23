@@ -197,15 +197,17 @@ release = sorted(p.name for p in (mesa / "kosmickrisp-patches").glob("*.patch"))
 check("31 Playport patches (0001 to 0019 from 412de5f8; 0020 to 0031, round 669, from 06e83ca5: each by the Playport authors), BCD's 0032 "
       "(round 669, X-Plane 12's opaque fds, tests/host/check-kk-opaque-fd.py), 0033 (build 673, X-Plane 12's SNORM blending, "
       "tests/host/check-kk-snorm-blend.py), 0034 (build 674, the refused MSL logged, tests/host/check-kk-msl-fail.py) and 0035 last "
-      "(build 675, stores to multisampled storage images left out with a key, tests/host/check-kk-ms-store-drop.py) "
+      "(build 675, stores to multisampled storage images left out with a key, tests/host/check-kk-ms-store-drop.py), 0036 last "
+      "(build 703, Apple frame interpolation in the Metal WSI with a key, tests/host/check-kk-vt-interp.py) "
       "and the six release patches",
-      [p[:4] for p in patches] == [f"{n:04d}" for n in range(1, 36)]
+      [p[:4] for p in patches] == [f"{n:04d}" for n in range(1, 37)]
       and all("From: The Playport authors <dev@playport.dev>" in (mesa / "playport-patches" / p).read_text().split("\n---\n")[0] for p in patches[:31])
       and patches[31] == "0032-kk-in-process-opaque-fd-memory-and-semaphores.patch"
       and patches[32] == "0033-kk-snorm-color-attachments-report-blending.patch"
       and patches[33] == "0034-kk-log-the-msl-source-metal-refused.patch"
       and patches[34] == "0035-kk-drop-stores-to-multisampled-storage-images.patch"
-      and all((mesa / "playport-patches" / q).read_text().startswith("From: BCD <190844990+thebcd69@users.noreply.github.com>") for q in patches[31:35])
+      and patches[35] == "0036-wsi-metal-apple-frame-interpolation-MADEIRA_VT_INTERP.patch"
+      and all((mesa / "playport-patches" / q).read_text().startswith("From: BCD <190844990+thebcd69@users.noreply.github.com>") for q in patches[31:36])
       and len(release) == 6 and all(p.startswith("kosmickrisp-ios-000") for p in release), (patches, release))
 check("...the recipe reads the six from their own folder, so the OSMesa build's patch folder (its cache key) holds only its numbered patches",
       'set -- "$HERE"/kosmickrisp-patches/kosmickrisp-ios-*.patch' in recipe

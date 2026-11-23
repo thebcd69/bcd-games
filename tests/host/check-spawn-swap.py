@@ -335,8 +335,9 @@ check('no other source reads or sets the variable', not other_readers, str(other
 
 lists = json.loads((root / 'recommended/recommendations.json').read_text())
 carriers = [r['id'] for r in lists['rules'] if 'MADEIRA_SPAWN_SWAP' in json.dumps(r.get('config', []))]
-check('only the Fallout 4 and Skyrim Special Edition lists set it (their launchers start a second copy of themselves)',
-      carriers == ['fallout-4', 'skyrim-special-edition'], str(carriers))
+# round 707 (agent M3 S1): Batman: Arkham Asylum GOTY (Epic) v1 swaps BmLauncher.exe for the game, ShippingPC-BmGame.exe, in its own folder
+check('only the Fallout 4 and Skyrim Special Edition lists (their launchers start a second copy of themselves) and (round 707) Batman: Arkham Asylum\'s (Epic) set it',
+      carriers == ['fallout-4', 'skyrim-special-edition', 'batman-arkham-asylum-epic'], str(carriers))
 fo4 = next((r for r in lists['rules'] if r['id'] == 'fallout-4'), None)
 check('Fallout 4 list: Steam 377160, folder "fallout 4", the launcher and the game as programs of Steam\'s copy only',
       fo4 is not None and fo4['match'] == {'steamAppIDs': [377160], 'steamFolders': ['fallout 4'],

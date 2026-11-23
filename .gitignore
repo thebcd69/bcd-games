@@ -247,6 +247,12 @@ build/7zip/
 build/dxc-win/work/
 build/dxc-win/out/
 app/Madeira/arm64ec-windows/dxcompiler-optin.dll
+# ICU4C for Qt 6 programs (tools/build-icu-optin.sh, M1-S10): the tarball, the source, the host tools and the cross build, and the built DLLs;
+# they ship as arm64ec-windows/icuuc-optin.dll and icuin-optin.dll (env.MADEIRA_OPTIN_DLLS = icuuc,icuin), built in CI, never committed
+build/icu-win/work/
+build/icu-win/out/
+app/Madeira/arm64ec-windows/icuuc-optin.dll
+app/Madeira/arm64ec-windows/icuin-optin.dll
 
 # BCD runtime installer (tools/build-bcd-runtimes.sh, round 603): the build directory is not committed; the program is tracked in arm64ec-windows
 build/bcd-runtimes/
@@ -272,6 +278,8 @@ app/Madeira/licenses/LuaJIT-MIT.txt
 app/Madeira/licenses/Mesa-license.rst
 # build/mesa-ios/build-kosmickrisp-bcd.sh -> gl/libvulkan_kosmickrisp.dylib (and .version), licenses/KosmicKrisp-Mesa-license.rst
 app/Madeira/licenses/KosmicKrisp-Mesa-license.rst
+# the shader translator's licence and source note (build/vkd3d-msl/build.sh, CI)
+app/Madeira/licenses/libbcd-dxbc-msl.*.txt
 app/Madeira/licenses/MoltenVK-Apache-2.0.txt
 app/Madeira/licenses/SPIRV-Cross-Apache-2.0.txt
 app/Madeira/licenses/SPIRV-Tools-Apache-2.0.txt

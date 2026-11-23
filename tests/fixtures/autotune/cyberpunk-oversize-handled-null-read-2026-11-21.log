@@ -1,0 +1,805 @@
+[16:40:46.722] [INFO] Checking entitlements...
+[16:40:46.722] [INFO] [build] v0.1.682 (682)
+[16:40:46.723] [INFO] [device] model=iPhone19,7 idiom=phone os=iOS Version 27.2.1 (Build 24B156) ram=11600MB available=6115MB cores=6
+[16:40:46.723] [INFO] [device] address-map=[0x102f48000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[16:40:46.723] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[16:40:46.738] [INFO] [device] settings: low-power=0 thermal=nominal screen=1320x2868@3.0x max-fps=120 utc-offset=+02:00 free-disk=237GB stikdebug-url=1
+[16:40:46.741] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[16:40:58.475] [INFO] Requesting JIT with Built-in StikJIT...
+[16:41:03.516] [INFO] [bcd] library launch Cyberpunk 2077: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[16:41:06.086] [INFO] [madeira-dock] launch option 1
+[16:41:06.086] [INFO] [madeira-dock] launch option 1 entry: program=redprelauncher.exe arguments="" oslist=windows osarch= type=default dlc=0 beta=0 workingDir=0
+[16:41:06.090] [INFO] [dock-launch] friends=0
+[16:41:06.091] [INFO] [dock-launch] image-retire=1
+[16:41:06.091] [INFO] [dock-launch] image-map-guard=1
+[16:41:06.091] [INFO] [dock-offline] enabled=1 network=up request=0 account-saved=1 game-started-online=1
+[16:41:06.095] [INFO] [dock-installers] app=1091500 scripts=0 programs=0
+[16:41:06.138] [INFO] [madeira-dock] starting the host for app 1091500; Valve's client authenticates and authorizes the launch
+[16:41:06.150] [INFO] Running full Wine sequence...
+[16:41:06.150] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102f48000,0x8000000000) 512GB available=8146MB low-power=0 thermal=nominal
+[16:41:06.151] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_JUMBO_HALF=1 env.MADEIRA_WOW_MIN_FREE_GB=2 env.MADEIRA_X64_IMAGE_NOCOPY=1 env.MADEIRA_X64_NOCOPY_DATAIMP=1 oversize-reserve=1 oversize-reserve-eager=1 oversize-reserve-mb=4096 oversize-reserve-min-mb=16384
+[16:41:06.153] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[16:41:06.155] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[16:41:06.156] [INFO] Allocating 896MB JIT pool via debugger...
+[16:41:06.156] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[16:41:06.156] [INFO] [jit-debugger] attached=1 at the pool request
+[16:41:06.156] [INFO] [jit-age] attach age=6s source=enable-jit method=builtin thermal=0
+[16:41:06.156] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[16:41:06.158] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 432MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[16:41:06.158] [ERR] ⚠️ SMALL JIT POOL (432MB) on this launch: expect ~1 s freezes in heavy games. Quit and relaunch the app for a smooth session.
+[16:41:06.567] [INFO] RX pool at 0x124400000
+[16:41:06.577] [OK] JIT pool ready (debugger still attached).
+[16:41:06.577] [INFO] BRK suspension lasted 0.42s
+[16:41:06.579] [INFO] Detaching debugger...
+[16:41:06.582] [OK] Debugger detached.
+[16:41:06.584] [OK] [early-detach] rev=ml524 took 5 ms
+[16:41:06.591] [INFO] Starting wineserver...
+[phase] wine-start             t+  0.462s rev=ml526
+[16:41:06.618] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=25 proc=0020 tid=0000
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 8 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[game-cfg]   oversize-reserve = 1
+[game-cfg]   oversize-reserve-min-mb = 16384
+[game-cfg]   oversize-reserve-eager = 1
+[game-cfg]   oversize-reserve-mb = 4096
+[madeira-env] game MADEIRA_X64_IMAGE_NOCOPY=1
+[madeira-env] game MADEIRA_X64_NOCOPY_DATAIMP=1
+[WineProc] Target exe: explorer.exe (bundle=aarch64-windows)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1150 pool: 8 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 6264 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x711b000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+[16:41:07.097] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=35 reply=41/42 wait=43/44 rev=ml586
+ml992: os_proc_available_memory=7698 MB + phys_footprint=493 MB = 8192 MB (hw.memsize says 11600 MB)
+ml992: clamping reported physical memory 11600 MB -> 8192 MB (jetsam kills us at the limit regardless of installed RAM)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x11c0e0000+0x70000 (?) → pool 0x124404000 used=0x78000/0x1b000000 tramp+0x4000
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x124404000)
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcf0000+0x110000 (ntdll.dll) → pool 0x124478000 used=0x190000/0x1b000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x124478000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[jit-pool] image 0x71ffc50000+0xa0000 (KERNEL32.dll) → pool 0x124590000 used=0x238000/0x1b000000 tramp+0x8000
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x124590000)
+[window] 0x7048000000..0x7400000000 regions=92 occupied=11787 MB of 15232 MB free=3652 MB maxhole=3651 MB@0x711b86c000 rev=ml787 (periodic)
+[jit-pool] image 0x71ffae0000+0x170000 (kernelbase.dll) → pool 0x124638000 used=0x3b8000/0x1b000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x124638000)
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[window] 0x151400000..0x78fb000000 regions=27830 occupied=465354 MB of 490140 MB free=45185 MB maxhole=20400 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=497 MB (peak 497) internal=496 MB compressed=0 MB external=83 MB reusable=35 MB (cycle=1)
+[jit-pool] image 0x71ffa10000+0xd0000 (rpcrt4.dll) → pool 0x1247b8000 used=0x48c000/0x1b000000 tramp+0x4000
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1247b8000)
+[jit-pool] image 0x71ff980000+0x90000 (advapi32.dll) → pool 0x12488c000 used=0x520000/0x1b000000 tramp+0x4000
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x12488c000)
+ml992: clamping reported physical memory 11600 MB -> 8192 MB (jetsam kills us at the limit regardless of installed RAM)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+ml992: clamping reported physical memory 11600 MB -> 8192 MB (jetsam kills us at the limit regardless of installed RAM)
+[gdi-shared] session table 0x711bf60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[srv-desktop] virtual desktop created: clip 1408x648, winstation visible, input desktop set
+[win-pos] #1 hwnd=0x10028 after=0x0 flags=0000003c vis={0,0,100,100} surface=0x10642aaa0 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #1 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #2 hwnd=0x10028 after=0x0 flags=00000018 vis={0,0,100,100} surface=0x10642aaa0 rev=ml505 style=86000000 visible=0 parent=0x0
+[win-name] #2 hwnd=0x10028 class='Message' text="" rev=ml853
+[win-pos] #3 hwnd=0x10020 after=0x0 flags=8000116a vis={0,0,1408,648} surface=0x14faa8300 rev=ml505 style=96000000 visible=1 parent=0x0
+[win-name] #3 hwnd=0x10020 class='#32769' text="madeira - Wine Desktop" rev=ml853
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[vmode] synthesized CURRENT = 1408x648 @60Hz
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[win-pos] #4 hwnd=0x10032 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #4 hwnd=0x10032 class='WineAppBar' text="" rev=ml853
+[win-pos] #5 hwnd=0x10034 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #5 hwnd=0x10034 class='__wine_display_settings_restorer' text="" rev=ml853
+[win-pos] #7 hwnd=0x1002e after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #7 hwnd=0x1002e class='__wine_clipboard_manager' text="" rev=ml853
+[win-name] #6 hwnd=0x10032 class='WineAppBar' text="WineAppBar" rev=ml853
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+0024:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\dockhost.exe" cmdline=L"C:\\windows\\system32\\dockhost.exe"
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.205s rev=ml526
+0024:err:process:spawn_process spawn_process: creating child thread for L"C:\\windows\\system32\\dockhost.exe" (fd=99, unixdir=100, dup_unixdir=104) cwd=L"unix\\private\\var\\mobile\\Containers\\Data\\Application\\<uuid>\\Documents\\wine\\"
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x13f600000+0xd5000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x13f600000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x13f600000+0xc000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x13f60c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x13f60c000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x13f610000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+0024:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x12622c000)
+[file-wfail] ml669 #2 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+0038:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.264s rev=ml526
+0038:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x34 --headless" (fd=126, unixdir=130, dup_unixdir=135) cwd=L"C:\\windows\\"
+[jit-pool] image 0x11d510000+0x80000 (?) → pool 0x12683c000 used=0x24c0000/0x1b000000 tramp+0x4000
+0044:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x127274000)
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 38 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 38 Load module dockhost.exe (dockhost.exe-09df7efb7c42a67b): 13F600000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC180000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC100000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FBFF0000
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x13f600000 (nocopy) IAT window 0x13f60fb88+0x430: 123 slot(s), 0 data import(s) bound
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF30000
+[file-wfail] ml669 #3 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[xp-names] m626466 "wine-x18-exc"
+[xp] 16:41:07.719 +0.59 dt=267 cpu=223 (thr 223) P=37 E=186 run=255 pgw=23.3 GHz P=4.73 E=2.63 Minst=2239 IPC=3.36 mJ=268 pin=580 rdKB=9920 fpMB=583
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x71f9fe0000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x711b000320 insn=0xb9432100
+[file-wfail] ml669 #4 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x71f88c0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x71f87f0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[xp] 16:41:08.041 +0.91 dt=322 cpu=232 (thr 232) P=41 E=191 run=280 pgw=44.6 GHz P=4.72 E=2.63 Minst=2256 IPC=3.23 mJ=283 pin=1424 rdKB=25072 fpMB=638
+0038:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0038:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[xp] 16:41:08.291 +1.16 dt=250 cpu=237 (thr 237) P=31 E=206 run=273 pgw=2.7 GHz P=4.54 E=2.63 Minst=2151 IPC=3.15 mJ=219 pin=43 rdKB=1924 fpMB=640
+D 38 Load module DXGI.dll (dxgi.dll-ba28aa35b054c084): 71F8590000
+[file-wfail] ml669 #5 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[winios-vk] Vulkan is off for this session (the game's file has no vulkan = moltenvk, or the library is not bundled)
+[vkmt] tid=0038 OpenAdapterFromLuid luid=83040000:01000000 -> 0 hAdapter=0x40000000
+[vkmt] tid=0038 CloseAdapter hAdapter=0x40000000 -> 0
+0048:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0048 status=00000001 caller=000000012649A474
+E 48 [thr-term] rev=ml435 deinit #1 tid=0x48
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\crashhandler64.dll" 0x71f8370000+0x1af000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+004c:err:module:find_dll_file mixed-arch fallback: L"WININET.dll" -> L"\\??\\C:\\windows\\sysx64\\WININET.dll"
+E 4C [iOS-xins] tracker=0x12613dfd8 WININET.dll sec=0x71f8170000-0x71f81ab029
+E 4C [iOS-xins] tracker=0x12613dfd8 WININET.dll sec=0x71f81b0000-0x71f81b0f90
+D 4C Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71F8160000
+E 4C [iOS-xins] tracker=0x12613dfd8 WININET.dll sec=0x71f8170000-0x71f81ab029
+E 4C [iOS-xins] tracker=0x12613dfd8 WININET.dll sec=0x71f81b0000-0x71f81b0f90
+[swap] ml1077 backed 0x71252a0000+0x1010000 (file off 8796093022208 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x71262b0000+0x1010000 (file off 8796093022224 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+[xp] 16:41:08.567 +1.44 dt=275 cpu=290 (thr 81) P=35 E=254 run=446 pgw=5.2 GHz P=4.74 E=2.62 Minst=1506 IPC=1.81 mJ=221 pin=164 rdKB=5116 fpMB=691
+[file-wfail] ml669 #7 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[apc-requeue] on (MADEIRA_APC_REQUEUE=0 restores dropping async I/O APCs for busy threads)
+[apc-requeue] #1 async I/O APC status=00000000 for busy thread 0060 -> waiting thread 0038
+0050:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\Program Files (x86)\\Steam\\SDL3.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+E 54 [thr-term] rev=ml435 deinit #2 tid=0x54
+[xp] 16:41:08.888 +1.76 dt=321 cpu=515 (thr 236) P=78 E=436 run=758 pgw=0.0 GHz P=4.86 E=2.60 Minst=5024 IPC=3.32 mJ=596 pin=157 rdKB=92 fpMB=710
+[file-wfail] ml669 #9 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x129af4000)
+[dns] madeira-bcd begin #1 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd refused #1 "crash.steampowered.com" = EAI_NONAME at once (MADEIRA_DNS_REFUSE_CRASH)
+[dns] madeira-bcd begin #2 "crash.steampowered.com" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd refused #2 "crash.steampowered.com" = EAI_NONAME at once (MADEIRA_DNS_REFUSE_CRASH)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=0000000000000210 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[apc-requeue] #2 async I/O APC status=00000000 for busy thread 0068 -> waiting thread 0038
+E 5C [thr-term] rev=ml435 deinit #3 tid=0x5c
+[footprint] rev=ml358 phys=749 MB (peak 749) internal=748 MB compressed=0 MB external=157 MB reusable=35 MB (cycle=2)
+[xp] 16:41:09.174 +2.05 dt=286 cpu=376 (thr 190) P=110 E=266 run=442 pgw=10.9 GHz P=4.82 E=2.62 Minst=4930 IPC=4.01 mJ=724 pin=302 rdKB=5220 fpMB=752
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x71f7370000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 0 of 64 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 64 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 0 MB in use (peak 32), 2 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 6162 MB available
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0070:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0070 status=00000001 caller=000000012649A474
+E 70 [thr-term] rev=ml435 deinit #4 tid=0x70
+0050:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" cmdline=L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe -pid=52"
+[proc-gate] REFUSING spawn of L"C:\\Program Files (x86)\\Steam\\steamerrorreporter64.exe" (steamerrorreporter gate)
+[dns] madeira-bcd begin #3 "crash.steampowered.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd refused #3 "crash.steampowered.com" = EAI_NONAME at once (MADEIRA_DNS_REFUSE_CRASH)
+[dns] madeira-bcd begin #4 "crash.steampowered.com" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd refused #4 "crash.steampowered.com" = EAI_NONAME at once (MADEIRA_DNS_REFUSE_CRASH)
+0050:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=0000000000000270 status=c0000022 native_pc=0000000000000000 is_ec=-1 -> returned rip=0000000000000000 rsp=0000000000000000 flags=00000000
+[win-name] #22 hwnd=0x20052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #23 hwnd=0x30052 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #23 hwnd=0x30052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #24 hwnd=0x30052 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #24 hwnd=0x30052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #25 hwnd=0x40052 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #25 hwnd=0x40052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #26 hwnd=0x40052 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #26 hwnd=0x40052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #27 hwnd=0x50052 after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #27 hwnd=0x50052 class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #28 hwnd=0x50052 after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10028
+[win-name] #28 hwnd=0x50052 class='OleMainThreadWndClass' text="" rev=ml853
+[dns] madeira-bcd begin #5 "api.steampowered.com" "(null)" family=30 flags=0xc00 type=0
+[dns] madeira-bcd end #5 "api.steampowered.com" = 0 after 16 ms (4 result(s))
+[dns] madeira-bcd begin #6 "ipv6check-udp.steamserver.net" "(null)" family=30 flags=0x0 type=0
+[dns] madeira-bcd end #6 "ipv6check-udp.steamserver.net" = 0 after 7 ms (16 result(s))
+[dns] madeira-bcd end #7 "ipv6check-udp.steamserver.net" = 0 after 1 ms (16 result(s))
+[dns] madeira-bcd end #8 "test.steampowered.com" = 0 after 16 ms (4 result(s))
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51274 dport=80 nb=1 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd end #9 "ipv6check-http.steamserver.net" = 0 after 10 ms (16 result(s))
+[dns] madeira-bcd end #10 "ipv6check-http.steamserver.net" = 0 after 1 ms (16 result(s))
+[dns] madeira-bcd end #11 "api.steampowered.com" = 0 after 0 ms (4 result(s))
+[srv-conn] owner=52 wsfam=23 ufam=30 lport=51275 dport=80 nb=1 ret=-1 plen=28 rev=ml478
+[apc-requeue] #3 async I/O APC status=00000000 for busy thread 0050 -> waiting thread 004c
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51276 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[apc-requeue] #4 async I/O APC status=00000000 for busy thread 0050 -> waiting thread 004c
+[srv-conn-done] dport=443 event=OUT err=0 fd=372 peer=YES path=REAL-kernel-completion rev=ml576
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51277 dport=27018 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51278 dport=27018 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51279 dport=27020 nb=1 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #16 "cmp1-fra2.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #16 "cmp1-fra2.steamserver.net" = 0 after 5 ms (2 result(s))
+[srv-conn-done] dport=443 event=OUT err=0 fd=386 peer=YES path=REAL-kernel-completion rev=ml576
+[apc-requeue] #5 async I/O APC status=00000101 for busy thread 004c -> waiting thread 0038
+[dns] madeira-bcd begin #17 "ye2.c.lencr.org" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #17 "ye2.c.lencr.org" = 0 after 5 ms (4 result(s))
+[free-delay] #1 release of 0x712dc00000+0x800000 held for 2000 ms (1 in flight)
+[dns] madeira-bcd begin #18 "p2p-sto1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #18 "p2p-sto1.discovery.steamserver.net" = 0 after 5 ms (6 result(s))
+008c:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery64.exe" cmdline=L".\\bin\\vulkandriverquery64.exe"
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[sock-big] send ERROR fd=408 errno=65 rev=ml464
+[footprint] rev=ml358 phys=891 MB (peak 891) internal=889 MB compressed=0 MB external=164 MB reusable=35 MB (cycle=3)
+[dns] madeira-bcd begin #19 "avatars.steamstatic.com" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #19 "avatars.steamstatic.com" = 0 after 5 ms (2 result(s))
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51285 dport=80 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51286 dport=80 nb=1 ret=-1 plen=16 rev=ml478
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\bin\\vulkandriverquery.exe" cmdline=L".\\bin\\vulkandriverquery.exe"
+[srv-conn] owner=52 wsfam=2 ufam=2 lport=51287 dport=27036 nb=1 ret=-1 plen=16 rev=ml478
+[16:41:11.570] [INFO] [dock-report] session-authenticated-online=1
+0084:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe\""
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe" t+  5.690s rev=ml526
+0084:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\redprelauncher.exe\"" (fd=457, unixdir=458, dup_unixdir=462) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077"
+[exec-alloc] NtAllocateVirtualMemoryEx #3 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I AC FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[exec-alloc] NtAllocateVirtualMemory #2 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #4 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[x64-data-imp] ml1245 importer pe=0x71f4b30000 (nocopy) IAT window 0x71f4d0e000+0xf30: 282 slot(s), 2 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71f4370000 (nocopy) IAT window 0x71f43c8000+0xdc8: 288 slot(s), 1 data import(s) bound
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x12c06c000)
+[x64-data-imp] ml1245 importer pe=0x71f3ad0000 (nocopy) IAT window 0x71f3d69000+0xb68: 339 slot(s), 1 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x14b190000 (nocopy) IAT window 0x14b232000+0x1000: 508 slot(s), 4 data import(s) bound
+[16:41:12.150] [INFO] [dock-report] friends-available=0
+[16:41:12.150] [INFO] [dock-report] launch-client-discovery-published=1
+[16:41:12.151] [INFO] [dock-report] launch-request-submitted=1
+[guest-log] file <container>/Documents/wine/drive_c/users/mobile/AppData/Local/Programs/CD Projekt Red/REDlauncher/logs/REDprelauncher.log
+[guest-log] #1 tid=00ac 2026-11-20 16:41:12.186 [Warning][ (0)] [TID 172][red-prelauncher]: OsVersionInfo: DisplayVersion registry key not found.
+[apc-requeue] #6 async I/O APC status=c000014b for busy thread 00ac -> dropped, no waiting thread 0000
+[apc-requeue] #7 async I/O APC status=c000014b for busy thread 00ac -> dropped, no waiting thread 0000
+[guest-log] #2 tid=00ac 2026-11-20 16:41:12.213 [Error][ (0)] [TID 172][red-prelauncher]: Waiting for Launcher Installer start failed. Process failed to start: Tiedostoa ei löydy. (0).
+[guest-log] #3 tid=00ac 2026-11-20 16:41:12.215 [Error][ (0)] [TID 172][red-prelauncher]: Failed to install REDlauncher! Falling back to launching the game.
+00ac:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe" cmdline=L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe\" "
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe" t+  6.068s rev=ml526
+[session-log] Steam game Cyberpunk2077.exe: logs/Cyberpunk2077.exe-2026-11-20_16-41-12.txt
+00ac:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe\" " (fd=499, unixdir=500, dup_unixdir=504) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64"
+ml985: map_image_view size=0x581b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[guest-log] #4 tid=00ac 2026-11-20 16:41:12.250 [Error][ (0)] [TID 172][red-prelauncher]: Application exited with code -1.
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xffffffff) syscalls=0 unix_calls=8936
+[unwind] term ml661 begin rip=12ad051d4 rsp=71313efe28 window=[71313efe28..7131befe28) max=32
+[unwind] term ml661 #00 pc=12ad051d4 rsp=71313efe28  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+af0:   ? 71f563e000  libarm64ecfex.dll+0x3ee000
+[term-stack] ml660 sp+af8:   ? 71f563e020  libarm64ecfex.dll+0x3ee020
+[term-stack] ml660 sp+b00:   ? 71f562a13c  libarm64ecfex.dll+0x3da13c
+[term-stack] ml660 sp+b08:   ? 71f55dad48  libarm64ecfex.dll+0x38ad48
+[tls-cross-clear] rev=ajan7-arkham TlsFree(6) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0050 (peb 0x10bcb0000, 64-bit): was 0x1
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 00b0 (peb 0x10bcb0000, 64-bit): was 0x712ecde210
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 00a4 (peb 0x10bcb0000, 64-bit): was 0x7128bb4040
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 00a0 (peb 0x10bcb0000, 64-bit): was 0x7128b93fc0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 009c (peb 0x10bcb0000, 64-bit): was 0x71289148d0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0098 (peb 0x10bcb0000, 64-bit): was 0x7128aa0cf0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0064 (peb 0x10bcb0000, 64-bit): was 0x71207a5a20
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0060 (peb 0x10bcb0000, 64-bit): was 0x71208773a0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0058 (peb 0x10bcb0000, 64-bit): was 0x71207bb9b0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0050 (peb 0x10bcb0000, 64-bit): was 0x71207a17a0
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 004c (peb 0x10bcb0000, 64-bit): was 0x7120789f00
+[tls-cross-clear] rev=ajan7-arkham TlsFree(5) by tid 00ac (peb 0x10c134000) SPARED (own-process clearing; MADEIRA_TLS_CLEAR_OWN_PROCESS=0 gives the old behaviour) the live cell of tid 0038 (peb 0x10bcb0000, 64-bit): was 0x71f8a53420
+[jit-pool] tail FREE rx=0x13e3f8000 size=0x4000 -> free-list rev=ml438
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xffffffff) syscalls=0 unix_calls=8977
+[unwind] term ml661 begin rip=12a78e16c rsp=71313efc80 window=[71313efc80..7131befc80) max=32
+[unwind] term ml661 #00 pc=12a78e16c rsp=71313efc80  ntdll.dll+0x7e16c
+[unwind] term ml662 #00 nv: rbx=1 rbp=71313efd00 rsi=1 rdi=0 r12=71f4620000 r13=1 r14=71f4620000 r15=7131c30ec0
+[unwind] term ml662   rbp=71313efd00: 904aee2a 01000000 d824742a 01000000 d04cc531 00000000 bc51d02a 01000000
+[unwind] term ml662   r12=71f4620000: 4d5a9000 03000000 04000000 ffff0000 b8000000 00000000 40000000 00000000
+[unwind] term ml661 #01 pc=71313efde0 rsp=71313efc88  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+050:   ? 71f4d70000  kernelbase.dll+0x0
+[term-stack] ml660 sp+0c8:   ? 71f4d70000  kernelbase.dll+0x0
+[term-stack] ml660 sp+c98:   ? 71f563e000  libarm64ecfex.dll+0x3ee000
+[term-stack] ml660 sp+ca0:   ? 71f563e020  libarm64ecfex.dll+0x3ee020
+[term-stack] ml660 sp+ca8:   ? 71f562a13c  libarm64ecfex.dll+0x3da13c
+[term-stack] ml660 sp+cb0:   ? 71f55dad48  libarm64ecfex.dll+0x38ad48
+00ac:err:process:NtTerminateProcess NtTerminateProcess: process_exiting=1, forcing exit_process(-1)
+[Wine ntdll/server] process_exit_wrapper(-1): closing child fd_socket=461
+[pool-freechk] POISONED AT FREE off=0x6310000 size=0x138000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x6448000 size=0x42c000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x6874000 size=0x134000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x69a8000 size=0xc8000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x6a70000 size=0x300000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x8f24000 size=0xa4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x885c000 size=0xb4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7ed8000 size=0x984000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7e44000 size=0x94000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7d90000 size=0xb4000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7c6c000 size=0x124000 cur=0x3 max=0x3  <== narrowed during the module's life
+[pool-freechk] POISONED AT FREE off=0x7be8000 size=0x84000 cur=0x3 max=0x3  <== narrowed during the module's life
+[Wine ntdll/server] process_exit_wrapper(-1)
+[Wine child thread] child exited with code -1
+I B8 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D B8 Load module DXGI.dll (dxgi.dll-ba28aa35b054c084): 71EF8A0000
+[copy-verify] setupapi.dll: OK, 14 .text pages executable (copy @0x12f7d4000)
+E B8 [iOS-xins] tracker=0x12d8d1fd8 WININET.dll sec=0x71ebd40000-0x71ebd7b029
+E B8 [iOS-xins] tracker=0x12d8d1fd8 WININET.dll sec=0x71ebd80000-0x71ebd80f90
+D B8 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71EBD30000
+E B8 [iOS-xins] tracker=0x12d8d1fd8 WININET.dll sec=0x71ebd40000-0x71ebd7b029
+E B8 [iOS-xins] tracker=0x12d8d1fd8 WININET.dll sec=0x71ebd80000-0x71ebd80f90
+E B8 [img-map] ml710 #35 intervals-only WININET.dll base=0x71ebd30000
+ml985: map_image_view size=0x4a36000 base=0x6ffff0240000 info_base=0x180000000 map_addr=0x6ffff0240000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[16:41:12.625] [INFO] [dock-offline] Valve's client can log this account on offline: saved
+[16:41:12.650] [INFO] [dock-game-end] redprelauncher.exe ended with status 0xffffffff; the session goes on for now (game-still-runs)
+[free-delay] #2 release of 0x7133d40000+0x800000 held for 2000 ms (2 in flight)
+00b8:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=2 first=0000000141963654
+[oversize] ml1298 unhinted reserve of 16384 MB: real 0x7400000000+4096 MB, the other 12288 MB is not mapped
+[oversize] ml1298 tail r663: the unmapped [0x7500000000,0x7800000000) of the reserve at 0x7400000000 holds 0 views (0 MB, 0 of this program) outside the emulator's arena, 0 views (0 MB) in the arena [0x7c00000000,0x8000000000), and 0 MB lie above the map's end 0x8000000000
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x104000000) and no V8 cage was asked for; its first page stays a guard
+[oversize] ml1298 unhinted reserve of 65536 MB: real 0x7204000000+4096 MB, the other 61440 MB is not mapped
+[oversize] ml1298 tail r663: the unmapped [0x7304000000,0x8204000000) of the reserve at 0x7204000000 holds 1 views (4096 MB, 1 of this program) outside the emulator's arena, 318 views (1204 MB) in the arena [0x7c00000000,0x8000000000), and 8256 MB lie above the map's end 0x8000000000: the program may count them as part of its reserve
+[oversize] ml1298 tail r663:   view 0x7400000000+4096 MB
+[oversize] ml1298 OVERLAP r663: reserve 0x7204000000+0x1000000000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[swap] ml1077 backed 0x7204000000+0x2c000000 (file off 8796093022208 MB): 704 MB in 1 extents, peak 704 MB, 0 refused
+[va-scan] FAILED window=0x701b000000..0x73ffff0000 size=0x100000000 align=0x4000000 bottom-up tries=0 skips=0 below-floor=0 above-ceiling=0 | seen=0x701b000000..0x73ffff0000 views=397 maxgap=0xff000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x0 errno=0(-)   --> relaxing ceiling, retrying unclamped
+[oversize] ml1298 unhinted reserve of 32768 MB: real 0x7500000000+4096 MB, the other 28672 MB is not mapped
+[bigres] tid=00b8 #1 size=0x1f400000 (500 MB) type=0x2000 prot=0x2 hint=0x0 peb=0x11aed0000 total=500 MB
+[steer] #1 size=0x1f400000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c4e000000
+[jumbo#1] +0ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x140764567 grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7304000000 st=0x0 | granted=1024 MB ok=1 fail=0
+[swap] ml1077 backed 0x7304000000+0x1000000 (file off 8796093022912 MB): 720 MB in 2 extents, peak 720 MB, 0 refused
+[jumbo#2] +0ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x140764567 grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7344000000 st=0x0 | granted=2048 MB ok=2 fail=0
+[steer] #2 size=0x2000000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c6d400000
+[steer] #3 size=0x2000000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c6f400000
+[va-scan] FAILED window=0x701b000000..0x73ffff0000 size=0x100000000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x701b000000..0x73ffff0000 views=400 maxgap=0x100000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x701b000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[jumbo#3] +24ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x140764567 grip=0x0 size=0x100000000 (4096 MB) hint=0x0 -> 0x7600000000 st=0x0 | granted=6144 MB ok=3 fail=0
+[oversize] ml1298 OVERLAP r663: reserve 0x7600000000+0x100000000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[oversize] ml1298 OVERLAP r663: commit 0x7600000000+0x80000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[swap] ml1077 backed 0x7600080000+0x1800000 (file off 8796093022928 MB): 744 MB in 3 extents, peak 744 MB, 0 refused
+[oversize] ml1298 OVERLAP r663: commit 0x7600080000+0x1800000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[jit-pool] tail FREE rx=0x13c3f8000 size=0x1000000 -> free-list rev=ml438
+[swap] ml1077 backed 0x7500410000+0x2110000 (file off 8796093022952 MB): 777 MB in 4 extents, peak 777 MB, 0 refused
+[oversize] ml1298 OVERLAP r663: commit 0x7500410000+0x2110000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+00b8:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\REDEngineErrorReporter.exe" cmdline=L"REDEngineErrorReporter.exe 180"
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\REDEngineErrorReporter.exe" t+  6.838s rev=ml526
+00b8:err:process:spawn_process spawn_process: creating child thread for L"REDEngineErrorReporter.exe 180" (fd=518, unixdir=519, dup_unixdir=523) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\"
+[Wine child thread] calling wine_ios_child_main...
+[va-scan] FAILED window=0x701b000000..0x73ffff0000 size=0x100000000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x701b000000..0x73ffff0000 views=413 maxgap=0x100000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x701b000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[jumbo#4] +156ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x71f1544f00 grip=0x0 size=0x100000000 (4096 MB) hint=0x0 -> 0x7700000000 st=0x0 | granted=10240 MB ok=4 fail=0
+[oversize] ml1298 OVERLAP r663: reserve 0x7700000000+0x100000000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[oversize] ml1298 OVERLAP r663: commit 0x7700000000+0x10000 (tid 00b8) lies inside the unmapped part [0x7500000000,0x7800000000) of the reserve at 0x7400000000: the program may count it as part of that reserve
+[va-scan] FAILED window=0x701b000000..0x73ffff0000 size=0x100000000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x701b000000..0x73ffff0000 views=413 maxgap=0x100000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x701b000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[jumbo#5] +1ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x1407644ec grip=0x0 size=0x100000000 (4096 MB) hint=0x0 -> 0x7800000000 st=0x0 | granted=14336 MB ok=5 fail=0
+[va-scan] FAILED window=0x701b000000..0x73ffff0000 size=0x100000000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x701b000000..0x73ffff0000 views=413 maxgap=0x100000000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x701b000000 errno=17(File exists)   --> relaxing ceiling, retrying unclamped
+[jumbo#6] +0ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x140764567 grip=0x0 size=0x100000000 (4096 MB) hint=0x0 -> 0x7900000000 st=0x0 | granted=18432 MB ok=6 fail=0
+[swap] ml1077 backed 0x7700010000+0xa00000 (file off 8796093022985 MB): 787 MB in 5 extents, peak 787 MB, 0 refused
+[swap] ml1077 backed 0x7900010000+0xa00000 (file off 8796093022995 MB): 797 MB in 6 extents, peak 797 MB, 0 refused
+[jumbo#7] +22ms tid=16db6f000 wtid=00b8 peb=0x11aed0000 nrip=0x71f17e7690 grip=0x0 size=0x40000000 (1024 MB) hint=0x0 -> 0x7384000000 st=0x0 | granted=19456 MB ok=7 fail=0
+00c0:err:process:NtCreateUserProcess NtCreateUserProcess: image=L"C:\\windows\\system32\\conhost.exe" cmdline=L"\"C:\\windows\\system32\\conhost.exe\" --server 0x28"
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  6.885s rev=ml526
+00c0:err:process:spawn_process spawn_process: creating child thread for L"\"C:\\windows\\system32\\conhost.exe\" --server 0x28 --headless" (fd=534, unixdir=535, dup_unixdir=539) cwd=L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\"
+[Wine child thread] calling wine_ios_child_main...
+[jit-pool] image 0x7201f00000+0x80000 (?) → pool 0x13102c000 used=0xccb0000/0x1b000000 tramp+0x4000
+00c8:err:thread:init_thread_stack iOS arm64ec: NOT setting cpu_area (owner machine=0xaa64 session is_arm64ec=0)
+[nls-getptr] type=11 id=20127 peb=0x11b668000
+[steer] #4 size=0x7e00000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c72c00000
+[nls-getptr] type=11 id=1252 peb=0x11b66c000
+[nls-getptr] type=11 id=437 peb=0x11b66c000
+[nls-getptr] type=11 id=20127 peb=0x11b66c000
+[free-delay] #3 release of 0x7203ab0000+0x100000 held for 2000 ms (2 in flight)
+I C0 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+[nls-getptr] type=11 id=1252 peb=0x11b668000
+[nls-getptr] type=11 id=437 peb=0x11b668000
+[copy-verify] version.dll: OK, 1 .text pages executable (copy @0x1320fc000)
+[footprint] rev=ml358 phys=1739 MB (peak 1739) internal=1775 MB compressed=0 MB external=273 MB reusable=35 MB (cycle=4)
+[file-wfail] ml669 #82 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #84 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[16:41:13.570] [INFO] [dock-report] launch-client-error=0
+[16:41:13.570] [INFO] [dock-report] launch-game-running=1
+E 90 [thr-term] rev=ml435 deinit #5 tid=0x90
+[swap] ml1077 backed 0x7502f50000+0xf00000 (file off 8796093023005 MB): 812 MB in 7 extents, peak 812 MB, 0 refused
+[swap] ml1077 backed 0x7503e50000+0x800000 (file off 8796093023020 MB): 820 MB in 8 extents, peak 820 MB, 0 refused
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamclient64.dll" 0x73fb760000+0x18bb000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\tier0_s64.dll" 0x73fb4b0000+0x19c000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\vstdlib_s64.dll" 0x73fb3e0000+0xc1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[footprint] rev=ml358 phys=1867 MB (peak 1867) internal=1931 MB compressed=0 MB external=282 MB reusable=35 MB (cycle=5)
+00b8:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b8:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #2 NtAllocateVirtualMemory status=c000000d proc=cyberpunk2077.exe tid=00b8 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[file-wfail] ml669 #85 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[steer] #5 size=0x2000000 reserved_total=500MB armed=va-pressure -> above ceiling 0x7c93410000
+00b8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "[S_API] SteamAPI_Init(): Loaded 'C:\Program Files (x86)\Steam\steamclient64.dll' OK.."
+[steam-api] replica: RegOpenKeyExW(ActiveProcess, 0x20219)=0 RegQueryValueExW(pid, cb=4)=0 type=4 cb=4 pid=52 | OpenProcess(0x400)=0 GetExitCodeProcess=0 exit=259 (259 = running) | open without the WOW flag (0x20019)=0
+[steam-api]   OpenProcess(52): opens, exit status 259 (259 = still running)
+[srv-stuck] tid=0030 teb=0x71fffb0000 age=8691ms op=1 flags=00000002 timeout=9223372036854775807 alertable=0 nhandles=2 caller=0x104ea1ae4
+[srv-stuck]   tid=0030 suspend=0 rev=ml714
+[srv-stuck]   h[0]=000000c0 obj=0x14ed0b640 type=Event raw_obj=0x14ed0b640 raw_waiters=0 sync_obj=0x14f7e20d0 sync_waiters=1 thread_wait=0x14fc7de00 state=LINKED Event manual=0 signaled=0 cell=7
+[srv-stuck]   h[1]=000000c4 obj=0x14ed0aa00 type=Event raw_obj=0x14ed0aa00 raw_waiters=0 sync_obj=0x14f7e1630 sync_waiters=1 thread_wait=0x14fc7de00 state=LINKED Event manual=0 signaled=0 cell=8
+[srv-stuck] tid=003c teb=0x71fff90000 age=8648ms op=1 flags=00000003 timeout=9223372036854775807 alertable=1 nhandles=2 caller=0x104ea1ae4
+[srv-stuck]   tid=003c suspend=0 rev=ml714
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #86 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[file-wfail] ml669 #87 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[footprint] rev=ml358 phys=1870 MB (peak 1870) internal=1934 MB compressed=0 MB external=282 MB reusable=35 MB (cycle=6)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=3857 full-path-hits=1862 component-lookups=9112 shortcut-hits=5296 misses=3610 scans=3816 entries-scanned=432877 us-in-lookup=1371984 (13% of the window) slowest=1.058 ms ...E-323AE3CE4E19/Documents/wine/dosdevices/c:/windows/system32
+0050:err:module:load_dll [dll-missing] rev=ml336 #51 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #52 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #53 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #54 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[file-wfail] ml669 #88 status=0xc0000034 disp=1 access=0xc0100080 sharing=0x00000000 options=0x00000040 unix=(none) name=\??\pipe\svcctl
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\gameoverlayrenderer64.dll" 0x73fb110000+0x1ac000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f1dc1000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f1dc1000 zb=0x0 hits=1 rev=ajan5-rockstar
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f1dc2000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f1dc2000 zb=0x0 hits=2 rev=ajan5-rockstar
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f1dc3000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f1dc3000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f1dc4000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f1dc4000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f1dc5000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f1dc6000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f1dc7000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f1dc8000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #7 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f1dc8000 zb=0x0 hits=8 rev=ajan5-rockstar
+[exec-alloc] NtAllocateVirtualMemory #15 req_addr=0x71f1dc9000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f1dc9000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[exec-alloc] NtAllocateVirtualMemory #16 req_addr=0x71f1dca000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f1dca000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[exec-alloc] NtAllocateVirtualMemory #17 req_addr=0x71f1dcb000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f1dcb000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[exec-alloc] NtAllocateVirtualMemory #18 req_addr=0x71f1dcc000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f1dcc000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[exec-alloc] NtAllocateVirtualMemory #19 req_addr=0x71f1dcd000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f1dcd000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[exec-alloc] NtAllocateVirtualMemory #20 req_addr=0x71f1dce000 size=0x1000 type=0x3000 protect=0x40
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f1dce000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f1dcf000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71ef9dd000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #8 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71ef9dd000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71ef9dc000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71ef9db000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71ef9da000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71ef9d9000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f3503000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f3504000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f3505000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f3506000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f3507000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f3508000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f3509000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f350a000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f350b000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f350c000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f350d000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f350e000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #9 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f350e000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f350f000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f357a000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f357b000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f357c000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f357d000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f357e000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f357f000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f4211000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f4212000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f4213000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f4214000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f4215000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f4216000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f4217000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f4218000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f4219000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f421a000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f421b000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f421c000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f421d000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f421e000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f421f000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f436f000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f43d2000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f43d3000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f43d4000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f43d5000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f43d6000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f43d7000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f43d8000 size=0x1000 type=0x3000 protect=0x40 tid=00b8 | STAGE=none err=0 at 0x0+0x0
+[nt-fail] #10 NtAllocateVirtualMemory status=c0000018 proc=cyberpunk2077.exe tid=00b8 size=0x1000 type=0x3000 prot=0x40 hint=0x71f43da000 zb=0x0 hits=64 rev=ajan5-rockstar
+[alias-own] ml640 #1 0x71f5a90000+0x4000 prot=r-x OWNED by live anon JIT alias (rx=0x12d2dc000 rw=0x7008edc000 vm_protect kr=0) — keeping the pool dual-map, no mprotect, no image lookup
+[alias-prot] ml638 #1 0x71f5a90000+0x1000 requested prot=0x40 (vprot=0x7) — logical kept, PHYSICAL forced RX on alias sub-range(s) (mprotect rc=0) alias=[0x71f5a90000,0x71f5a94000)
+[fex-arena] r652 peb=0x10c134000 ended 5615 ms ago holding 25 view(s), 62 MB of the emulator's arena (2331 of 16384 MB in views, 434 view(s) in all); 1 thread(s) of it still listed: kept (MADEIRA_FEX_ARENA_REAP is not set)
+[srv-conn] owner=180 wsfam=2 ufam=2 lport=51289 dport=51288 nb=0 ret=-1 plen=16 rev=ml478
+[srv-conn] owner=180 wsfam=2 ufam=2 lport=51291 dport=51290 nb=0 ret=-1 plen=16 rev=ml478
+[dns] madeira-bcd begin #20 "legacy-config.live.cdpred.services" "443" family=0 flags=0x0 type=1
+[dns] madeira-bcd end #20 "legacy-config.live.cdpred.services" = 0 after 14 ms (1 result(s))
+E 104 [thr-term] rev=ml435 deinit #1 tid=0x104
+[srv-conn] owner=180 wsfam=2 ufam=2 lport=51292 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=443 event=OUT err=0 fd=667 peer=YES path=REAL-kernel-completion rev=ml576
+00b8:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+00b8:fixme:cryptasn:CryptDecodeObjectEx Unsupported decoder for lpszStructType <ip>.<ip>.1.4
+[free-delay] #4 release of 0x73ce330000+0x110000 held for 2000 ms (1 in flight)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\GfnRuntimeSdk.dll" 0x73fa8e0000+0x39a000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[jit-pool] image 0x73fa0b0000+0x6a0000 (windowscodecs.dll) → pool 0x12c3cc000 used=0x8670000/0x1b000000 tramp+0x4000
+[jit-pool] image 0x73fa010000+0xa0000 (propsys.dll) → pool 0x12c02c000 used=0x7cd0000/0x1b000000 tramp+0x4000
+D B8 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 73FA010000
+010c:err:seh:call_seh_handlers [exc] ml811 code=e06d7363 addr=000000012DB40110 flags=1 nparams=4 tid=010c hit=1
+[guest-log] file <container>/Documents/wine/drive_c/ProgramData/NVIDIA Corporation/GfnRuntimeSdk/GfnRuntimeSdk.log
+[guest-log] #5 tid=010c 2026-11-20T16:41:18.404[E]               GfnRuntimeBootstrap.c:662  MessageBus Join failed: Failed to open file
+[swap] ml1077 backed 0x7504e00000+0xf60000 (file off 8796093023028 MB): 835 MB in 9 extents, peak 835 MB, 0 refused
+[swap] ml1077 backed 0x7505ec0000+0xc40000 (file off 8796093023043 MB): 847 MB in 10 extents, peak 847 MB, 0 refused
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf8e18100 pc=0x13447ed6c NO pool/anon alias | region 0x102f48000+0x332c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x13447ed6c hinsn=0xf8e18100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x1343f8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x14196a7d2 pc=0x13447ed6c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x13447ed6c addr=0x0 x18=0x71ffe10000 type=1 lr=0x138982918 sp=0x71f14a0000 x16=0x12d4219a4 x17=0x71f149ff20
+[guest-code] rev=ml333 pool_rip=0x14196a7d2 (PE 0x14196a7d2) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xf57beabc431eb0 x10=0x13447ebe0 x11=0x0 x0=0x143bcde80 x2=0x0 | teb=0x71ffe10000 peb=0x11aed0000 peb->EcCodeBitMap=0x71fd610000
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x140272d0d (block entry 0x14196a7d2) no pool-copied image holds it (a run from the loaded view, or not an image) | host region 0x140000000+0x3900000 prot=r-- max=rwx | Wine vprot of the 4 KB pages of host page 0x140270000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: none | 32 bytes at rip, loaded image: 48 87 08 48 89 11 c3 49 8b 42 40 48 89 02 41 ff 4a 48 45 8b 42 48 41 8b 42 20 49 89 52 40 48 29 | pool copy: - | image and pool copy not compared
+[fault-host] 13447ec6c: d503201f cb0800a5 cb080021 eb0100bf aa0403e1 540000e2 5299b006 ab060009
+[fault-host] 13447ec8c: aa0003f8 aa0903e0 d500401f 140000f7 5299c806 ab060009 aa0003f8 aa0903e0
+[fault-host] 13447ecac: d500401f 140000a4 f941f386 d94300c8 d503201f aa0103e3 52800005 99448101
+[fault-host] 13447eccc: d503201f 2a0503e8 2a0803e2 8b020806 994000c6 d503201f 6b0100df 540000c0
+[fault-host] 13447ecec: 11000508 71010109 aa0803f8 54fffee1 1400009b 8b020448 91040000 d378dd08
+[fault-host] 13447ed0c: ca080018 ab080009 aa0903e0 d500401f 54000fc0 d9400061 d503201f f1000029
+[mach_exc] insn_stream PC-12..PC+8: d9000025 d9400088 d503201f [f8e18100] d503201f d9000001 f84086e6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe10000 TEB=0x71ffe10000 TEB[0x58]=0x71335f4420 *(gs_cached+0x58)=0x71335f4420
+[x86_live] RAX=0x0 RCX=0x143bcde80 RDX=0x7504e00000 RBX=0x0 RSP=0x7132d9f368 RBP=0x7132d9f430 RSI=0x0 RDI=0x720465dc80
+[x86_live]  R8=0x0  R9=0x7132d9f390 R10=0x7504e00000 R11=0x0 R12=0x7132d9f6c0 R13=0x74257cb180 R14=0x7132d9f490 R15=0x1460e2000
+[x86_live] State.RIP=0x14196a7d2 callret_sp=0x7c45801000
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf8e18100 pc=0x13447ed6c NO pool/anon alias | region 0x102f48000+0x332c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x13447ed6c hinsn=0xf8e18100 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=5 base=0x1343f8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x14196a7d2 pc=0x13447ed6c addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x13447ed6c addr=0x0 x18=0x71ffe10000 type=1 lr=0x138982918 sp=0x71f14a0000 x16=0x12d4219a4 x17=0x71f149ff20
+[guest-code] rev=ml333 pool_rip=0x14196a7d2 (PE 0x14196a7d2) -- NO pool copy for this address (identity translate)
+[ec-fault-regs] x8=0x0 x9=0xf57beabc431eb0 x10=0x13447ebe0 x11=0x0 x0=0x143bcde80 x2=0x0 | teb=0x71ffe10000 peb=0x11aed0000 peb->EcCodeBitMap=0x71fd610000
+[fault-host] 13447eccc: d503201f 2a0503e8 2a0803e2 8b020806 994000c6 d503201f 6b0100df 540000c0
+[fault-host] 13447ecec: 11000508 71010109 aa0803f8 54fffee1 1400009b 8b020448 91040000 d378dd08
+[fault-host] 13447ed0c: ca080018 ab080009 aa0903e0 d500401f 54000fc0 d9400061 d503201f f1000029
+[fault-host] 13447ed2c: 54000260 9270bc24 99420088 d503201f d503201f d9008068 910b6008 d9400086
+[fault-host] 13447ed4c: d503201f ca0800d8 eb0800c9 54000240 d503201f d9000025 d9400088 d503201f
+[fault-host] 13447ed6c: f8e18100 d503201f d9000001 f84086e6 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d9000025 d9400088 d503201f [f8e18100] d503201f d9000001 f84086e6
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe10000 TEB=0x71ffe10000 TEB[0x58]=0x71335f4420 *(gs_cached+0x58)=0x71335f4420
+[x86_live] RAX=0x0 RCX=0x143bcde80 RDX=0x7504e00000 RBX=0x0 RSP=0x7132d9f368 RBP=0x7132d9f430 RSI=0x0 RDI=0x720465dc80
+[x86_live]  R8=0x0  R9=0x7132d9f390 R10=0x7504e00000 R11=0x0 R12=0x7132d9f6c0 R13=0x74257cb180 R14=0x7132d9f490 R15=0x1460e2000
+[x86_live] State.RIP=0x14196a7d2 callret_sp=0x7c45801000
+00b8:err:seh:segv_handler SEGV #1: pc=0x13447ed6c addr=0x0 uctx_x18=0x71ffe10000 disp=0 mach_exc=11101
+00b8:err:seh:segv_handler SEGV at pc=0x13447ed6c addr=0x0 esr=0x92000006 TPIDR_EL0=0x0 (informational only — TEB is tsd275 below)
+00b8:err:seh:segv_handler   x0=0x143bcde80 x1=0x7504e00000 x2=0x0 x3=0x7132d9f390
+00b8:err:seh:segv_handler   x8=0x0 x9=0xf57beabc431eb0 x10=0x13447ebe0 x16=0x12d4219a4 x17=0x71f149ff20 x18=0x71ffe10000 x19=0x7132d9f6c0 x20=0x74257cb180
+00b8:err:seh:segv_handler   fp=0x7132d9f430 lr=0x138982918 sp=0x71f14a0000
+00b8:err:seh:segv_handler   [teb-tsd] base=0x16db6f0e0 offset=0x918 raw=0x71ffe10000 teb_key_val=0x71ffe10000
+00b8:err:seh:segv_handler   [guest-state] x28=0x7c45001140 rip=0x14196a7d2
+00b8:err:seh:segv_handler   [guest-exact] ml885 block=0x13447ebe0 rip=0x140272d0d x86=48 87 08 48 89 11 c3 49 8b 42 40 48 89 02 41 ff
+00b8:err:seh:segv_handler   [guest-state]   rax=0x0 rcx=0x7132d9f410 rdx=0x7204000000 rbx=0x0
+00b8:err:seh:segv_handler   [guest-state]   rsp=0x7132d9f3a8 rbp=0x7132d9f430 rsi=0x0 rdi=0x720465dc80
+00b8:err:seh:segv_handler   [guest-state]   r8 =0x7204903490 r9 =0xb r10=0x17 r11=0x143bdab00
+00b8:err:seh:segv_handler   [guest-state]   r12=0x7132d9f6c0 r13=0x74257cb180 r14=0x7132d9f490 r15=0x1460e2000
+00b8:err:seh:segv_handler   [guest-state] plausible-ptr gregs=11/16 (low => uninitialised frame, high => only rsp clobbered)
+00b8:err:seh:segv_handler   [emit-dump]   +-24  eb0800c9 54000240 d503201f d9000025 d9400088 d503201f
+00b8:err:seh:segv_handler   [emit-dump]   +0    f8e18100 d503201f d9000001 f84086e6 a94a2f8a 8a06116b
+00b8:err:seh:segv_handler   [emit-dump]   +24   8b0b014a a940294b cb06014a b400006a f945b38b f9000f86
+00b8:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x7132d9f368  gregs[RSP]=0x7132d9f3a8  NZCV/flags[24]=0x60000000  callret_sp=0x7c45801000 base=0x7c45401000  x28=0x7c45001140
+00b8:err:seh:segv_handler   insn_stream PC-12..PC+8: d9000025 d9400088 d503201f [f8e18100] d503201f d9000001 f84086e6
+00b8:err:seh:segv_handler setup_exception for SEGV at pc=0x13447ed6c addr=0x0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=00b8 code=c0000005 flags=0 addr=0x13447ed6c pc=13447ed6c nparams=2 p0=0 p1=0
+00b8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x13447ed6c RX from -32, 64 of 64 bytes: 1f 20 03 d5 d8 00 08 ca c9 00 08 eb 40 02 00 54 1f 20 03 d5 25 00 00 d9 88 00 40 d9 1f 20 03 d5 00 81 e1 f8 1f 20 03 d5 01 00 00 d9 e6 86 40 f8 8a 2f 4a a9 6b 11 06 8a 4a 01 0b 8b 4b 29 40 a9 
+00b8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x13447ed6c (not an anon-JIT page)
+D B8 Exception: Code: C0000005 Address: 13447ED6C AV READ of 0
+00b8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x140272d0d RX from -32, 64 of 64 bytes: 00 ff ff 41 8b 42 20 49 89 41 08 48 8d 81 d8 02 00 00 49 39 02 74 10 4c 89 1a 49 8b 02 48 8b ca 48 87 08 48 89 11 c3 49 8b 42 40 48 89 02 41 ff 4a 48 45 8b 42 48 41 8b 42 20 49 89 52 40 48 29 
+00b8:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x140272d0d (not an anon-JIT page)
+D B8 Exception: Code: C0000005 Address: 140272D0D AV READ of 0
+00b8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "Unhandled exception: ExceptionCode=0xC0000005 at address 0x140272D0D."
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\SymSrv.dll" 0x73f9e90000+0x74000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D C0 Load module SymSrv.dll (symsrv.dll-30ffd6200b73bd5a): 73F9E90000
+[jit-pool] image 0x73f9df0000+0xa0000 (ws2_32.dll) → pool 0x12b310000 used=0x6fb4000/0x1b000000 tramp+0x4000
+D C0 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 73F9DF0000
+[jit-pool] image 0x73f9cc0000+0x130000 (crypt32.dll) → pool 0x12b8b0000 used=0x75e8000/0x1b000000 tramp+0x8000
+D C0 Load module CRYPT32.dll (crypt32.dll-6b697b9bfcd69537): 73F9CC0000
+[jit-pool] image 0x73f9c30000+0x90000 (bcrypt.dll) → pool 0x12ac3c000 used=0x68d0000/0x1b000000 tramp+0x4000
+D C0 Load module bcrypt.dll (bcrypt.dll-5a6e36eeb1a98b0b): 73F9C30000
+00c0:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "................"
+00c0:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: "DBGHELP: Symbol Search Path: ..."
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #1 handle=00000000000000DC status=00000000 native_pc=000000012D439AF0 is_ec=1 -> returned rip=000000012D439AF0 rsp=0000007132D9E230 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #2 handle=00000000000000E0 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=0000007202C0E9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #3 handle=00000000000000E4 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=0000007203EEE9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #4 handle=00000000000000E8 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=00000073C48FE9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #5 handle=00000000000000EC status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=00000073C52FE9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #6 handle=00000000000000F0 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=00000073C5D3E9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #7 handle=00000000000000F4 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=00000073C677E9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #8 handle=00000000000000F8 status=00000000 native_pc=000000024D8861E4 is_ec=0 -> returned rip=000000024D8861E4 rsp=00000073C777FB00 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #9 handle=00000000000000FC status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073C817F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #13 handle=000000000000010C status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CBC2F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #14 handle=0000000000000110 status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CC62F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #15 handle=0000000000000114 status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CD02F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #16 handle=0000000000000118 status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CE53F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #17 handle=000000000000011C status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CEF3F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #18 handle=0000000000000120 status=00000000 native_pc=000000024D87EAC4 is_ec=0 -> returned rip=000000024D87EAC4 rsp=00000073CF93F9D0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #19 handle=0000000000000124 status=00000000 native_pc=000000024D883DF8 is_ec=0 -> returned rip=000000024D883DF8 rsp=00000073D033E9C0 flags=0010000b
+00c0:err:seh:NtGetContextThread [ec-getctx] ml715 #20 handle=0000000000000128 status=00000000 native_pc=000000024D8861E4 is_ec=0 -> returned rip=000000024D8861E4 rsp=00000073D0E3FB00 flags=0010000b
+[jit-pool] image 0x73f9d60000+0x90000 (psapi.dll) → pool 0x12b664000 used=0x72f8000/0x1b000000 tramp+0x4000
+D C0 Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 73F9D60000
+ml985: map_image_view size=0x581b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x581b000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=none err=0 at 0x0+0x0 rev=ajan5-motor
+ml985: map_image_view size=0x581b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x581b000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=none err=0 at 0x0+0x0 rev=ajan5-motor
+[free-delay] #5 release of 0x73d1740000+0x100000 held for 2000 ms (2 in flight)
+[jit-pool] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\windows\\system32\\VCRUNTIME140_1.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\libxell.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[jit-pool] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cyberpunk 2077\\bin\\x64\\libxell.dll": resource-only map (no loader name; GetFileVersionInfo / LOAD_LIBRARY_AS_IMAGE_RESOURCE) of a refused image -- mapped without a pool copy and without exec, the code never runs from it
+[xp-api-top] 16:41:19.873 4096 samples: ntdll.dll+0x71aac=9385348/s ntdll.dll+0x680ec=3628505/s ntdll.dll+0x6886c=3549984/s ntdll.dll+0x281ac=132246/s kernel32.dll+0x26678=95052/s ntdll.dll+0x27cc8=90919/s kernelbase.dll+0x6a524=45460/s
+ml985: map_image_view size=0x4a36000 base=0x6ffff0240000 info_base=0x180000000 map_addr=0x6ffff0240000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+ml985: map_image_view size=0x4a36000 base=0x6ffff0240000 info_base=0x180000000 map_addr=0x6ffff0240000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[xp-api-top] 16:41:21.005 4096 samples: ntdll.dll+0x680ec=144055/s ntdll.dll+0x71aac=143947/s ntdll.dll+0x6886c=140821/s ntdll.dll+0x281ac=4852/s kernel32.dll+0x26678=3127/s ntdll.dll+0x27cc8=3127/s kernelbase.dll+0x6a524=1617/s kernelbase.dll+0x68958=108/s
+[xp-api-top] 16:41:22.194 4096 samples: ntdll.dll+0x71aac=183863/s ntdll.dll+0x680ec=183725/s ntdll.dll+0x6886c=179863/s ntdll.dll+0x281ac=6483/s kernel32.dll+0x26678=4414/s ntdll.dll+0x27cc8=4414/s kernelbase.dll+0x6a524=2207/s
+[xp-api-top] 16:41:23.329 4096 samples: ntdll.dll+0x71aac=168781/s ntdll.dll+0x680ec=168654/s ntdll.dll+0x6886c=164858/s ntdll.dll+0x281ac=6073/s kernel32.dll+0x26678=3922/s ntdll.dll+0x27cc8=3922/s kernelbase.dll+0x6a524=1898/s ntdll.dll+0x68e44=127/s
+[hwinput] keyboard focus: program (responder)
+[16:41:24.315] [INFO] [steam-launch-view] reveal reason=button scene=waiting t=18s
+[launch-view] dismissed reason=show-desktop logs=0
+[xp-api-top] 16:41:24.463 4096 samples: ntdll.dll+0x680ec=161892/s ntdll.dll+0x71aac=161771/s ntdll.dll+0x6886c=158512/s ntdll.dll+0x281ac=4467/s kernel32.dll+0x26678=3260/s ntdll.dll+0x27cc8=3018/s kernelbase.dll+0x6a524=1569/s
+E 11C [thr-term] rev=ml435 deinit #6 tid=0x11c
+[free-delay] #6 release of 0x73cda30000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #7 release of 0x73cd930000+0x100000 held for 2000 ms (2 in flight)
+[xp-api-top] 16:41:25.595 4096 samples: ntdll.dll+0x680ec=187495/s ntdll.dll+0x71aac=187495/s ntdll.dll+0x6886c=184132/s ntdll.dll+0x281ac=5465/s kernel32.dll+0x26678=3784/s ntdll.dll+0x27cc8=3643/s kernelbase.dll+0x6a524=1822/s ntdll.dll+0x6784c=140/s
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16ceb6230 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d0e2b30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8889e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-stacks] port=0x103 "" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=3 x8=0x0 x18=0x0 sp=0x16ceb6230
+[thread-stacks] port=0x3803 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x1 x18=0x0 sp=0x16d0e2b40
+[thread-stacks] port=0x4103 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=0 x8=0x201dcd264 x18=0x0 sp=0x16d16a450
+[thread-stacks] port=0x8403 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d39efc0
+[thread-stacks] port=0x9e0f "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d42afc0
+[thread-stacks] port=0xbc03 "" pc=libsystem_kernel.dylib`__semwait_signal+0x8 run=3 susp=0 cpu=1 x8=0x201dcd264 x18=0x0 sp=0x16d658c90
+[thread-stacks] port=0x1480f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d8889e0
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+[sock-big] send ERROR fd=584 errno=65 rev=ml464
+[file-census] r624 12s: case-sensitive=1 full-path-tries=1108 full-path-hits=854 component-lookups=1111 shortcut-hits=715 misses=278 scans=396 entries-scanned=50518 us-in-lookup=223114 (1% of the window) slowest=0.960 ms ...E7E-323AE3CE4E19/Documents/wine/dosdevices/c:/windows/sysx64
+E 120 [thr-term] rev=ml435 deinit #7 tid=0x120
+[free-delay] #8 release of 0x73d1740000+0x100000 held for 2000 ms (1 in flight)
+[rip-profile] ml981 gen=1 threads=9 samples=1800 buckets=3 span=0x20cdb4e75 [0x71f1544760..0x73fe2f95d5] top: 0x71f1544740=77% 0x73fe2f95c0=11% 0x71f17e7500=11%
+[cpu-split] ml1123 gen=1 running samples=140: x64 JIT 0%, ARM64EC images 0%, native 99%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__sysctl+0x28=120 libsystem_kernel.dylib`semaphore_signal_trap+0=13 libsystem_kernel.dylib`mach_port_mod_refs+0x64=4 libsystem_kernel.dylib`__kqueue_workloop_ctl+0xc=1 libsystem_kernel.dylib`__getpeername+0=1
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=63 resident=2530MB dbg=DEBUGGED rev=ml525
+[16:41:36.699] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[apc-requeue] #8 async I/O APC status=8000000a for busy thread 004c -> waiting thread 0038
+[apc-requeue] #9 async I/O APC status=8000000a for busy thread 004c -> waiting thread 0038
+[apc-requeue] #10 async I/O APC status=8000000a for busy thread 004c -> waiting thread 0038
+[apc-requeue] #11 async I/O APC status=8000000a for busy thread 004c -> waiting thread 0038
+[thread-stacks] port=0x1480f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d8889e0
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8889e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2 threads=10 samples=1817 buckets=5 span=0x72bc6057d8 [0x141cf3dfd..0x73fe2f95d5] top: 0x71f1544740=77% 0x73fe2f95c0=11% 0x71f17e7500=11% 0x141cf3dc0=0% 0x141cf3e00=0%
+[cpu-split] ml1123 gen=2 running samples=172: x64 JIT 3%, ARM64EC images 6%, native 89%
+[cpu-split] ml1123 image top (PE address/256): 0x71f1e41a00=4 0x71f1e38a00=4 0x71f1e4df00=1 0x71f1e38800=1 0x71f1abbf00=1 0x71f1e38900=1
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__sysctl+0x28=134 libsystem_kernel.dylib`semaphore_signal_trap+0=10 libsystem_kernel.dylib`mach_port_mod_refs+0x64=4 libsystem_kernel.dylib`__getpeername+0=2 ?`?+0=1 libsystem_kernel.dylib`getentropy+0x18=1 libsystem_kernel.dylib`__kqueue_workloop_ctl+0xc=1 Madeira`ios_wineserver_ring+0x50=1
+[window] 0x7048000000..0x7400000000 regions=2367 occupied=12640 MB of 15232 MB free=2799 MB maxhole=2778 MB@0x713849c000 rev=ml787 (periodic)
+[window] 0x151400000..0x78fb000000 regions=30484 occupied=486605 MB of 490140 MB free=3534 MB maxhole=2778 MB@0x713849c000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 2569 MB in 494 views of the 16384 MB arena (0 MB of them in 0 unity-va views), highest end +2840 MB, largest free gap 13544 MB
+[swap] ml1077 stats: 847 MB file-backed now (peak 847), 10 extents, file used 0 of 64 MB, backs 12 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 64 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[swap] ml1150 pool: 847 MB in use (peak 847), 12 takes, 0 guarded, 0 decommits zeroed in place, 0 MB lost (free list full, or not zeroed) | 0 reservations under the file's floor (0 MB) | 0 FEX arena reservations (0 MB) | system has 4920 MB available
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=62 resident=2529MB dbg=DEBUGGED rev=ml525
+[16:42:06.787] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[thread-stacks] port=0x1480f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d8889e0
+[dns] madeira-bcd begin #21 "p2p-sto1.discovery.steamserver.net" "(null)" family=2 flags=0x0 type=0
+[dns] madeira-bcd end #21 "p2p-sto1.discovery.steamserver.net" = 0 after 9 ms (6 result(s))
+E 98 [thr-term] rev=ml435 deinit #8 tid=0x98
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[srv-input] btn msg=0x201 at (539,354) hit win=00010020 thread=0x14fe16100
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8889e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[frontend] graceful close requested
+[rip-profile] ml981 gen=3 threads=10 samples=1816 buckets=6 span=0x72bc9951fa [0x1419643db..0x73fe2f95d5] top: 0x71f1544740=77% 0x73fe2f95c0=11% 0x71f17e7500=11% 0x141cf3e00=0% 0x1419643c0=0% 0x141cf3dc0=0%
+[cpu-split] ml1123 gen=3 running samples=176: x64 JIT 3%, ARM64EC images 5%, native 90%
+[cpu-split] ml1123 image top (PE address/256): 0x71f1e41a00=3 0x71f1e38a00=2 0x71f1e4df00=2 0x71f1abc200=1 0x71f1e38100=1 0x71f1e38900=1
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`__sysctl+0x28=142 libsystem_kernel.dylib`semaphore_signal_trap+0=8 libsystem_kernel.dylib`mach_port_mod_refs+0x64=6 libsystem_kernel.dylib`__getpeername+0=2 Madeira`ios_wineserver_ring+0x50=1
+[thread-stacks] port=0x1480f "wine-x18-exc" pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 run=3 susp=0 cpu=0 x8=0x0 x18=0x0 sp=0x16d8889e0
+[thread-stacks] port=0x160ab "redDispatcher4" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d7440e0 x18=0x0 sp=0x73c5d3e9d0
+[thread-stacks] port=0x1f057 "redDispatcher5" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d7480e0 x18=0x0 sp=0x73c677e9d0
+[thread-stacks] port=0x120db "WatchdogThread" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=0 x8=0x101bc x18=0x0 sp=0x73c777fb00
+[thread-stacks] port=0x1e40b "wine_threadpool_waitqueue" pc=libsystem_kernel.dylib`read+0x8 run=3 susp=0 cpu=0 x8=0x16d7740e0 x18=0x0 sp=0x73d033e9c0
+[thread-stacks] port=0x1e353 "GameModWorker" pc=libsystem_kernel.dylib`__select+0x8 run=3 susp=0 cpu=25 x8=0x3a86 x18=0x0 sp=0x73d0e3fb00
+[thread-stacks] port=0x9023 "" pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 run=3 susp=0 cpu=0 x8=0x14ee04281 x18=0x0 sp=0x16dc86b30
+[footprint] rev=ml358 phys=2077 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=43)
+[footprint] rev=ml358 phys=2077 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=44)
+[footprint] rev=ml358 phys=2077 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=45)
+[xp-api-top] 16:42:35.555 1772 samples: kernelbase.dll+0x6c248=61561/s kernelbase.dll+0x3fe54=30885/s
+[srv-stuck] tid=0114 teb=0x7201dd0000 age=77652ms op=1 flags=00000002 timeout=9223372036854775807 alertable=0 nhandles=4 caller=0x104ea1ae4
+[srv-stuck]   tid=0114 suspend=3 rev=ml714
+[srv-stuck]   h[0]=000001e4 obj=0x14ece4000 type=Event name=GeforceNow.InstallStart raw_obj=0x14ece4000 raw_waiters=0 sync_obj=0x14f47ef30 sync_waiters=1 thread_wait=0x14f44d6c0 state=LINKED Event manual=1 signaled=0 cell=128
+[srv-stuck]   h[1]=000001ec obj=0x14ece48c0 type=Event name=GeforceNow.UninstallStart raw_obj=0x14ece48c0 raw_waiters=0 sync_obj=0x123c1bbb0 sync_waiters=1 thread_wait=0x14f44d6c0 state=LINKED Event manual=1 signaled=0 cell=130
+[srv-stuck]   h[2]=000001f4 obj=0x14e3f8c40 type=Event name=GeforceNow.InstallComplete raw_obj=0x14e3f8c40 raw_waiters=0 sync_obj=0x123c19860 sync_waiters=1 thread_wait=0x14f44d6c0 state=LINKED Event manual=1 signaled=0 cell=131
+[srv-stuck]   h[3]=000001e0 obj=0x14ece41c0 type=Event raw_obj=0x14ece41c0 raw_waiters=0 sync_obj=0x123c1a8f0 sync_waiters=1 thread_wait=0x14f44d6c0 state=LINKED Event manual=0 signaled=0 cell=129
+[xp-api-top] 16:42:36.746 1732 samples: kernelbase.dll+0x6c248=62032/s kernelbase.dll+0x3fe54=30989/s
+[16:42:36.848] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=60 resident=2519MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2077 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=46)
+[xp-api-top] 16:42:38.001 1818 samples: kernelbase.dll+0x6c248=61758/s kernelbase.dll+0x3fe54=30956/s
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d8889e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[xp-api-top] 16:42:39.256 1829 samples: kernelbase.dll+0x6c248=62129/s kernelbase.dll+0x3fe54=31166/s
+[thread-sample] ml876 b2 "" teb=0x7201e50000 cpu=0% RUN pc=libsystem_kernel.dylib`__ulock_wait2+0x8 lr=libsystem_platform.dylib`os_sync_wait_on_address_with_timeout+0x78 sp=0x73ca82f9d0 NATIVE (no FEX state) sp-cand=[ REDGalaxy64.dll+0x509db4 ] last-syscall id=0xff pc=0x12d423634 user-sp=0x73cb12f6d0 user-cand=[ ]
+[footprint] rev=ml358 phys=2076 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=47)
+[thread-sample] ml876 modmap peb=0x11aed0000 modules=89 first=Cyberpunk2077.exe@0x140000000
+[thread-sample] ml876 b3 "GameThread" teb=0x71ffe10000 cpu=0% wait pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`wait_select_reply+0x38 sp=0x14591eb00 NATIVE (no FEX state) sp-cand=[ ] last-syscall id=0x5b pc=0x12d4234a0 user-sp=0x7132d9df90 user-cand=[ Cyberpunk2077.exe+0x51ce980 ]
+[thread-sample] ml876 modmap peb=0x11b668000 modules=26 first=REDEngineErrorReporter.exe@0x72006c0000
+[thread-sample] ml876 b3 "" teb=0x71ffe00000 cpu=44% RUN pc=libsystem_kernel.dylib`read+0x8 lr=Madeira`read_reply_data+0x30 sp=0x720080fa50 NATIVE (unresolved: hostPC outside block) sp-cand=[ ]
+[thread-sample] ml876 burst done
+[xp] 16:42:40.147 +93.02 dt=266 cpu=187 (thr 187) P=59 E=128 run=327 pgw=0.0 GHz P=4.93 E=2.63 Minst=495 IPC=0.79 mJ=136 pin=0 rdKB=0 fpMB=2076
+[xp] 16:42:40.404 +93.28 dt=257 cpu=185 (thr 185) P=60 E=126 run=318 pgw=0.0 GHz P=4.91 E=2.63 Minst=533 IPC=0.86 mJ=144 pin=0 rdKB=0 fpMB=2076
+[xp-api-top] 16:42:40.404 1614 samples: kernelbase.dll+0x6c248=59938/s kernelbase.dll+0x3fe54=30053/s
+[xp] 16:42:40.668 +93.54 dt=264 cpu=192 (thr 192) P=61 E=131 run=331 pgw=0.0 GHz P=4.90 E=2.63 Minst=559 IPC=0.87 mJ=148 pin=0 rdKB=0 fpMB=2076
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 16:42:40.979 +93.85 dt=312 cpu=159 (thr 158) P=55 E=104 run=400 pgw=0.0 GHz P=4.80 E=2.61 Minst=726 IPC=1.36 mJ=194 pin=0 rdKB=0 fpMB=2077
+[xp] 16:42:41.299 +94.17 dt=320 cpu=153 (thr 153) P=46 E=108 run=626 pgw=0.0 GHz P=4.77 E=2.61 Minst=511 IPC=1.02 mJ=131 pin=0 rdKB=0 fpMB=2077
+[waiters]  tid=00f8 addr=0x7137584c48 age=83s INF w0=00000001 w1=00000000
+[waiters]  tid=00fc addr=0x7137584c48 age=83s INF w0=00000001 w1=00000000
+[waiters]  tid=00f4 addr=0x7137584c48 age=83s INF w0=00000001 w1=00000000
+[waiters]  tid=0100 addr=0x7137584c48 age=83s INF w0=00000001 w1=00000000
+[waiters]  tid=0108 addr=0x713794e5b8 age=83s INF w0=00000000 w1=00000000
+[waiters]  tid=010c addr=0x7137989c38 age=83s INF w0=00000001 w1=00000000
+[footprint] rev=ml358 phys=2077 MB (peak 2092) internal=2169 MB compressed=0 MB external=314 MB reusable=35 MB (cycle=48)
+[xp] 16:42:41.609 +94.48 dt=310 cpu=191 (thr 191) P=57 E=133 run=382 pgw=0.0 GHz P=4.89 E=2.62 Minst=545 IPC=0.87 mJ=147 pin=0 rdKB=0 fpMB=2077
+[xp-api-top] 16:42:41.609 1496 samples: kernelbase.dll+0x6c248=52932/s kernelbase.dll+0x3fe54=26492/s
+[16:42:41.720] [INFO] [session] length=95s partial=1 play=0s frames=0 stalls=0/0s peak=2100MB limit=8191MB thermal=nominal lpm=0 res=1408x648 cap=60 game=Cyberpunk 2077

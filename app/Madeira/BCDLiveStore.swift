@@ -80,6 +80,8 @@ import os
             itchChanges,   // BCDItch/BCDLiveStoreItch.swift: says something only once itch.io is in use
             eaChanges,     // BCDEA/BCDLiveStoreEA.swift: only while the experimental EA store is switched on
             amazonChanges, // BCDAmazon/BCDLiveStoreAmazon.swift: only while the experimental Amazon Games store is switched on
+            // Steam for Windows (experimental; BCDSteamDesktopLive.swift): its switch was turned, or its client was installed.
+            NotificationCenter.default.publisher(for: SteamDesktop.didChange).map { _ in () }.eraseToAnyPublisher(),
             // External drives (ExternalDrives.swift): a drive connected or removed moves games between "on this device" and
             // "on the external drive"; a game being moved (GameMover) shows on its page.
             ExternalDrives.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
@@ -230,6 +232,7 @@ import os
         var desktop = false
         for (position, entry) in library.entries.enumerated() {
             if BCDLauncherSpec.hidesEntry(entry.id) { continue }   // build 600: Battle.net and the EA app are hidden (BCDLaunchers.swift)
+            if BCDSteamDesktopLive.hidesEntry(entry.id) { continue }   // branch steam-client: Steam for Windows' own entry shows only while its switch is on
             if let appID = entry.steamAppID {
                 if steamEntries[appID] == nil { steamEntries[appID] = entry; steamPositions[appID] = position }
                 continue

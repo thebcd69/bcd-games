@@ -130,6 +130,10 @@ final class BCDHUDState: ObservableObject {
     private var buffer = [UInt64](repeating: 0, count: 512)
     private var frames: [BCDFrameSample] = []
     private var lastFrame: Double?
+    /// The frames frame generation made (BCDFrameRing.h, bcd_frame_made_*): apart from the game's, for the "+N" after its rate.
+    private var madeReader = bcd_frame_made_reader_start()
+    private var made: [BCDFrameSample] = []
+    private var lastMade: Double?
     private var tick = 0
 
     private let cpuMeter = CPUMeter()
@@ -172,6 +176,9 @@ final class BCDHUDState: ObservableObject {
         reader = bcd_frame_reader_start()
         frames.removeAll()
         lastFrame = nil
+        madeReader = bcd_frame_made_reader_start()
+        made.removeAll()
+        lastMade = nil
         pipeline = Self.pipeline(for: model.activeEntry)
         configure()
         sample()
@@ -184,6 +191,7 @@ final class BCDHUDState: ObservableObject {
         if gpuOn { madeira_gpu_meter_enable(0); gpuOn = false }
         if batteryOn { UIDevice.current.isBatteryMonitoringEnabled = false; batteryOn = false }
         frames.removeAll()
+        made.removeAll()
         feed.plan = nil
         feed.editing = false
         lastPlan = nil
@@ -250,6 +258,8 @@ final class BCDHUDState: ObservableObject {
         let cutoff = now - retain
         if let first = frames.firstIndex(where: { $0.t >= cutoff }), first > 0 { frames.removeSubrange(0..<first) }
         else if frames.last.map({ $0.t < cutoff }) == true { frames.removeAll() }
+        if let first = made.firstIndex(where: { $0.t >= now - 4 }), first > 0 { made.removeSubrange(0..<first) }   // the rate looks 2 s back at most
+        else if made.last.map({ $0.t < now - 4 }) == true { made.removeAll() }
         render(now: now, force: false)
     }
 
@@ -264,14 +274,28 @@ final class BCDHUDState: ObservableObject {
             }
             if count < buffer.count { break }
         } while true
+        repeat {
+            let count = Int(bcd_frame_made_drain(&madeReader, &buffer, UInt32(buffer.count), &lost))
+            for i in 0..<count {
+                let t = bcd_frame_ticks_to_seconds(buffer[i])
+                if let previous = lastMade, t > previous { made.append(BCDFrameSample(t: t, dt: t - previous)) }
+                lastMade = t
+            }
+            if count < buffer.count { break }
+        } while true
     }
+
+    /// Round 707 (A2 F12): the session's fixed frame cap (env.MADEIRA_FPS_CAP, exported for the session before the game starts and read
+    /// once by the engine), read once by the HUD too.
+    private lazy var frameCap: Int? = getenv("MADEIRA_FPS_CAP").flatMap { Int(String(cString: $0)) }
 
     private func render(now: Double, force: Bool) {
         guard setup.layout.shown else { return }
         tick += 1
         var d = BCDHUDData()
         d.fps = BCDFrameMath.fps(frames, now: now)
-        d.cap = BCDHUDRules.cap(fpsMode: model.fpsMode)
+        d.madeFps = BCDFrameMath.fps(made, now: now)
+        d.cap = BCDHUDRules.cap(fpsMode: model.fpsMode, frameCap: frameCap)   // round 707: the frame cap too (the session's MADEIRA_FPS_CAP)
         d.frameMs = BCDFrameMath.averageMs(frames, now: now)
         if needs.contains(.lows) {
             // Sorting a minute of frame times is the dearest thing here: twice a second is plenty for a reading that moves slowly.
@@ -330,11 +354,12 @@ final class BCDHUDState: ObservableObject {
         d.build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
 
         // The quiet dot of layouts 1 and 2: the rate under 60% of its limit for 3 seconds, serious heat, little memory.
-        if let cap = d.cap, d.fps > 0, d.fps < cap * 0.6 { lowSince = lowSince ?? now } else { lowSince = nil }
+        let shown = BCDHUDRules.shownFps(d)   // the game's frames and the ones frame generation adds: what the limit is judged by
+        if let cap = d.cap, shown > 0, shown < cap * 0.6 { lowSince = lowSince ?? now } else { lowSince = nil }
         d.warning = BCDHUDRules.quietWarning(thermal: d.thermal, freeMB: d.freeMB, lowFor: lowSince.map { now - $0 } ?? 0)
 
         // Calm: the same colours for 6 seconds. Layouts 3 and 4 (and a Custom list that asks) then fade; any change brings them back.
-        let key = [BCDHUDRules.fpsTone(d.fps, cap: d.cap), BCDHUDRules.memoryTone(freeMB: d.freeMB)].map { "\($0)" }.joined() + "\(d.thermal)"
+        let key = [BCDHUDRules.rateTone(d), BCDHUDRules.memoryTone(freeMB: d.freeMB)].map { "\($0)" }.joined() + "\(d.thermal)"
         if key.hashValue != calmKey { calmKey = key.hashValue; calmSince = now }
         let dims = setup.layout.dimsWhenCalm || (setup.layout == .custom && setup.custom.dimWhenCalm)
         let dimmed = dims && now - calmSince >= 6 && !state.moving
@@ -355,6 +380,7 @@ final class BCDHUDState: ObservableObject {
         guard writes, now - lastLogged >= 5 else { return }
         lastLogged = now
         var parts = ["layout=\(setup.layout.rawValue)", String(format: "fps=%.0f", d.fps)]
+        if d.madeFps >= 0.5 { parts.append(String(format: "made=%.0f", d.madeFps)) }   // frames frame generation adds, apart from the game's
         if let ms = d.frameMs { parts.append(String(format: "ms=%.1f", ms)) }
         if let low = d.low1 { parts.append(String(format: "low1=%.0f", low)) }
         if let cpu = d.cpuTotal { parts.append(String(format: "cpu=%.0f", cpu)) }

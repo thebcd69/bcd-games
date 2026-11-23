@@ -423,6 +423,10 @@ final class AutoTuneLogScanner {
     /// Whether a signal's first line is already in `evidence` (a count that starts again does not add a second line).
     private var evidenced: [Bool]
     private var carry: [UInt8] = []
+    /// madeira-bcd (2026-11-20): system32 programs Wine failed to start for want of their file (see `mSystem32StartFail`) whose
+    /// NtTerminateProcess(exit_code=0xc0000135) and "child exited with code -1073741515" lines are still to come and do not count.
+    private var missingProgramTerminates = 0
+    private var missingProgramChildExits = 0
 
     init(signals: [AutoTuneSignal], pairFilter: Bool = true) {
         usePairs = pairFilter
@@ -537,6 +541,10 @@ final class AutoTuneLogScanner {
         // 177 archive logs with such a block were scored by it (Cult of the Lamb 4DR32H "hung" from the previous run's GPU errors; Mina
         // the Hollower W6PACT matched metal-texture-double-release through it).
         if Self.find(l, Self.mPrevTail) != nil { return }
+        // madeira-bcd (2026-11-19): the "[prev-end]" line after that tail (BCDSessionCore.endLine) quotes the previous run's last
+        // "[freeze] alive t+", footprint and session lines, so it is that run's too. A session that exited after 6 s was scored "ran"
+        // at stage 5 from the previous run's "alive t+1502s", so no early-exit rule could match.
+        if Self.find(l, Self.mPrevEnd) != nil { return }
         // Night round 2026-11-11 (agents G10 S2, G1 note on 778A58): the sender's own words ("[user-comment] ..." lines at the top of a sent log,
         // LogUploadCore.commentLines) are a person's text, never the game's: Alan Wake 778A58's comment quoted a shader message and matched
         // dxmt-d3d9-vs-ps-interface ("FIX-FAILED") although the log has no such failure. The app's own live log never has these lines.
@@ -709,6 +717,14 @@ final class AutoTuneLogScanner {
     private static let mXpLine = Array("[xp] ".utf8)
     private static let mFpMB = Array(" fpMB=".utf8)
     private static let mPrevTail = Array("[prev-tail]".utf8)
+    private static let mPrevEnd = Array("[prev-end]".utf8)
+    /// madeira-bcd (2026-11-20): Wine starting a system32 program the bundle does not ship, `wine: failed to start
+    /// L"C:\\windows\\system32\\winemenubuilder.exe": c0000135` (build/wine-i386/build.sh leaves winemenubuilder out: there is no host
+    /// desktop). Shell32 starts it by itself (`winemenubuilder.exe -a`), also after the game's first frame.
+    private static let mSystem32StartFail = Array("wine: failed to start L\"C:\\\\windows\\\\system32\\\\".utf8)
+    private static let mStartFailNoFile = Array("\": c0000135".utf8)
+    private static let mExitNoFile = Array("exit_code=0xc0000135)".utf8)
+    private static let mChildExitNoFile = Array("child exited with code -1073741515".utf8)
     /// "[user-comment] " as bytes, not as an Array("...".utf8) literal: tools/autotune-fixture.py keeps every line a literal matches, and a
     /// sender's comment must never reach a fixture because of this marker.
     private static let mUserComment: [UInt8] = [0x5B, 0x75, 0x73, 0x65, 0x72, 0x2D, 0x63, 0x6F, 0x6D, 0x6D, 0x65, 0x6E, 0x74, 0x5D, 0x20]
@@ -961,7 +977,19 @@ final class AutoTuneLogScanner {
         }
         if S.find(l, S.mLaunchView) != nil, S.find(l, S.mCoverByPresent) != nil { facts.frameSeen = true }
         if S.find(l, S.mDeviceError) != nil { facts.gpuErrors += 1 }
-        if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
+        // madeira-bcd (2026-11-20): a system32 program Wine could not start because the bundle has no file for it is not the game failing.
+        // Its pseudo-process ends with NtTerminateProcess(exit_code=0xc0000135) and "child exited with code -1073741515" (0xc0000135):
+        // after the first frame those two scored a session that played 105 s and went to the background "crashed" instead of "ran".
+        // One of each per such start; any other error exit, and a c0000135 the game's own start or a DLL gives, still count.
+        if S.find(l, S.mSystem32StartFail) != nil, S.find(l, S.mStartFailNoFile) != nil {
+            missingProgramTerminates += 1
+            missingProgramChildExits += 1
+        }
+        if missingProgramTerminates > 0, S.find(l, S.mTerminate) != nil, S.find(l, S.mExitNoFile) != nil {
+            missingProgramTerminates -= 1
+        } else if missingProgramChildExits > 0, S.find(l, S.mChildExitNoFile) != nil {
+            missingProgramChildExits -= 1
+        } else if (S.find(l, S.mTerminate) != nil && (S.find(l, S.mErrorCode) != nil || S.find(l, S.mWarningCode) != nil))
             || S.find(l, S.mChildNegative) != nil || S.find(l, S.mInitFailed) != nil
             || S.find(l, S.mObjCException) != nil || S.find(l, S.mRedelivKill) != nil {
             if !facts.cleanMainExit { facts.errorExits += 1; facts.lastErrorExitAfterFrame = facts.frameSeen }
@@ -1070,8 +1098,12 @@ enum AutoTuneEngine {
         // madeira-bcd (round 630, agent O2 S6; N6EG31, X8FMD9): in a Dock session whose game window came up, an unhandled exception before
         // that window (the Dock's Steam client, not the game) is not the game's crash.
         let unhandledEff = f.gameWindowSeen ? f.unhandled - f.unhandledBeforeWindow : f.unhandled
+        // Round 707 (agent G1 S12; FINAL FANTASY TACTICS PJ43S9, build 686): a Dock session whose game showed an error box and whose frame
+        // counter stayed at 0 for the whole session failed at any stage: the player sat in "Graphics card is not supported" for 352 s, the
+        // clock raised the stage to 5 and the session was scored "ran, ok". A Dock game that drew frames keeps the old rule.
+        let dockBoxNoFrame = f.dock && f.presentsCounted == true && f.presentsLogged == 0 && !f.dialogs.isEmpty
         let crashedInLog = unhandledEff > 0 || f.runtimeErrorDialog || f.exitStatus != nil || errorExitsEff > 0
-            || (!f.dialogs.isEmpty && f.stage < 4) || (f.dock && f.steamNotFound && !f.dialogs.isEmpty) || launcherFailed
+            || (!f.dialogs.isEmpty && f.stage < 4) || (f.dock && f.steamNotFound && !f.dialogs.isEmpty) || launcherFailed || dockBoxNoFrame
         // madeira-bcd (round 624, Kerbal Space Program 2G3Q3V): the game drew 3474 frames, then the Dock's counter stayed at that number for
         // 5 minutes while a thread waited for a FEX lock it owned; the player closed the frozen game, and "quit after playing" (and "ran") hid
         // the freeze from every rule. As it stood at the quit, when the player asked to quit.
@@ -1180,7 +1212,11 @@ enum AutoTuneEngine {
         }
         // The app's crash status of a run whose Wine process ended with code 0 is a leftover thread's (cleanMainExit).
         let crashStatus = f.cleanMainExit ? nil : end.crashStatus
-        if !end.sawProcess && crashStatus == nil { return "inconclusive" }
+        // Round 707 (agent S1 S16; Spider-Man Remastered 2137MG, TEKKEN 7 WAD42Z, Battlefield 4 A2BNBC): the debugger answered the JIT pool
+        // request but every placement was refused ("BAD POOL ... The game is not started", "JIT pool allocation FAILED"): no Wine process ever
+        // ran, and the session was "inconclusive", so bad-pool-window-not-held (pool-window-cut = 1) could never act on the next start.
+        // That is the start's own failure: exited-early at stage 0. An unanswered request (the debugger left) stays inconclusive above.
+        if !end.sawProcess && crashStatus == nil { return f.jitPoolFailed && !f.jitDebuggerUnanswered ? "exited-early" : "inconclusive" }
         // madeira-bcd (round 624, R.E.P.O. AJ7RNE): a thread waited for a FEX lock forever ("[fexlock] STUCK write-wait") and the Dock's frame
         // counter stayed at 0 for 6.5 minutes, yet the stage the clock raises (5 after five minutes) scored the session "ran, ok" and auto-tune
         // tried nothing. Only with the Dock's counter (a game that draws without it keeps the old rule, round 580) and no crash evidence.
@@ -1225,6 +1261,10 @@ enum AutoTuneEngine {
         // 10 s or less after a few frames (32 frames, then the loading screen stayed for 100 s): "hung", not "ran". Of the 82 archive logs
         // alive 100 s or more with 15 s or less of play, only these two change.
         if f.stage <= 3, f.aliveSeconds >= 120, let play = f.sessionPlaySeconds, play <= 10, f.presentsLogged > 0 { return "hung" }
+        // Round 707 (agent A1 S12; VRChat MR0CR9, build 682): the app's own exit report says the game closed by itself before it showed a
+        // picture, and the session never reached the presenting stage: that is not a game that ran, however long the session lived around
+        // it (the Dock's Steam client starting took the two minutes; launch.exe died 1 s after it started). Scored "ran", no rule spoke.
+        if f.closedBeforePicture && f.stage < 3 { return "exited-early" }
         return f.stage >= 4 || (f.aliveSeconds >= 120 && !noFrameProof) ? "ran" : "exited-early"
     }
 
@@ -1479,6 +1519,24 @@ struct AutoTuneState: Codable, Equatable {
         let have = Set(kept.filter { AutoTuneRules.key($0) == optinKey }.flatMap(optinNames).map { $0.lowercased() })
         return lines.filter { AutoTuneRules.key($0) == optinKey }.flatMap(optinNames).contains { !have.contains($0.lowercased()) }
     }
+    /// Round 707 (owner 2026-11-22, decision 3; NFS: Most Wanted 2012 XP5V1Y, FIFA 22): a list row that owns env.MADEIRA_OPTIN_DLLS kept every
+    /// rule that names one more DLL out ("a key of the recommended list"), so EADesktop's dxva2 never reached the EA rows. A rule whose only
+    /// key the list holds is that one, and that names a DLL the list's line lacks, adds its names to the list's: the attempt's line is the
+    /// list's names first, then the rule's (no name of the list is ever dropped). Nil: not such a rule.
+    static func optinOverList(_ lines: [String], keys: [String], listValues: [String: String]) -> [String]? {
+        guard let listed = listValues[optinKey], keys.filter({ listValues[$0] != nil }) == [optinKey] else { return nil }
+        let listLine = optinKey + " = " + listed
+        guard addsOptinNames(lines, to: [listLine]) else { return nil }
+        return lines.map { line in AutoTuneRules.key(line) == optinKey ? merge([listLine], [line]).first { AutoTuneRules.key($0) == optinKey } ?? line : line }
+    }
+    /// Round 707: a launch line that holds every name of the list's env.MADEIRA_OPTIN_DLLS and more (optinOverList) replaces the list's line in
+    /// the launch file's copy of the game's file, as a raised swap-mb does.
+    static func supersedesListOptin(_ line: String, listValue: String?) -> Bool {
+        guard AutoTuneRules.key(line) == optinKey, let listValue else { return false }
+        let have = Set(optinNames(line).map { $0.lowercased() })
+        let listed = Set(optinNames(optinKey + " = " + listValue).map { $0.lowercased() })
+        return listed.isSubset(of: have) && have.count > listed.count
+    }
     static func merge(_ kept: [String], _ add: [String]) -> [String] {
         let keys = Set(add.map(AutoTuneRules.key))
         var out = kept.filter { !keys.contains(AutoTuneRules.key($0)) }
@@ -1706,7 +1764,11 @@ extension AutoTuneEngine {
                     }
                     if !changes { return skip("the recommended list has its lines") }
                 } else if keys.contains(where: { listValues[$0] != nil }) {
-                    return skip("a key of the recommended list")   // any other rule or verdict: the list's keys are the user's, as before
+                    // Round 707 (owner 2026-11-22): a rule that only adds DLL names to the list's env.MADEIRA_OPTIN_DLLS (optinOverList) may.
+                    guard let union = AutoTuneState.optinOverList(partialLines ?? rule.lines, keys: keys, listValues: listValues) else {
+                        return skip("a key of the recommended list")   // any other rule or verdict: the list's keys are the user's, as before
+                    }
+                    partialLines = union
                 }
             }
             // An upgrade raises what auto-tune kept; anything else adds only new keys.

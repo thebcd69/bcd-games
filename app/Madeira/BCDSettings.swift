@@ -43,6 +43,8 @@ import UIKit
     var custom: [BCDSettingsSection: () -> AnyView] = [:]
     /// A game's page, from Storage's list of games; nil until the game page is wired in.
     var openGame: ((BCDGame) -> Void)? = nil
+    /// Recommended settings' catalog of the list in use (BCDRecommendedCatalogLive.swift); nil in the preview build, which shows a sample.
+    var recommended: (any BCDRecommendedBackend)? = nil
 }
 
 /// B in a section built elsewhere (Accounts, JIT, BCD Dock): the section hands Settings its own
@@ -849,6 +851,7 @@ struct BCDSettingsDetail: View {
         case .dotnet: Self.dotNet(model.backends.dotNet)
         case .logs: Self.logs(model.backends.logs)
         case .feedback: Self.feedback(model.backends.feedback)
+        case .recommended: BCDRecommendedSettings(backend: model.backends.recommendedBackend)
         case .all: Self.allSettings(model.backends.allSettings)
         case .developer: Self.developer(model.backends.developer)
         case .updates: BCDUpdatesSettings()

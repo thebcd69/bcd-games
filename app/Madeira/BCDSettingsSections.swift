@@ -21,7 +21,7 @@ private func gigabytes(_ megabytes: Int) -> String { String(format: "%g GB", Dou
 private func memoryText(_ bytes: Int64) -> String { ByteCountFormatter.string(fromByteCount: bytes, countStyle: .memory) }
 
 /// Graphics' frame caps, Controls' opacity and speed steps (frames a second, fractions, multiples).
-private let frameCaps = [24, 30, 40, 60]
+private let frameCaps = [20, 24, 25, 30, 40, 60]   // round 707 (A2 F12, 140WHX): 20 and 25, which frame generation doubles to 40 and 50
 private let opacitySteps = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 private let speedSteps = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8]
 
@@ -74,6 +74,9 @@ struct BCDMemoryStatus: Hashable {
     /// Whether the game's sound plays meanwhile (muted unless this is on).
     var backgroundSound: Bool { get }
     func setBackgroundSound(_ on: Bool)
+    /// bcd.cfg's background-cpu (BCDBackgroundCPU.swift): "" is the standard, 50% of one core, no line; the effect starts the next time BCD is left.
+    var backgroundCPU: String { get }
+    func setBackgroundCPU(_ percent: String)
     /// A switch changed this run: it applies from BCD's next start.
     var restartNeeded: Bool { get }
     var extensionTestAvailable: Bool { get }
@@ -86,6 +89,8 @@ struct BCDMemoryStatus: Hashable {
 extension BCDMemoryBackend {
     var schedHints: String { "" }
     func setSchedHints(_ value: String) {}
+    var backgroundCPU: String { "" }
+    func setBackgroundCPU(_ percent: String) {}
 }
 
 /// The minutes Memory & performance's In the background rows offer ("" is off, the engine's own default). Outside the generic view: Swift
@@ -165,7 +170,7 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                 if backend.restartNeeded { BCDSettingsNotice(text: bcdSettingsRestartNote) }
             }
             BCDSettingsGroup(title: "In the background",
-                             footer: "Off, BCD behaves as it always has: iOS pauses a game and a download within seconds of leaving BCD. On, BCD stays running with a silent audio session, so the phone may run warmer and use more battery meanwhile; it holds its own CPU use down so iOS does not end it, and a game loads slower than in front. iOS can still close BCD in the background when another app needs the memory.") {
+                             footer: "Off, BCD behaves as it always has: iOS pauses a game and a download within seconds of leaving BCD. On, BCD stays running with a silent audio session, so the phone may run warmer and use more battery meanwhile; it holds its own CPU use down so iOS does not end it (the CPU limit sets how far), and a game or a download goes slower than in front. iOS can still close BCD in the background when another app needs the memory.") {
                 BCDSettingsValueRow(id: BCDSettingsID.control(.memory, "background-game"), title: "Keep a game running",
                                     note: "When you switch apps or lock the screen, a running game keeps loading for this long instead of being paused. It draws nothing until you are back, and its sound is muted. Then it pauses, and a notification says so if you allowed them. Applies the next time you leave BCD.",
                                     choices: BCDBackgroundRows.choices(current: backend.backgroundGame, steps: BCDBackgroundRows.gameSteps),
@@ -174,6 +179,9 @@ struct BCDMemorySettings<Backend: BCDMemoryBackend>: View {
                                     note: "A Steam, Epic, GOG, EA or itch.io download goes on for this long after you leave BCD, where iOS would otherwise stop it. iOS 26 and later often keeps a download going by itself.",
                                     choices: BCDBackgroundRows.choices(current: backend.backgroundDownload, steps: BCDBackgroundRows.downloadSteps),
                                     value: backend.backgroundDownload) { backend.setBackgroundDownload($0) }
+                BCDSettingsValueRow(id: BCDSettingsID.control(.memory, "background-cpu"), title: BCDBackgroundCPU.title, note: BCDBackgroundCPU.note,
+                                    choices: BCDBackgroundCPU.choices(current: backend.backgroundCPU).map { BCDSettingsChoice(value: $0.value, label: $0.label) },
+                                    value: backend.backgroundCPU) { backend.setBackgroundCPU($0) }
                 BCDSettingsToggleRow(id: BCDSettingsID.control(.memory, "background-sound"), title: "Hear the game meanwhile",
                                      note: "Off: the game's sound is muted while BCD is in the background, and other apps' audio plays normally. On: you keep hearing the game.",
                                      isOn: backend.backgroundSound, enabled: backend.backgroundGame != "") { backend.setBackgroundSound($0) }

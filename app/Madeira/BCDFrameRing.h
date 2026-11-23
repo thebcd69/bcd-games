@@ -63,6 +63,23 @@ uint32_t bcd_frame_ring_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t 
 /// How many presents the ring has taken since the process began.
 uint64_t bcd_frame_ring_count(void);
 
+// MARK: Frames made by frame generation
+//
+// Apple's frame interpolation (winemetal's and KosmicKrisp's), Lossless Scaling (DXMT's, the Direct3D 12 bridge's and KosmicKrisp's)
+// and MetalFX frame interpolation show frames of their own besides the game's. They come here, never into the ring above: the frame
+// times, the lows and the session's statistics stay the game's own, and the HUD shows these next to the game's rate ("15+15").
+// Exported by name (KosmicKrisp, a library of its own, finds bcd_frame_made_push_n in the process); wait-free, from any thread.
+
+/// `count` frames made by frame generation have just been handed to the screen.
+void bcd_frame_made_push_n(uint32_t count);
+/// The same with the clock given in ticks: the seam for tests.
+void bcd_frame_made_push_at(uint64_t ticks);
+/// A reader of the frames made from now on, and their timestamps since its last call (as bcd_frame_ring_drain).
+bcd_frame_reader bcd_frame_made_reader_start(void);
+uint32_t bcd_frame_made_drain(bcd_frame_reader *reader, uint64_t *out, uint32_t max, uint64_t *lost);
+/// How many frames made the ring has taken since the process began.
+uint64_t bcd_frame_made_count(void);
+
 // MARK: The session's statistics
 
 /// Starts a new session's statistics (the histogram of frame times, the stalls, the worst frame).

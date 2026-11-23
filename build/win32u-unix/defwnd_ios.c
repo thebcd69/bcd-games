@@ -693,8 +693,12 @@ static BOOL on_bottom_border( int hit )
  *
  * Perform SC_MOVE and SC_SIZE commands.
  */
+extern void winios_input_wake_enter( int *saved );   /* driver_ios.c, round 707 (G1 S23) */
+extern void winios_input_wake_leave( int saved );
+
 static void sys_command_size_move( HWND hwnd, WPARAM wparam )
 {
+    int wake_saved;   /* madeira-bcd (round 707, G1 S23): the thread's input-wake mark before the loop */
     DWORD msg_pos = NtUserGetThreadInfo()->message_pos;
     BOOL thickframe, drag_full_windows = TRUE, moved = FALSE;
     RECT sizing_rect, mouse_rect, orig_rect;
@@ -801,7 +805,10 @@ static void sys_command_size_move( HWND hwnd, WPARAM wparam )
 
     send_message( hwnd, WM_ENTERSIZEMOVE, 0, 0 );
     set_capture_window( hwnd, GUI_INMOVESIZE, NULL );
-    fprintf( stderr, "[winios-move] loop start (captured)\n" );
+    /* madeira-bcd (round 707, agent G1 S23): the loop's waits drain the app's input ring (winios_input_wake_enter), or the button-up never
+     * arrives in game mode and the game freezes for good (MemeticBox HK9M6K) */
+    winios_input_wake_enter( &wake_saved );
+    fprintf( stderr, "[winios-move] loop start (captured; its waits drain the input ring)\n" );
 
     for (;;)
     {
@@ -922,6 +929,7 @@ static void sys_command_size_move( HWND hwnd, WPARAM wparam )
     if (moved && !drag_full_windows)
         draw_moving_frame( parent, hdc, &sizing_rect, thickframe );
 
+    winios_input_wake_leave( wake_saved );   /* round 707 (G1 S23) */
     fprintf( stderr, "[winios-move] exit moved=%d last_msg=0x%x\n",
              moved, (unsigned)msg.message );
     set_capture_window( 0, GUI_INMOVESIZE, NULL );

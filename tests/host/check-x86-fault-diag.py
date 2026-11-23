@@ -274,7 +274,9 @@ check('the bundled lists that carry the switch are exactly Most Wanted, Undergro
                           # round 669 (agent D): Digimon Time Stranger, Dumpster Gang, OutRun 2006, One Piece PW3
                           + [('digimon-story-time-stranger', 'env.MADEIRA_X86_FAULT_DUMP = 1', 652), ('dumpster-gang', 'env.MADEIRA_X86_FAULT_DUMP = 1', 652), ('outrun-2006-coast-2-coast', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598), ('one-piece-pirate-warriors-3', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]
                           # round 677 (agent A1 S11): Thief: Deadly Shadows, beside its d3d8to9 line
-                          + [('thief-deadly-shadows', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]),
+                          + [('thief-deadly-shadows', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]
+                          # round 707 (agent M3): Detroit: Become Human's new row, to make the next log name its fault
+                          + [('detroit-become-human', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]),
       str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs

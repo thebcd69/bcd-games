@@ -967,6 +967,26 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     require(events == ["logoff-sent", "socket-closed", "sign-in-transfer-written"],
             "a Dock start during a session's close waits for that close: \(events)")
     gate.releaseDock(); gate.reopen(sessionRunning: false)
+    // Branch steam-client (2026-11-21, M1): a Steam for Windows session holds the account the same way, with a hold of its own: Valve's
+    // client signs in in its own window some time after the session began.
+    events.removeAll()
+    await gate.holdForDesktopClient()
+    require(events == ["logoff-sent", "socket-closed"] && gate.heldForDesktopClient && !gate.heldForDock && !gate.open,
+            "Steam for Windows: the app's connection logs off and its socket closes before the session starts: \(events)")
+    require(!gate.reopen(sessionRunning: false) && !events.contains("reopened"),
+            "while a Steam for Windows session holds the account the connection stays closed (no session seen yet)")
+    gate.releaseDock()
+    require(!gate.reopen(sessionRunning: false), "a Dock release does not free a Steam for Windows hold")
+    gate.releaseDesktopClient()
+    require(!gate.reopen(sessionRunning: true) && !events.contains("reopened"), "the Steam for Windows session still runs: still closed")
+    require(gate.reopen(sessionRunning: false) && events.last == "reopened" && gate.open && !gate.heldForDesktopClient,
+            "the Steam for Windows session ended: the connection may come back")
+    // Both holds at once never happen (one session a run), but neither release frees the other's.
+    await gate.holdForDock()
+    await gate.holdForDesktopClient()
+    gate.releaseDesktopClient()
+    require(!gate.reopen(sessionRunning: false), "a Steam for Windows release does not free a Dock hold")
+    gate.releaseDock(); gate.reopen(sessionRunning: false)
     // Round 630 (agent A1 S17): a bounded wait answers true for work that ends in time, false for work that does not, and lets it go on.
     @MainActor final class Flag { var on = false }
     let finished = Flag()
