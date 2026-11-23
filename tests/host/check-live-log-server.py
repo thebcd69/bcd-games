@@ -30,9 +30,18 @@ let logURL = URL(fileURLWithPath: CommandLine.arguments[1])
 let network = BCDLiveLogServer.IPv4Network(address: .loopback, netmask: IPv4Address("255.0.0.0")!)
 let subnet = BCDLiveLogServer.IPv4Network(address: IPv4Address("192.168.42.65")!,
                                           netmask: IPv4Address("255.255.255.192")!)
-precondition(subnet.contains(IPv4Address("192.168.42.66")!))
+let macAddress = IPv4Address("192.168.42.66")!
+precondition(subnet.contains(macAddress))
 precondition(!subnet.contains(IPv4Address("192.168.42.63")!))
 precondition(!subnet.contains(IPv4Address("192.168.42.128")!))
+
+let validateHostname = BCDLiveLogServer.validatedHostname
+let hostname = "iphone.local."
+precondition(validateHostname(hostname, subnet.address, [subnet.address]) == "iphone.local")
+precondition(validateHostname(hostname, subnet.address, [macAddress]) == nil)
+precondition(validateHostname(hostname, subnet.address, [subnet.address, macAddress]) == nil)
+precondition(validateHostname(hostname, subnet.address, []) == nil)
+precondition(validateHostname("iphone.example.", subnet.address, [subnet.address]) == nil)
 
 var server: BCDLiveLogServer?
 while let line = readLine() {

@@ -27,6 +27,12 @@ final class BCDLiveLogServer: @unchecked Sendable {
         init(_ connection: NWConnection) { self.connection = connection }
     }
 
+    private struct IPv4Lookup {
+        var addresses: Set<IPv4Address> = []
+        var moreComing = true
+        var failed = false
+    }
+
     private static let endOfHeaders = Data("\r\n\r\n".utf8)
     private static let requestLimit = 4096
     private static let replayBytes: UInt64 = 64 * 1024
@@ -51,7 +57,8 @@ final class BCDLiveLogServer: @unchecked Sendable {
         parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(network.address), port: port)
         listener = try NWListener(using: parameters)
         if let interface {
-            listener.service = NWListener.Service(name: "BCD Live Logs", type: "_http._tcp", domain: "local.",
+            // A new instance name avoids reusing another device's cached service record.
+            listener.service = NWListener.Service(name: "BCD Live Logs \(UUID().uuidString)", type: "_http._tcp", domain: "local.",
                                                   txtRecord: NWTXTRecord(["path": "/api/log"]))
             listener.serviceRegistrationUpdateHandler = { [weak self] change in
                 self?.updateRegistration(change, interfaceIndex: UInt32(interface.index), status: status)
@@ -96,8 +103,9 @@ final class BCDLiveLogServer: @unchecked Sendable {
         switch change {
         case .add(let endpoint):
             registration = endpoint
+            let address = network.address
             DispatchQueue.global(qos: .utility).async { [weak self] in
-                guard let hostname = Self.resolveHostname(endpoint, interfaceIndex: interfaceIndex) else { return }
+                guard let hostname = Self.resolveHostname(endpoint, interfaceIndex: interfaceIndex, address: address) else { return }
                 self?.queue.async { [weak self] in
                     guard let self, !self.stopped, self.registration == endpoint else { return }
                     self.hostname = hostname
@@ -114,11 +122,10 @@ final class BCDLiveLogServer: @unchecked Sendable {
         }
     }
 
-    // Resolve the service's SRV record to get the device's .local hostname.
-    private static func resolveHostname(_ endpoint: NWEndpoint, interfaceIndex: UInt32) -> String? {
+    private static func resolveHostname(_ endpoint: NWEndpoint, interfaceIndex: UInt32, address: IPv4Address) -> String? {
         guard case let .service(name, type, domain, _) = endpoint else { return nil }
         var hostname: String?
-        return withUnsafeMutablePointer(to: &hostname) { result in
+        let qualifiedHostname = withUnsafeMutablePointer(to: &hostname) { result -> String? in
             var service: DNSServiceRef?
             let error = DNSServiceResolve(&service, 0, interfaceIndex, name, type, domain, { _, _, _, error, _, host, _, _, _, context in
                 guard error == kDNSServiceErr_NoError, let host, let context else { return }
@@ -126,12 +133,55 @@ final class BCDLiveLogServer: @unchecked Sendable {
             }, result)
             guard error == kDNSServiceErr_NoError, let service else { return nil }
             defer { DNSServiceRefDeallocate(service) }
-            var descriptor = pollfd(fd: DNSServiceRefSockFD(service), events: Int16(POLLIN), revents: 0)
-            guard poll(&descriptor, 1, 2000) > 0, descriptor.revents & Int16(POLLIN) != 0,
-                  DNSServiceProcessResult(service) == kDNSServiceErr_NoError,
-                  let name = result.pointee, name.lowercased().hasSuffix(".local.") else { return nil }
-            return String(name.dropLast())
+            return processDNSResult(service, until: .now() + .seconds(2)) ? result.pointee : nil
         }
+        guard let qualifiedHostname, qualifiedHostname.lowercased().hasSuffix(".local.") else { return nil }
+        return validatedHostname(qualifiedHostname, for: address,
+                                 resolvedAddresses: resolveIPv4Addresses(qualifiedHostname, interfaceIndex: interfaceIndex))
+    }
+
+    static func validatedHostname(_ qualifiedHostname: String, for address: IPv4Address,
+                                  resolvedAddresses: Set<IPv4Address>) -> String? {
+        guard qualifiedHostname.lowercased().hasSuffix(".local."), resolvedAddresses == [address] else { return nil }
+        return String(qualifiedHostname.dropLast())
+    }
+
+    private static func resolveIPv4Addresses(_ hostname: String, interfaceIndex: UInt32) -> Set<IPv4Address> {
+        var lookup = IPv4Lookup()
+        return withUnsafeMutablePointer(to: &lookup) { result in
+            var service: DNSServiceRef?
+            let error = DNSServiceGetAddrInfo(&service, 0, interfaceIndex, UInt32(kDNSServiceProtocol_IPv4), hostname, {
+                _, flags, _, error, _, socket, _, context in
+                guard let context else { return }
+                let result = context.assumingMemoryBound(to: BCDLiveLogServer.IPv4Lookup.self)
+                guard error == kDNSServiceErr_NoError, let address = BCDLiveLogServer.ipv4(socket) else {
+                    result.pointee.failed = true
+                    return
+                }
+                if flags & UInt32(kDNSServiceFlagsAdd) != 0 {
+                    result.pointee.addresses.insert(address)
+                } else {
+                    result.pointee.addresses.remove(address)
+                }
+                result.pointee.moreComing = flags & UInt32(kDNSServiceFlagsMoreComing) != 0
+            }, result)
+            guard error == kDNSServiceErr_NoError, let service else { return [] }
+            defer { DNSServiceRefDeallocate(service) }
+            let deadline = DispatchTime.now() + .seconds(2)
+            while result.pointee.moreComing {
+                guard processDNSResult(service, until: deadline), !result.pointee.failed else { return [] }
+            }
+            return result.pointee.addresses
+        }
+    }
+
+    private static func processDNSResult(_ service: DNSServiceRef, until deadline: DispatchTime) -> Bool {
+        let now = DispatchTime.now().uptimeNanoseconds
+        guard now < deadline.uptimeNanoseconds else { return false }
+        let timeout = Int32((deadline.uptimeNanoseconds - now + 999_999) / 1_000_000)
+        var descriptor = pollfd(fd: DNSServiceRefSockFD(service), events: Int16(POLLIN), revents: 0)
+        return poll(&descriptor, 1, timeout) > 0 && descriptor.revents & Int16(POLLIN) != 0
+            && DNSServiceProcessResult(service) == kDNSServiceErr_NoError
     }
 
     private func closeAll() {
