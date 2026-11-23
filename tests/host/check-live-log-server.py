@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
-"""Check live logs over macOS loopback TCP and restoration of the saved opt-in."""
+"""Check live logs over macOS loopback TCP and restoration of saved preferences."""
 
 from contextlib import contextmanager
 from http.client import HTTPConnection
 from pathlib import Path
 from select import select
-from socket import create_connection
+from socket import create_connection, socket
 from urllib.parse import urlsplit
 import os
 import subprocess
@@ -44,11 +44,20 @@ struct LogStore {
         let access = BCDLiveLogAccess(defaults: defaults)
         access.restore()
         precondition(!access.state.isOn, "Live log access must default to off")
+        precondition(access.preferences.port == 8766)
+        precondition(access.preferences.historyMB == 1 && access.preferences.historyBytes == 1_000_000)
+        access.setPort(9876)
+        access.setHistoryMB(5)
+        access.setPort(0)
+        access.setHistoryMB(6)
+        precondition(access.preferences.port == 9876 && access.preferences.historyMB == 5)
         access.setEnabled(true)
         precondition(access.state.isOn)
     }
     do {
         let access = BCDLiveLogAccess(defaults: UserDefaults(suiteName: suite)!)
+        precondition(access.preferences.port == 9876)
+        precondition(access.preferences.historyMB == 5 && access.preferences.historyBytes == 5_000_000)
         access.restore()
         guard case .starting = access.state else {
             preconditionFailure("A new controller must start live log access after opt-in")
@@ -63,6 +72,7 @@ struct LogStore {
 
 MainActor.assumeIsolated { checkSavedAccess() }
 
+precondition(BCDLiveLogServer.defaultPort.rawValue == 8766)
 let network = BCDLiveLogServer.IPv4Network(address: .loopback, netmask: IPv4Address("255.0.0.0")!)
 let subnet = BCDLiveLogServer.IPv4Network(address: IPv4Address("192.168.42.65")!,
                                           netmask: IPv4Address("255.255.255.192")!)
@@ -91,6 +101,9 @@ while let line = readLine() {
             case .failure(let error): fatalError("Listener failed: \(error)")
             }
         }
+    case "history":
+        server!.setReplayBytes(UInt64(command[1])!)
+        reply("updated")
     case "stop":
         server?.stop()
         server = nil
@@ -129,14 +142,11 @@ class LiveLogServerTest(unittest.TestCase):
         self.assertTrue(line, f"Server exited during {command}")
         return line.strip()
 
-    def start(self, server, port=0):
+    def start(self, server, port):
         endpoint = urlsplit(self.command(server, f"start {port}"))
         self.assertEqual((endpoint.scheme, endpoint.hostname, endpoint.path), ("http", "127.0.0.1", "/api/log"))
         self.assertEqual(endpoint.query, "")
-        if port:
-            self.assertEqual(endpoint.port, port)
-        else:
-            self.assertGreater(endpoint.port, 0)
+        self.assertGreater(endpoint.port, 0)
         return endpoint
 
     def assert_rejected(self, endpoint, status, *, target=None, host=None):
@@ -152,14 +162,16 @@ class LiveLogServerTest(unittest.TestCase):
             source.write_text("\n".join((
                 HARNESS,
                 swift_declaration("BCDSettingsSections.swift", "enum BCDLiveLogState {"),
+                swift_declaration("BCDSettingsSections.swift", "struct BCDLiveLogPreferences"),
                 swift_declaration("BCDSettingsLive.swift", "@MainActor final class BCDLiveLogAccess:"),
             )))
             subprocess.run([os.environ.get("SWIFTC", "swiftc"), "-module-cache-path", str(folder / "modules"),
                             str(SERVER), str(source), "-o", str(binary)], check=True, timeout=120)
 
             log = folder / "bcd-log.txt"
-            recent = b"recent log line\n" * 4096
-            log.write_bytes(b"older log entry\n" + recent)
+            recent = b"recent log line\n" * 62_500
+            history = b"older log lines\n" * 250_000 + recent
+            log.write_bytes(b"outside the rolling history\n" + history)
 
             preferences = folder / "test-user"
             (preferences / "Library/Preferences").mkdir(parents=True)
@@ -167,7 +179,12 @@ class LiveLogServerTest(unittest.TestCase):
             with subprocess.Popen([binary, log], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                   text=True, env=env) as server:
                 try:
-                    endpoint = self.start(server)
+                    with socket() as occupied:
+                        occupied.bind(("127.0.0.1", 0))
+                        occupied.listen()
+                        preferred_port = occupied.getsockname()[1]
+                        endpoint = self.start(server, port=preferred_port)
+                        self.assertNotEqual(endpoint.port, preferred_port)
                     self.assert_rejected(endpoint, 404, target="/api/log?extra=value")
                     self.assert_rejected(endpoint, 404, target="/another-file")
                     self.assert_rejected(endpoint, 403, host="bad.example")
@@ -180,11 +197,16 @@ class LiveLogServerTest(unittest.TestCase):
                             self.assertEqual(stream.headers["Cache-Control"], "no-store")
                             self.assertEqual(stream.read(len(recent)), recent)
 
-                        appended = b"written while both readers are connected\n"
-                        with log.open("ab") as file:
-                            file.write(appended)
-                        for stream in (first, second):
-                            self.assertEqual(stream.read(len(appended)), appended)
+                        self.assertEqual(self.command(server, "history 5000000"), "updated")
+                        with request(endpoint) as expanded:
+                            self.assertEqual(expanded.status, 200)
+                            self.assertEqual(expanded.read(len(history)), history)
+
+                            appended = b"written while all three readers are connected\n"
+                            with log.open("ab") as file:
+                                file.write(appended)
+                            for stream in (first, second, expanded):
+                                self.assertEqual(stream.read(len(appended)), appended)
 
                         replacement = b"new log after Clear Log\n"
                         new_log = log.with_suffix(".new")
@@ -203,8 +225,8 @@ class LiveLogServerTest(unittest.TestCase):
                     with self.assertRaises(ConnectionRefusedError):
                         create_connection((endpoint.hostname, endpoint.port), timeout=TIMEOUT).close()
 
-                    next_endpoint = self.start(server, port=endpoint.port)
-                    self.assertEqual(next_endpoint, endpoint)
+                    next_endpoint = self.start(server, port=preferred_port)
+                    self.assertEqual(next_endpoint.port, preferred_port)
                     with request(next_endpoint) as stream:
                         self.assertEqual(stream.status, 200)
                         self.assertEqual(stream.read(len(replacement)), replacement)

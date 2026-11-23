@@ -939,12 +939,26 @@ struct BCDTouchEditorHost: View {
 @MainActor final class BCDLiveLogAccess: ObservableObject {
     static let shared = BCDLiveLogAccess()
     static let defaultsKey = "bcd.logs.liveAccess"
+    private static let portKey = "bcd.logs.livePort"
+    private static let historyKey = "bcd.logs.liveHistoryMB"
     @Published private(set) var state = BCDLiveLogState.off
+    @Published private(set) var preferences: BCDLiveLogPreferences
     private let defaults: UserDefaults
     private var monitor: NWPathMonitor?
     private var server: BCDLiveLogServer?
 
-    init(defaults: UserDefaults = .standard) { self.defaults = defaults }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        var preferences = BCDLiveLogPreferences()
+        if let savedPort = UInt16(exactly: defaults.integer(forKey: Self.portKey)), savedPort != 0 {
+            preferences.port = savedPort
+        }
+        let savedHistory = defaults.integer(forKey: Self.historyKey)
+        if BCDLiveLogPreferences.historyRange.contains(savedHistory) {
+            preferences.historyMB = savedHistory
+        }
+        self.preferences = preferences
+    }
 
     func restore() {
         guard case .off = state, defaults.bool(forKey: Self.defaultsKey) else { return }
@@ -954,6 +968,23 @@ struct BCDTouchEditorHost: View {
     func setEnabled(_ on: Bool) {
         defaults.set(on, forKey: Self.defaultsKey)
         if on { start() } else { stop(.off) }
+    }
+
+    func setPort(_ port: UInt16) {
+        guard port != 0, port != preferences.port else { return }
+        defaults.set(Int(port), forKey: Self.portKey)
+        preferences.port = port
+        guard state.isOn else { return }
+        if case .sharing(let url) = state, url.port == Int(port) { return }
+        stop(.starting)
+        start()
+    }
+
+    func setHistoryMB(_ count: Int) {
+        guard BCDLiveLogPreferences.historyRange.contains(count), count != preferences.historyMB else { return }
+        defaults.set(count, forKey: Self.historyKey)
+        preferences.historyMB = count
+        server?.setReplayBytes(preferences.historyBytes)
     }
 
     private func start() {
@@ -988,7 +1019,8 @@ struct BCDTouchEditorHost: View {
         }
         state = .starting
         do {
-            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, network: network, interface: interface) {
+            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, network: network, interface: interface,
+                                         port: NWEndpoint.Port(rawValue: preferences.port)!, replayBytes: preferences.historyBytes) {
                 [weak self, weak monitor] result in
                 guard let self, let monitor else { return }
                 DispatchQueue.main.async {
@@ -1042,7 +1074,10 @@ struct BCDLiveSwitch {
     }
 
     var liveLogState: BCDLiveLogState { liveLogs.state }
+    var liveLogPreferences: BCDLiveLogPreferences { liveLogs.preferences }
     func setLiveLogAccess(_ on: Bool) { liveLogs.setEnabled(on) }
+    func setLiveLogPort(_ port: UInt16) { liveLogs.setPort(port) }
+    func setLiveLogHistoryMB(_ count: Int) { liveLogs.setHistoryMB(count) }
 
     func refresh() {
         LogUpload.forgetAutomatic()

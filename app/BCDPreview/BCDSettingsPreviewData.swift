@@ -338,6 +338,7 @@ extension BCDSettingsBackends {
     @Published private(set) var sending = false
     @Published private(set) var sendStatus: String?
     @Published private(set) var liveLogState = BCDLiveLogState.off
+    @Published private(set) var liveLogPreferences = BCDLiveLogPreferences()
     @Published private(set) var extendedLogging = false
     @Published private(set) var perfTrace = false   // round 604
     @Published private var diagnostics: Set<BCDDiagnostic> = []
@@ -351,10 +352,15 @@ extension BCDSettingsBackends {
         var endpoint = URLComponents()
         endpoint.scheme = "http"
         endpoint.host = "iphone.local"
-        endpoint.port = 8766
+        endpoint.port = Int(liveLogPreferences.port)
         endpoint.path = "/api/log"
         liveLogState = on ? .sharing(endpoint.url!) : .off
     }
+    func setLiveLogPort(_ port: UInt16) {
+        liveLogPreferences.port = port
+        if liveLogState.isOn { setLiveLogAccess(true) }
+    }
+    func setLiveLogHistoryMB(_ count: Int) { liveLogPreferences.historyMB = count }
     func setExtendedLogging(_ on: Bool) { extendedLogging = on }
     func setPerfTrace(_ on: Bool) { perfTrace = on }
     func diagnostic(_ item: BCDDiagnostic) -> Bool { diagnostics.contains(item) }

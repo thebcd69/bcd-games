@@ -8,6 +8,8 @@ import Network
 
 /// Serves the current raw log without depending on the UI log reader or its filters.
 final class BCDLiveLogServer: @unchecked Sendable {
+    typealias StatusHandler = @Sendable (Result<URL, Error>) -> Void
+
     struct IPv4Network: Equatable {
         let address: IPv4Address
         let netmask: IPv4Address
@@ -35,47 +37,67 @@ final class BCDLiveLogServer: @unchecked Sendable {
 
     private static let endOfHeaders = Data("\r\n\r\n".utf8)
     private static let requestLimit = 4096
-    private static let replayBytes: UInt64 = 64 * 1024
-    static let port: NWEndpoint.Port = 8766
+    static let defaultPort = NWEndpoint.Port(rawValue: BCDLiveLogPreferences.defaultPort)!
     private let queue = DispatchQueue(label: "bcd.live-logs", qos: .utility)
-    private let listener: NWListener
     private let logURL: URL
     let network: IPv4Network
     let interface: NWInterface?
+    private var listener: NWListener
+    private var replayBytes: UInt64
     private var registration: NWEndpoint?
     private var hostname: String?
     private var clients: [ObjectIdentifier: Client] = [:]
     private var stopped = false
 
-    init(logURL: URL, network: IPv4Network, interface: NWInterface?, port: NWEndpoint.Port = BCDLiveLogServer.port,
-         status: @escaping @Sendable (Result<URL, NWError>) -> Void) throws {
+    init(logURL: URL, network: IPv4Network, interface: NWInterface?, port: NWEndpoint.Port = BCDLiveLogServer.defaultPort,
+         replayBytes: UInt64 = BCDLiveLogPreferences().historyBytes, status: @escaping StatusHandler) throws {
         self.logURL = logURL
         self.network = network
         self.interface = interface
+        self.replayBytes = replayBytes
+        var retryIfBusy = port != .any
+        do {
+            listener = try Self.makeListener(network.address, interface: interface, port: port)
+        } catch NWError.posix(.EADDRINUSE) where retryIfBusy {
+            listener = try Self.makeListener(network.address, interface: interface, port: .any)
+            retryIfBusy = false
+        }
+        startListener(listener, retryIfBusy: retryIfBusy, status: status)
+    }
+
+    private static func makeListener(_ address: IPv4Address, interface: NWInterface?, port: NWEndpoint.Port) throws -> NWListener {
         let parameters = NWParameters.tcp
         parameters.requiredInterface = interface
-        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(network.address), port: port)
-        listener = try NWListener(using: parameters)
+        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(address), port: port)
+        return try NWListener(using: parameters)
+    }
+
+    private func startListener(_ listener: NWListener, retryIfBusy: Bool, status: @escaping StatusHandler) {
         if let interface {
             // A new instance name avoids reusing another device's cached service record.
             listener.service = NWListener.Service(name: "BCD Live Logs \(UUID().uuidString)", type: "_http._tcp", domain: "local.",
                                                   txtRecord: NWTXTRecord(["path": "/api/log"]))
-            listener.serviceRegistrationUpdateHandler = { [weak self] change in
-                self?.updateRegistration(change, interfaceIndex: UInt32(interface.index), status: status)
+            listener.serviceRegistrationUpdateHandler = { [weak self, weak listener] change in
+                guard let self, self.listener === listener else { return }
+                self.updateRegistration(change, interfaceIndex: UInt32(interface.index), status: status)
             }
         }
-        listener.newConnectionHandler = { [weak self] connection in
-            guard let self else { connection.cancel(); return }
+        listener.newConnectionHandler = { [weak self, weak listener] connection in
+            guard let self, self.listener === listener else { connection.cancel(); return }
             self.accept(connection)
         }
-        listener.stateUpdateHandler = { [weak self] state in
-            guard let self, !self.stopped else { return }
+        listener.stateUpdateHandler = { [weak self, weak listener] state in
+            guard let self, !self.stopped, self.listener === listener else { return }
             switch state {
             case .ready:
                 self.reportURL(status)
             case .failed(let error), .waiting(let error):
-                self.closeAll()
-                status(.failure(error))
+                if retryIfBusy, case .posix(.EADDRINUSE) = error {
+                    self.startOnAvailablePort(status)
+                } else {
+                    self.closeAll()
+                    status(.failure(error))
+                }
             default:
                 break
             }
@@ -87,18 +109,32 @@ final class BCDLiveLogServer: @unchecked Sendable {
 
     func stop() { queue.async { self.closeAll() } }
 
-    private func reportURL(_ status: (Result<URL, NWError>) -> Void) {
+    func setReplayBytes(_ count: UInt64) { queue.async { self.replayBytes = count } }
+
+    private func startOnAvailablePort(_ status: @escaping StatusHandler) {
+        do {
+            let replacement = try Self.makeListener(network.address, interface: interface, port: .any)
+            closeListener()
+            listener = replacement
+            startListener(replacement, retryIfBusy: false, status: status)
+        } catch {
+            closeAll()
+            status(.failure(error))
+        }
+    }
+
+    private func reportURL(_ status: StatusHandler) {
         guard let port = listener.port,
               let url = URL(string: "http://\(hostname ?? String(describing: network.address)):\(port.rawValue)/api/log") else {
             closeAll()
-            status(.failure(.posix(.EADDRNOTAVAIL)))
+            status(.failure(NWError.posix(.EADDRNOTAVAIL)))
             return
         }
         status(.success(url))
     }
 
     private func updateRegistration(_ change: NWListener.ServiceRegistrationChange, interfaceIndex: UInt32,
-                                    status: @escaping @Sendable (Result<URL, NWError>) -> Void) {
+                                    status: @escaping StatusHandler) {
         guard !stopped else { return }
         switch change {
         case .add(let endpoint):
@@ -186,7 +222,13 @@ final class BCDLiveLogServer: @unchecked Sendable {
 
     private func closeAll() {
         stopped = true
+        closeListener()
+    }
+
+    private func closeListener() {
         listener.cancel()
+        registration = nil
+        hostname = nil
         for client in clients.values { client.connection.cancel() }
         clients.removeAll()
     }
@@ -249,7 +291,7 @@ final class BCDLiveLogServer: @unchecked Sendable {
         do {
             let file = try FileHandle(forReadingFrom: logURL)
             let end = try file.seekToEnd()
-            try file.seek(toOffset: end - min(end, Self.replayBytes))
+            try file.seek(toOffset: end - min(end, replayBytes))
             client.file = file
         } catch {
             reject(client, status: "500 Internal Server Error")
