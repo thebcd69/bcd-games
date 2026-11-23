@@ -484,6 +484,10 @@ struct BCDSettingsBinding: Hashable {
     func setTouchSpeed(_ value: Double)
     var lookSpeed: Double { get }
     func setLookSpeed(_ value: Double)
+    var trackpadAcceleration: Bool { get }
+    func setTrackpadAcceleration(_ on: Bool)
+    var lookAcceleration: Bool { get }
+    func setLookAcceleration(_ on: Bool)
     var mouseSpeed: Double { get }
     func setMouseSpeed(_ value: Double)
     var rightStickMouse: Bool { get }
@@ -572,7 +576,13 @@ struct BCDControlsSettings<Backend: BCDControlsBackend>: View {
                                     choices: BCDPointerMode.allCases.map { BCDSettingsChoice(value: $0.rawValue, label: $0.title) },
                                     value: backend.pointer.rawValue) { backend.setPointer(BCDPointerMode(rawValue: $0) ?? .absolute) }
                 speedRow("touch-speed", "Touch speed", backend.touchSpeed) { backend.setTouchSpeed($0) }
+                BCDSettingsToggleRow(id: id("trackpad-accel"), title: "Trackpad acceleration",
+                                     note: "Faster finger swipes move farther, including on the Duo lower touchpad.",
+                                     isOn: backend.trackpadAcceleration) { backend.setTrackpadAcceleration($0) }
                 speedRow("look-speed", "Mouse-look speed", backend.lookSpeed) { backend.setLookSpeed($0) }
+                BCDSettingsToggleRow(id: id("look-accel"), title: "Mouse-look acceleration",
+                                     note: "Faster finger swipes turn the camera farther.",
+                                     isOn: backend.lookAcceleration) { backend.setLookAcceleration($0) }
                 speedRow("mouse-speed", "Mouse speed", backend.mouseSpeed, note: "A mouse or trackpad connected to this device.") {
                     backend.setMouseSpeed($0)
                 }

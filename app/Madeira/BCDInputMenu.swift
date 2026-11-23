@@ -50,6 +50,10 @@ enum BCDInputMenu {
                                    kind: .choice(BCDAimSettings.verticalChoices.map { BCDChoice(id: String($0), title: "\($0) %") }, selected: String(aim.vertical))))
             rows.append(BCDMenuRow(id: "in.aim-invert", title: "Invert up and down", kind: .toggle(aim.invertY)))
             rows.append(BCDMenuRow(id: "in.aim-tap", title: "A tap is a click", kind: .toggle(aim.tapClicks)))
+            if aim.output == .mouse {
+                rows.append(BCDMenuRow(id: "in.aim-accel", title: "Mouse acceleration",
+                                       detail: "Faster finger swipes turn farther.", kind: .toggle(aim.mouseAcceleration)))
+            }
         }
         return BCDMenuSection(id: "aim", title: "Aim mode", rows: rows)
     }

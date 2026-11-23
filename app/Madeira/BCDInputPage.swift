@@ -86,6 +86,11 @@ enum BCDInputPage {
                 BCDGameSetting(id: "aim-tap", title: "A tap is a click", kind: .toggle, value: aim.tapClicks ? "1" : "0", defaultValue: "0",
                                note: "A short tap in the zone clicks the left mouse button (fire). Off, a tap does nothing; put a fire button on the touch controls instead."),
             ]
+            if aim.output == .mouse {
+                settings.append(BCDGameSetting(id: "aim-accel", title: "Mouse acceleration",
+                                               kind: .toggle, value: aim.mouseAcceleration ? "1" : "0", defaultValue: "0",
+                                               note: "Faster swipes turn farther. Only applies when the finger moves the mouse."))
+            }
         }
         return BCDGameSettingGroup(id: "aim", title: "Aim mode", symbol: "scope", settings: settings,
                                    headline: aim.isOn ? aim.zone.title + " · " + number(aim.sensitivity) + "×" : "Off")

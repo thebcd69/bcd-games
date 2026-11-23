@@ -148,7 +148,7 @@ else:
         main = Path(tmp) / "main.swift"
         main.write_text(harness)
         exe = Path(tmp) / "check"
-        files = ["BCDKeyNames.swift", "BCDExtraKeys.swift", "BCDInputPrefs.swift", "BCDTurbo.swift", "BCDTouchLook.swift", "BCDPlayers.swift", "BCDInputActions.swift",
+        files = ["BCDKeyNames.swift", "BCDExtraKeys.swift", "BCDInputPrefs.swift", "BCDTurbo.swift", "BCDTouchLook.swift", "BCDTouchAcceleration.swift", "BCDPlayers.swift", "BCDInputActions.swift",
                  "BCDRadial.swift", "BCDAimZone.swift", "BCDGestureMap.swift", "BCDPencil.swift", "BCDInputProfile.swift"]   # the profile routes every feature
         r = subprocess.run([SWIFTC, "-O"] + [str(APP / n) for n in files] + [str(main), "-o", str(exe)], capture_output=True, text=True)
         check(r.returncode == 0, "the behaviour checks compile on the host", r.stderr or r.stdout)

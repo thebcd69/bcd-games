@@ -112,7 +112,7 @@ final class BCDAimStick: @unchecked Sendable {
                         stickPush(BCDAimMath.stickPush(dx: travel.dx, dy: travel.dy, settings), now: t.timestamp)
                         taken.append(t)
                     }
-                } else if let counts = touch.moved(id: id, to: point, settings) {
+                } else if let counts = touch.moved(id: id, to: point, settings, time: t.timestamp) {
                     post(counts, now: t.timestamp)
                     taken.append(t)
                 }

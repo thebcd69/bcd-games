@@ -40,6 +40,8 @@ struct BCDAimSettings: Equatable {
     /// How fast the camera turns up and down against left and right, in percent.
     var vertical = 100
     var invertY = false
+    /// Faster swipes produce more mouse counts. The right-stick output is unchanged.
+    var mouseAcceleration = false
     /// A short tap in the zone is a left click.
     var tapClicks = false
 
@@ -50,7 +52,7 @@ struct BCDAimSettings: Equatable {
     static let verticalChoices = [50, 75, 100, 125, 150]
     static let verticalRange = 25...200
     /// The lines of a game this feature keeps.
-    static let lineNames = ["aim-zone", "aim-sens", "aim-vertical", "aim-invert", "aim-tap", "aim-as"]
+    static let lineNames = ["aim-zone", "aim-sens", "aim-vertical", "aim-invert", "aim-tap", "aim-as", "aim-accel"]
 
     static func parse(_ get: (String) -> String?) -> BCDAimSettings {
         func word(_ line: String) -> String { (get(line) ?? "").trimmingCharacters(in: .whitespaces).lowercased() }
@@ -60,6 +62,7 @@ struct BCDAimSettings: Equatable {
         if let v = Double(word("aim-sens")), v.isFinite { s.sensitivity = min(max(v, sensitivityRange.lowerBound), sensitivityRange.upperBound) }
         if let v = Int(word("aim-vertical")) { s.vertical = min(max(v, verticalRange.lowerBound), verticalRange.upperBound) }
         s.invertY = word("aim-invert") == "1"
+        s.mouseAcceleration = word("aim-accel") == "1"
         s.tapClicks = word("aim-tap") == "1"
         return s
     }
@@ -89,9 +92,10 @@ enum BCDAimMath {
 
     /// The whole counts for a finger's travel of (`dx`, `dy`) points, y growing downwards; the rest stays in `carry`. Dragging right
     /// turns right and dragging down looks down, as a mouse does.
-    static func counts(dx: Double, dy: Double, _ s: BCDAimSettings, carry: inout Carry) -> (dx: Int32, dy: Int32) {
+    static func counts(dx: Double, dy: Double, _ s: BCDAimSettings, elapsed: Double = 0, carry: inout Carry) -> (dx: Int32, dy: Int32) {
         guard dx.isFinite, dy.isFinite else { return (0, 0) }
-        let gain = countsPerPoint * s.sensitivity
+        let gain = countsPerPoint * s.sensitivity *
+            BCDTouchAcceleration.multiplier(dx: dx, dy: dy, elapsed: elapsed, enabled: s.mouseAcceleration)
         carry.x += dx * gain
         carry.y += dy * gain * Double(s.vertical) / 100 * (s.invertY ? -1 : 1)
         let ix = Int32(max(-30000, min(30000, carry.x.rounded(.towardZero))))
@@ -126,6 +130,7 @@ struct BCDAimTouch {
     private var last = CGPoint.zero
     private var start = CGPoint.zero
     private var startTime = 0.0
+    private var lastTime = 0.0
     private var travelled = 0.0
     private(set) var carry = BCDAimMath.Carry()
 
@@ -138,18 +143,21 @@ struct BCDAimTouch {
         last = point
         start = point
         startTime = time
+        lastTime = time
         travelled = 0
         carry.reset()
         return true
     }
 
     /// The aiming finger moved: the counts to send; nil for any other finger.
-    mutating func moved(id: Int, to point: CGPoint, _ s: BCDAimSettings) -> (dx: Int32, dy: Int32)? {
+    mutating func moved(id: Int, to point: CGPoint, _ s: BCDAimSettings, time: Double) -> (dx: Int32, dy: Int32)? {
         guard finger == id else { return nil }
         let dx = Double(point.x - last.x), dy = Double(point.y - last.y)
+        let elapsed = time - lastTime
         last = point
+        lastTime = time
         travelled = max(travelled, hypot(Double(point.x - start.x), Double(point.y - start.y)))
-        return BCDAimMath.counts(dx: dx, dy: dy, s, carry: &carry)
+        return BCDAimMath.counts(dx: dx, dy: dy, s, elapsed: elapsed, carry: &carry)
     }
 
     /// Night round 2026-11-11 (A5 S13): the aiming finger moved: its travel since the last event, in points, for the stick; nil for any other finger.

@@ -43,7 +43,7 @@ args = ap.parse_args()
 k = Checks(args)
 check = k.check
 
-PLAIN = ["BCDAimZone.swift", "BCDGestureMap.swift", "BCDPencil.swift"]
+PLAIN = ["BCDAimZone.swift", "BCDTouchAcceleration.swift", "BCDGestureMap.swift", "BCDPencil.swift"]
 src = {n: (APP / n).read_text() for n in PLAIN + ["BCDTouchExtrasLive.swift"]}
 harnesses = {n: (R / f"tests/host/bcd_{n}_checks.swift").read_text() for n in ("aim", "gestures", "pencil")}
 content = (APP / "ContentView.swift").read_text()
@@ -61,6 +61,7 @@ k.licence(list(src.items()) + [(f"bcd_{n}_checks.swift", t) for n, t in harnesse
 check(sorted(imports(src["BCDAimZone.swift"])) == ["CoreGraphics", "Foundation"] and sorted(imports(src["BCDGestureMap.swift"])) == ["CoreGraphics", "Foundation"],
       "BCDAimZone.swift and BCDGestureMap.swift import Foundation and CoreGraphics only")
 check(imports(src["BCDPencil.swift"]) == ["Foundation"], "BCDPencil.swift imports Foundation only")
+check(imports(src["BCDTouchAcceleration.swift"]) == ["Foundation"], "touch acceleration math needs Foundation only")
 for name in PLAIN:
     named = sorted(w for w in ("UIKit", "SwiftUI", "UITouch", "GamepadInput", "HardwareInput", "LibraryModel", "MadeiraConfig", "winios_", "LogStore", "UserDefaults") if w in code(src[name]))
     check(not named, f"{name} names no engine, UI or storage type", ", ".join(named))
@@ -105,16 +106,22 @@ check(func(live, "static func filter(").index("pencil.handle") < func(live, "sta
 check("BCDTouchExtras.configure(aim: profile.aim, gestures: profile.gestures, pencil: profile.pencil, title: title)" in input_live, "the session's hook tells them what the game chose")
 for gid, title in (("aim", "Aim mode"), ("gestures", "Touch gestures"), ("pencil", "Apple Pencil")):
     check(f'BCDGameSettingGroup(id: "{gid}", title: "{title}"' in page, f"the game page has {title}")
+check('id: "aim-accel"' in page and 'id: "in.aim-accel"' in menu and '"aim-accel"' in profile,
+      "Aim's per-game mouse-only acceleration has both settings surfaces and a routed opt-in line")
 check('id: "in.aim-zone"' in menu and 'id: "in.pencil"' in menu and 'id: "in.gestures.note"' in menu, "the in-game menu has them (the gestures' bindings are set on the page)")
 check("BCDAimSettings.lineNames.contains(line) { return aim }" in profile and "BCDGestureSettings.lineNames.contains(line) { return gestures }" in profile
       and "BCDPencilSettings.lineNames.contains(line) { return pencil }" in profile, "their lines are routed")
+check("BCDTouchAcceleration.multiplier" in content and "input.accelTrackpad" in content and "input.accelLook" in content,
+      "trackpad and mouse-look share the optional swipe-speed gain")
+check('BCDTabletopTouchpad.owns(' in content and 'let pad = padGesture' in content,
+      "Duo lower touchpad shares trackpad gesture handling")
 ci = R / ".github/workflows/build-ipa.yml"
 if ci.exists():
     check("python3 tests/host/check-bcd-touch-extras.py" in ci.read_text(), "CI runs this check")
 
 # ---- behaviour and build ------------------------------------------------------------------------------------------
 base = ["BCDKeyNames.swift", "BCDExtraKeys.swift", "BCDTurbo.swift", "BCDInputPrefs.swift"]
-k.harness("aim mode", ["BCDAimZone.swift"], "bcd_aim_checks.swift")
+k.harness("aim mode", ["BCDTouchAcceleration.swift", "BCDAimZone.swift"], "bcd_aim_checks.swift")
 k.harness("the touch gestures", base + ["BCDInputActions.swift", "BCDGestureMap.swift"], "bcd_gestures_checks.swift")
 k.harness("the Apple Pencil", ["BCDPencil.swift"], "bcd_pencil_checks.swift")
 k.preview("with the plain files")
