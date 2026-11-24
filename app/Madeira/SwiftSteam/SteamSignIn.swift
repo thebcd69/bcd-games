@@ -73,7 +73,11 @@ enum SteamSignIn {
     static func usable(accountName: String, refreshToken: String, now: Date) -> (accountName: String, refreshToken: String)? {
         let name = accountName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty, !refreshToken.isEmpty else { return nil }
-        if let expiry = expiry(of: refreshToken), expiry <= now { return nil }
+        // Compare the raw intervals, not `expiry <= now`: with the iOS 27.2 SDK, Date's `<=` is a back-deployment thunk that
+        // calls Foundation's own `Date.<=` whenever the OS reports 27.2. iPadOS 27.2 beta 24B5089g reports 27.2 without that
+        // symbol (weak-linked, so 0), so this check jumped to address 0 at launch (SteamSignInModel.shared, before the first
+        // frame) and the app stayed on a black screen while the JIT debugger held the fault (iPad16,6, LiveContainer).
+        if let expiry = expiry(of: refreshToken), expiry.timeIntervalSinceReferenceDate <= now.timeIntervalSinceReferenceDate { return nil }
         return (name, refreshToken)
     }
 
