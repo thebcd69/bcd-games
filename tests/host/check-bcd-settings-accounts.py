@@ -353,6 +353,17 @@ for major in [18, 26, 27] {
 }
 // Inside LiveContainer with its Helper Process Support (LiveContainer 3.8.13; follow-up of the night round 2026-11-11): only a proven
 // ready helper opens Built-in, by hand (no Automatic); every other state is the old LiveContainer answer with its own words.
+expect(BCDJITRules.lcHelperState(multitask: false, switchOn: true, prepared: true, discoveredClass: "LCGuestExtension") == .ready,
+       "LiveContainer 3.8.13: the wrapper is discoverable")
+expect(BCDJITRules.lcHelperState(multitask: false, switchOn: true, prepared: true, discoveredClass: "NSExtension") == .ready,
+       "LiveContainer 3.8.14: a system extension object is discoverable")
+expect(BCDJITRules.lcHelperState(multitask: false, switchOn: true, prepared: true, discoveredClass: nil) == .noHook,
+       "LiveContainer: a failed lookup leaves the helper unavailable")
+expect(BCDJITRules.lcHelperState(multitask: true, switchOn: true, prepared: true, discoveredClass: "NSExtension") == .multitask
+       && BCDJITRules.lcHelperState(multitask: false, switchOn: false, prepared: true, discoveredClass: "NSExtension") == .switchOff
+       && BCDJITRules.lcHelperState(multitask: false, switchOn: nil, prepared: true, discoveredClass: "NSExtension") == .tooOld
+       && BCDJITRules.lcHelperState(multitask: false, switchOn: true, prepared: false, discoveredClass: "NSExtension") == .notPrepared,
+       "LiveContainer: discovery still requires full-screen mode, the switch and helper preparation")
 for major in [26, 27] {
     var ready = p(major, "iPhone15,2", lc: true)
     ready.lcHelper = .ready
@@ -409,8 +420,9 @@ require('targetEnvironment(simulator)' in reason and '#available(iOS 26.0, *)' i
         'JIT rules mirror the app: the built-in helper needs a device, iOS 26 and, inside LiveContainer, its proven Helper Process Support (JITBuiltInHost.swift)')
 lc_look = block(host, 'private static func look() -> BCDLCHelper')
 require(lc_look[lc_look.index('{') + 1:].lstrip().startswith('guard getenv("LC_HOME_PATH") != nil else { return .notAvailable }')
-        and 'probe == "LCGuestExtension" && prepared' in lc_look and 'static let state: BCDLCHelper = look()' in host,
-        'LiveContainer: outside it the look returns at once; ready needs LiveContainer\'s own extension object and its install-time preparation')
+        and 'BCDJITRules.lcHelperState(multitask: multitask, switchOn: switchOn, prepared: prepared, discoveredClass: probe)' in lc_look
+        and 'static let state: BCDLCHelper = look()' in host,
+        'LiveContainer: the app uses the tested readiness rules for the lookup result')
 pairing = (app / 'JITPairing.swift').read_text()
 network = (app / 'JITNetwork.swift').read_text()
 require('majorVersion: 27' in block(pairing, 'static var isSupported: Bool') and 'static let hostName = "BCD"' in pairing,

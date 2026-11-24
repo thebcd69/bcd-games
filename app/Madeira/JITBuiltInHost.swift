@@ -236,14 +236,9 @@ private final class HelperRequest {
     }
 }
 
-/// BCD inside LiveContainer: whether LiveContainer's Helper Process Support (LiveContainer 3.8.13, the nightly of 2026-11-08,
-/// commit 9d6ea09) starts BCD's own app extensions. With it, `+[NSExtension extensionWithIdentifier:error:]` returns LiveContainer's
-/// `LCGuestExtension` for an appex in the guest's PlugIns and runs it in a LiveProcess process (follow-up of the night round
-/// 2026-11-11, owner's go; ~/madeira-local/intake/analysis/livecontainer-jit-2026-11-11/RAPOR.md). `ready` needs both proofs: that
-/// object, and LiveContainer's install-time preparation of the helper (`LCAppExtension.plist` beside it). Anything else keeps the
-/// built-in helper off there, as before, with words for why. Outside LiveContainer nothing here runs and nothing is logged; inside
-/// it, without the switch on, only LiveContainer's own LCAppInfo.plist is read.
-/// One look per app run, cached, one `[lc-helper]` line.
+/// Checks whether LiveContainer can discover BCD's prepared guest helper by bundle ID.
+/// LiveContainer 3.8.13 returns an `LCGuestExtension` wrapper. Version 3.8.14 routes discovery through PlugInKit and returns a
+/// system extension object. The class name stays in the log for diagnosis. The lookup runs once per app run.
 enum LiveContainerHelper {
     static let state: BCDLCHelper = look()
 
@@ -254,10 +249,9 @@ enum LiveContainerHelper {
         let switchOn = appInfo?["helperProcessesSupport"] as? Bool
         let helperURL = Bundle.main.builtInPlugInsURL?.appendingPathComponent("MadeiraJITHelper.appex")
         let prepared = helperURL.map { FileManager.default.fileExists(atPath: $0.appendingPathComponent("LCAppExtension.plist").path) } ?? false
-        var probe = "skipped"
-        // The probe runs only with the switch on: an older LiveContainer, or the switch off, gets no new call at all (owner,
-        // 2026-11-11: nothing may change for them).
-        if !multitask, switchOn == true, let url = helperURL, let identifier = Bundle(url: url)?.bundleIdentifier {
+        let shouldProbe = !multitask && switchOn == true && prepared
+        var probe: String?
+        if shouldProbe, let url = helperURL, let identifier = Bundle(url: url)?.bundleIdentifier {
             if NSClassFromString("NSExtension") == nil {
                 dlopen("/System/Library/Frameworks/ExtensionFoundation.framework/ExtensionFoundation", RTLD_NOW)
             }
@@ -265,21 +259,14 @@ enum LiveContainerHelper {
                 let factory = unsafeBitCast(extensionClass as AnyObject, to: NSExtensionClassShim.self)
                 if let found = try? factory.extension(withIdentifier: identifier), let cls = object_getClass(found) {
                     probe = String(cString: class_getName(cls))
-                } else {
-                    probe = "none"
                 }
             }
         }
-        let state: BCDLCHelper
-        if multitask { state = .multitask }
-        else if probe == "LCGuestExtension" && prepared { state = .ready }
-        else if switchOn == nil { state = .tooOld }
-        else if switchOn == false { state = .switchOff }
-        else if !prepared { state = .notPrepared }
-        else { state = .noHook }
+        let state = BCDJITRules.lcHelperState(multitask: multitask, switchOn: switchOn, prepared: prepared, discoveredClass: probe)
         let switchWord = switchOn.map { $0 ? "on" : "off" } ?? "absent"
+        let probeWord = probe ?? (shouldProbe ? "none" : "skipped")
         LogStore.shared.log("[lc-helper] lc=1 live-process=\(multitask ? 1 : 0) switch=\(switchWord) prepared=\(prepared ? 1 : 0) "
-                            + "probe=\(probe) host-pid=\(getpid()) -> \(state == .ready ? "ready" : "not-ready: \(state.rawValue)")")
+                            + "probe=\(probeWord) host-pid=\(getpid()) -> \(state == .ready ? "ready" : "not-ready: \(state.rawValue)")")
         return state
     }
 }

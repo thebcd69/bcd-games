@@ -30,6 +30,7 @@ import tempfile
 root = Path(__file__).resolve().parents[2]
 app = root / 'app/Madeira'
 host = (app / 'JITBuiltInHost.swift').read_text()
+jit = (app / 'BCDJIT.swift').read_text()
 SWIFTC = os.environ.get('SWIFTC') or shutil.which('swiftc')
 failures = 0
 
@@ -66,8 +67,9 @@ final class LogStore {
 }
 var fakeTraced = false
 func isDebuggerTraced() -> Bool { fakeTraced }
-''' + block((app / 'BCDJIT.swift').read_text(), 'enum BCDLCHelper: String, Hashable {') + '''
-enum BCDJITRules { static func lcHelperText(_ s: BCDLCHelper) -> String { "" } }
+''' + block(jit, 'enum BCDLCHelper: String, Hashable {') + '\nenum BCDJITRules {\n' + block(jit, 'static func lcHelperState(') + '''
+    static func lcHelperText(_ s: BCDLCHelper) -> String { "" }
+}
 
 /// The NSExtension calls JITBuiltInHost.swift makes (NSExtensionShim), recorded.
 final class FakeExtension: NSObject {

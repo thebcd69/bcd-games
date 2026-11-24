@@ -34,9 +34,7 @@ struct BCDJITPlatform: Hashable {
     var lcHelper: BCDLCHelper = .notAvailable
 }
 
-/// LiveContainer's Helper Process Support (LiveContainer 3.8.13, the nightly of 2026-11-08) as BCD finds it: with it LiveContainer
-/// starts a guest's own app extensions, so BCD's built-in helper can run inside LiveContainer (follow-up of the night round 2026-11-11,
-/// owner's go). Only `ready`, which BCD proves, lets the helper run there; the other states choose the words.
+/// Readiness for LiveContainer's Helper Process Support. BCD checks whether the guest helper can be discovered before starting it.
 enum BCDLCHelper: String, Hashable {
     /// Not inside LiveContainer, or not looked at.
     case notAvailable
@@ -54,6 +52,14 @@ enum BCDLCHelper: String, Hashable {
 
 enum BCDJITRules {
     enum BuiltInBlock: Equatable { case needsIOS26, liveContainer, simulator }
+
+    static func lcHelperState(multitask: Bool, switchOn: Bool?, prepared: Bool, discoveredClass: String?) -> BCDLCHelper {
+        if multitask { return .multitask }
+        guard let switchOn else { return .tooOld }
+        guard switchOn else { return .switchOff }
+        guard prepared else { return .notPrepared }
+        return discoveredClass == nil ? .noHook : .ready
+    }
 
     /// Why BCD's built-in helper cannot run here, or nil when it can: it needs iOS 26 or
     /// newer and a real device, and inside LiveContainer it starts only through LiveContainer's
