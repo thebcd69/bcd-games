@@ -222,6 +222,9 @@ python3 "$R/tools/patch-fex-ios-ec-teardown-ctx.py" "$R/FEX" || echo "::warning:
 python3 "$R/tools/patch-fex-ios-exit-runaway.py" "$R/FEX" || echo "::warning::the exit-runaway stop was not applied (FEX anchor changed); xtajit64.dll is built without it"
 # Whichever pin (round 630, agent O2 S7; Outlast Y09766): the code-invalidation walk skips a thread state without its caches ([inval-null]).
 python3 "$R/tools/patch-fex-ios-inval-null-thread.py" "$R/FEX" || echo "::warning::the invalidation-walk guard was not applied (FEX anchor changed); xtajit64.dll is built without it"
+# Opt-in, whichever pin (owner's decision 2026-11-25; willfaust/FEX pull request #40 by Dragooon, commit 71d78809): MADEIRA_FEX_SECTION_SKIP=1 leaves out the
+# code invalidation of an unmapped section that was never executable (not for a sub-floor image's window, either name); unchanged without it.
+python3 "$R/tools/patch-fex-ios-section-skip.py" "$R/FEX" || echo "::warning::the section-unmap skip was not applied (FEX anchor changed); xtajit64.dll is built without it"
 # Whichever pin (round 630, agent G3 S11; Hearts of Iron IV's dowser.exe TM3HCY): RDTSCP/RDPID report processor 0 instead of the translation
 # ending the process ("A <tid> Unsupported").
 python3 "$R/tools/patch-fex-ios-processorid.py" "$R/FEX/FEXCore/Source/Interface/Core/JIT/MiscOps.cpp" || echo "::warning::the ProcessorID fix was not applied (FEX anchor changed); xtajit64.dll is built without it"

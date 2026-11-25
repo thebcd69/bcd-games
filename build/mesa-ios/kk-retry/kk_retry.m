@@ -63,6 +63,9 @@ static os_unfair_lock kkr_lock = OS_UNFAIR_LOCK_INIT;
 static struct kkr_slot { CFAbsoluteTime t0; CFTypeRef desc; unsigned long bytes; int kind, used, named; } kkr_slots[KKR_SLOTS];
 static long kkr_done[KKR_KINDS], kkr_failed[KKR_KINDS], kkr_waiting, kkr_untracked, kkr_refused;
 static double kkr_ms_sum[KKR_KINDS], kkr_ms_max[KKR_KINDS];
+/* Round 714 (A1 S8; Detroit 80CDTN, 806EFR): the totals since the start, so a log says how long a first-start pass takes and whether it
+ * ends. Touched only by kkr_report (one timer). */
+static long kkr_total[KKR_KINDS], kkr_total_failed; static double kkr_total_ms[KKR_KINDS];
 #ifdef KKR_TEST
 double kkr_overdue_s = 60;     // test hook: when a running compile is named
 useconds_t kkr_test_delay;     // test hook: each compile takes at least this long
@@ -159,6 +162,12 @@ void kkr_report(char *out, size_t cap) {
         n += snprintf(line + n, sizeof line - n, "; waiting for a slot %ld", waiting);
         if (untracked) n += snprintf(line + n, sizeof line - n, "; %ld not tracked (all %d slots busy)", untracked, KKR_SLOTS);
         if (refused) n += snprintf(line + n, sizeof line - n, "; %ld without MSL refused", refused);
+        for (int k = 0; k < KKR_KINDS; k++) { kkr_total[k] += done[k]; kkr_total_ms[k] += sum[k]; kkr_total_failed += failed[k]; }
+        n += snprintf(line + n, sizeof line - n, " | since start:");
+        for (int k = 0; k < KKR_KINDS && n < (int)sizeof line; k++)
+            n += snprintf(line + n, sizeof line - n, " %s %ld (%.0f s)%s", kkr_kind_name[k], kkr_total[k], kkr_total_ms[k] / 1000.0,
+                          k + 1 < KKR_KINDS ? "," : ",");
+        if (n < (int)sizeof line) n += snprintf(line + n, sizeof line - n, " %ld failed", kkr_total_failed);
         fprintf(stderr, "%s\n", line);
         if (out && cap) snprintf(out, cap, "%s", line);
     }

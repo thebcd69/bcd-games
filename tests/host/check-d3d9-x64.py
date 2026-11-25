@@ -188,9 +188,10 @@ for _id in ("pico-park", "dont-starve-together", "a-hat-in-time"):
     check(f"{_id}: the line is from build 602 only, after the standard line",
           r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 602}] + extra
           and r_["version"] == (2 if extra else 1))
-for _id in ("mudrunner", "indivisible"):
+# round 714 (agent G2 S5): MudRunner v2 adds the Epic host start after it
+for _id, extra in (("mudrunner", [{"line": "env.BCD_EPIC_HOST_START = 1", "minBuild": 598}]), ("indivisible", [])):
     r_ = next(r for r in recs["rules"] if r["id"] == _id)
-    check(f"{_id}: the line is from build 598 only, after the standard line", r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}])
+    check(f"{_id}: the line is from build 598 only, after the standard line", r_["config"][2:] == ["env.MADEIRA_EC_HOOK_TRACE = 0", {"line": "env.MADEIRA_D3D9_X64 = dxmt", "minBuild": 598}] + extra)
 css = next(r for r in recs["rules"] if r["id"] == "counter-strike-source")
 # round 632 (ajan63 W13): v2 adds the opt-in directory listing cache after the line, from build 632
 check("Counter-Strike: Source (round 2026-10-24): Steam 240, the folder and cstrike_win64.exe, the line from build 598 only (v2: + the directory cache from 632)",

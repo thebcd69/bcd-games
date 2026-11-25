@@ -675,6 +675,21 @@ enum SteamRemoteCache {
         return out + "}\n"
     }
 
+    /// madeira-bcd (round 714, D1-S1): what the client's list says about the comparison's `remote` files (Cloud API saves; no %Root%):
+    /// `device` files the device holds (identical, differing or device-only), `listed` of them named in the list (any case), `missing`
+    /// identical files the list does not name. A missing one is a save the account has that the game cannot see in a Dock session.
+    static func census(audit: SteamCloudAudit, paths: SteamCloudPaths) -> (listed: Int, device: Int, missing: Int) {
+        let url = paths.remoteFolder.deletingLastPathComponent().appendingPathComponent("remotecache.vdf")
+        let names = Set(((try? String(contentsOf: url, encoding: .utf8)).flatMap(parse)?.files ?? []).map { $0.name.lowercased() })
+        let remote = audit.entries.filter { SteamCloudPaths.split($0.path).root == nil && $0.kind != .cloudOnly }
+        let listed = remote.filter { names.contains($0.path.lowercased()) }.count
+        let missing = remote.filter { $0.kind == .same && !names.contains($0.path.lowercased()) }.count
+        return (listed, remote.count, missing)
+    }
+
+    /// True when a file identical on both sides is missing from the client's list: the default (`when-missing`) rewrites only then.
+    static func listMisses(audit: SteamCloudAudit, paths: SteamCloudPaths) -> Bool { census(audit: audit, paths: paths).missing > 0 }
+
     /// Rewrites the app's list from a comparison. Returns the counts written,
     /// or nil when there is nothing to write (no `remote` files, or no change).
     static func write(appID: Int, audit: SteamCloudAudit, paths: SteamCloudPaths) -> (synced: Int, local: Int, dropped: Int)? {

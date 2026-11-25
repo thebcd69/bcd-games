@@ -1,3 +1,5 @@
+// Portions copyright 2026 sky9662: the touch-control editor's group selection, guides and group pinch, from thebcd69/bcd-games
+// pull request #69 (GPL-3.0-only). See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 alantangok, 125hz and wamei: code taken from https://github.com/willfaust/Madeira (pull request #244; commits abca30a, facd2cc and bbe0b12)
 // under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md.
 // Portions copyright 2026 Connor Gow: code taken from https://github.com/willfaust/Madeira (pull request #464)
@@ -851,7 +853,11 @@ final class MetalBackedView: UIView {
             let iy = Int32(max(-30000, min(30000, relCarryY)))
             relCarryX -= CGFloat(ix)
             relCarryY -= CGFloat(iy)
-            if ix != 0 || iy != 0 { winios_pointer(ix, iy, F_MOVE, 0) }
+            if ix != 0 || iy != 0 {
+                winios_pointer(ix, iy, F_MOVE, 0)
+                // madeira-bcd (round 714, A1 S10): env.MADEIRA_RELATIVE_CURSOR = 1: the drawn cursor follows Wine's, shown only while the program shows its own.
+                if !desktopMode && HardwareInput.relativeCursorEnabled { HardwareInput.shared.stickMoved() }
+            }
             return
         }
 

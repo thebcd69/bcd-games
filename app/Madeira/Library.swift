@@ -714,7 +714,11 @@ struct LibraryEntry: Codable, Identifiable {
         }
         // madeira-bcd (round 602): DXMT's Direct3D 9 is a 64-bit Direct3D 9 game's default when its folder shows nothing of Direct3D 11, DXGI or
         // Direct3D 12 (BCDGraphicsDefaults.swift); the game's own env.MADEIRA_D3D9_X64 line, read just above, always wins.
+        // Round 714 (A1 S2; N5CYTD, T2TYGT on iPhone19,4): the log is written synchronously, so the last of these names the step a start
+        // that vanished was in.
+        LogStore.shared.log("[launch-step] d3d9-x64 begin")
         BCDGraphicsDefaults.applyD3D9X64(for: self)
+        LogStore.shared.log("[launch-step] game-setup begin")
         BCDGameSetup.prepare(self)   // madeira-bcd (round 604): the game's Windows version, Wine desktop settings and fixes, before the wineserver exists (BCDGameSetup/BCDGameSetupLaunch.swift)
         fputs("[frontend] launch profile applied\n", stderr)
         if usesLaunchOptions {

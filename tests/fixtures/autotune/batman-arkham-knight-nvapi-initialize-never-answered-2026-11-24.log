@@ -1,0 +1,251 @@
+[22:02:14.120] [INFO] Checking entitlements...
+[22:02:14.121] [INFO] [build] v0.1.712 (712)
+[22:02:14.122] [INFO] [device] model=iPad13,16 idiom=pad os=iPadOS Version 27.2 (Build 24B119) ram=7644MB available=8168MB cores=8
+[22:02:14.122] [INFO] [device] address-map=[0x102878000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[22:02:14.122] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[22:02:14.135] [INFO] [device] settings: low-power=0 thermal=nominal screen=1640x2360@2.0x max-fps=60 utc-offset=+05:30 free-disk=48GB stikdebug-url=1
+[22:02:14.138] [INFO] [device] gpu="Apple M1 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:04:25.043] [INFO] Requesting JIT with StikDebug...
+[22:04:25.965] [INFO] Opening StikDebug to enable JIT...
+[22:04:50.522] [INFO] [bcd-ui] play local
+[22:04:50.533] [INFO] [bcd] library launch BatmanAK.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[22:04:50.565] [INFO] Running full Wine sequence...
+[22:04:50.565] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102878000,0x8000000000) 512GB available=8153MB low-power=0 thermal=nominal
+[22:04:50.566] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0 low-graphics-tip=1
+[22:04:50.567] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): the library knows this game as D3D10/D3D11/D3D12/D3D9
+[22:04:50.574] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:04:50.575] [INFO] Allocating 896MB JIT pool via debugger...
+[22:04:50.575] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:04:50.575] [INFO] [jit-debugger] attached=1 at the pool request
+[22:04:50.575] [INFO] [jit-age] attach age=17s source=enable-jit method=stikdebug thermal=0
+[22:04:50.576] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[22:04:50.578] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:04:55.258] [INFO] RX pool at 0x148000000
+[22:04:55.297] [OK] JIT pool ready (debugger still attached).
+[22:04:55.298] [INFO] BRK suspension lasted 4.72s
+[22:04:55.301] [INFO] Detaching debugger...
+[22:04:55.306] [OK] Debugger detached.
+[22:04:55.308] [OK] [early-detach] rev=ml524 took 7 ms
+[22:04:56.062] [INFO] [session] length=5s partial=1 play=0s frames=0 stalls=0/0s peak=630MB limit=8191MB thermal=nominal lpm=0 api=D3D10/D3D11/D3D12/D3D9/64 res=960x540 cap=30 game=BatmanAK
+[22:04:56.196] [INFO] Starting wineserver...
+[phase] wine-start             t+  5.667s rev=ml526
+[22:04:56.242] [wineserver] send_client_fd: fd=39 handle=0x3a2 msg_fd_unix=36 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/4b5e261a554c4b7d.cfg (read)
+[game-cfg]   low-graphics-tip = 1
+[WineProc] Target exe: C:\Batman - Arkham Knight\Binaries\Win64\BatmanAK.exe (bundle=arm64ec-windows)
+[hwinput] keyboard focus: program (app active)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[valloc] ml959 # base=0x7038000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71ffe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x71fffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x71fffe0000 zero_bits=0x0 limit=0x0
+[Wine init_process] waiting for request_fd from wineserver...
+[22:04:56.657] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[22:04:56.657] [fdtrace] pipes tid=0000 peb=0x71ffff0000 master=37 reply=42/43 wait=44/45 rev=ml586
+[Wine init_process] reply_pipe=43, sending init_first_thread...
+[22:04:56.657] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=7551 MB + phys_footprint=640 MB = 8192 MB (hw.memsize says 7644 MB)
+ml993: REJECTED 8192 MB -- larger than hw.memsize (7644 MB), so it is a sentinel, not a limit
+ml985: map_image_view size=0x440b000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x100010000..0x73fffeffff
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x140000000+0x440b000 (BatmanAK.exe) → pool 0x148005000 used=0x4415000/0x25000000 tramp+0x0
+[copy-verify] BatmanAK.exe: OK, 1623 .text pages executable (copy @0x148005000)
+[window] 0x7048000000..0x7400000000 regions=66 occupied=8193 MB of 15232 MB free=7038 MB maxhole=7038 MB@0x7048000000 rev=ml787 (periodic)
+[fex-arena] ml793 PUBLISHED [0x7c00000000,0x8000000000) size=0x400000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0x71ffcd0000+0x130000 (ntdll.dll) → pool 0x14c414000 used=0x454c000/0x25000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x14c414000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 291)
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[jit-pool] image 0x71fe8a0000+0x421000 (libarm64ecfex.dll) → pool 0x14c54f000 used=0x497b000/0x25000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x14c54f000)
+[jit-pool] image 0x71fe770000+0x130000 (ucrtbase.dll) → pool 0x14c978000 used=0x4aac000/0x25000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x14c978000)
+[jit-pool] image 0x71fe6b0000+0xc0000 (kernel32.dll) → pool 0x14caac000 used=0x4b74000/0x25000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x14caac000)
+[window] 0x122c00000..0x7805000000 regions=75955 occupied=462099 MB of 486948 MB free=41312 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 0 MB in 0 views of the 16384 MB arena (0 MB of them in 0 unity-va views), highest end +0 MB, largest free gap 16384 MB
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=789 MB (peak 789) internal=786 MB compressed=0 MB external=84 MB reusable=16 MB (cycle=1)
+[jit-pool] image 0x71fe3c0000+0x2f0000 (kernelbase.dll) → pool 0x14cb74000 used=0x4e74000/0x25000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x14cb74000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+[nls-getptr] type=11 id=20127 peb=0x71ffff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module BatmanAK.exe (batmanak.exe-0c8a9e09d9fa5ec2): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0x71ffff0000
+[nls-getptr] type=11 id=437 peb=0x71ffff0000
+D 24 Load module WS2_32.dll (ws2_32.dll-590ada9b52e97b01): 71FE2C0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14195b000+0x638: 185 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14195b000+0x638: 185 slot(s), 0 data import(s) bound
+D 24 Load module IMM32.dll (imm32.dll-d32ec4d784d2a68d): 71FE220000
+D 24 Load module user32.dll (user32.dll-7d4349728057d260): 71FE000000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FDF10000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14195a000+0x1000: 494 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14195a000+0x1000: 494 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fdc10000 IAT window 0x71fdc1c000+0x220: 65 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x71fdc10000 IAT window 0x71fdc1c000+0x220: 65 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7038000320 insn=0xb9432100
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x14dc80000)
+[x64-data-imp] ml1245 importer pe=0x71fd940000 IAT window 0x71fd948000+0x2b0: 81 slot(s), 3 data import(s) bound
+[copy-verify] d3d9.dll: OK, 8 .text pages executable (copy @0x14dd74000)
+[copy-verify] wined3d.dll: OK, 134 .text pages executable (copy @0x14de28000)
+[copy-verify] opengl32.dll: OK, 38 .text pages executable (copy @0x14e19c000)
+[copy-verify] GFSDK_GodraysLib.x64.dll: OK, 5 .text pages executable (copy @0x14e300000)
+D 24 Load module DINPUT8.dll (dinput8.dll-fa63f814948e9838): 71FC7E0000
+[file-fail] ml665 #57 NtCreateFile status=0xc0000034 disp=1 access=0x80100000 options=0x00000060 unix=(none) name=\??\C:\Batman - Arkham Knight\Binaries\Win64\WININET.dll
+E 24 [iOS-xins] tracker=0x14c91dfd8 WININET.dll sec=0x71fc3d0000-0x71fc40b029
+E 24 [iOS-xins] tracker=0x14c91dfd8 WININET.dll sec=0x71fc410000-0x71fc410f90
+D 24 Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71FC3C0000
+[copy-verify] shlwapi.dll: OK, 8 .text pages executable (copy @0x14ef08000)
+E 24 [iOS-xins] tracker=0x14c91dfd8 WININET.dll sec=0x71fc3d0000-0x71fc40b029
+E 24 [iOS-xins] tracker=0x14c91dfd8 WININET.dll sec=0x71fc410000-0x71fc410f90
+E 24 [img-map] ml710 #36 intervals-only WININET.dll base=0x71fc3c0000
+[x64-data-imp] ml1245 importer pe=0x140000000 IAT window 0x14195a000+0x1000: 494 slot(s), 3 data import(s) bound
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[jit-pool] image 0x71faad0000+0xb0000 (uxtheme.dll) → pool 0x1507e8000 used=0x889c000/0x25000000 tramp+0x4000
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1d696344b97035): 71FAAD0000
+[image-reload] unmapped image 0x71faad0000+0xb0000: 1 pool copy marked
+[unixlib] opengl32 (GL-absent stub table) (module 0x71fcf10000) -> 64-bit table (0x106431220)
+0024:err:module:call_tls_callbacks [tls-life] ml704 RUN callbacks module=0000000140000000 reason=1 count=0 first=0000000000000000
+[xp-names] m17529 "wine-x18-exc"
+[xp] 22:04:57.361 +0.57 dt=312 cpu=278 (thr 271) P=277 E=0 run=283 pgw=40.3 GHz P=3.10 E=2.06 Minst=3715 IPC=4.32 mJ=994 pin=1597 rdKB=27132 fpMB=914
+[xp] 22:04:57.673 +0.89 dt=313 cpu=247 (thr 231) P=247 E=0 run=258 pgw=0.0 GHz P=3.05 E=2.00 Minst=2875 IPC=3.82 mJ=857 pin=0 rdKB=32 fpMB=1019
+[xp] 22:04:57.972 +1.19 dt=298 cpu=305 (thr 305) P=304 E=0 run=315 pgw=0.0 GHz P=3.12 E=1.68 Minst=5210 IPC=5.48 mJ=1462 pin=0 rdKB=0 fpMB=1019
+[xp] 22:04:58.297 +1.51 dt=325 cpu=333 (thr 333) P=333 E=0 run=341 pgw=0.0 GHz P=3.12 E=1.67 Minst=5688 IPC=5.48 mJ=1598 pin=0 rdKB=0 fpMB=1020
+[xp] 22:04:58.617 +1.83 dt=320 cpu=326 (thr 326) P=326 E=0 run=336 pgw=0.0 GHz P=3.11 E=1.58 Minst=5264 IPC=5.19 mJ=1487 pin=0 rdKB=0 fpMB=1020
+[footprint] rev=ml358 phys=1027 MB (peak 1027) internal=1024 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=2)
+[xp] 22:04:58.942 +2.16 dt=325 cpu=448 (thr 448) P=447 E=1 run=458 pgw=0.0 GHz P=3.10 E=1.35 Minst=5671 IPC=4.09 mJ=1675 pin=0 rdKB=0 fpMB=1027
+[footprint] rev=ml358 phys=1027 MB (peak 1027) internal=1024 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=3)
+[footprint] rev=ml358 phys=1027 MB (peak 1027) internal=1024 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=4)
+[footprint] rev=ml358 phys=1027 MB (peak 1027) internal=1024 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=5)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=2863 full-path-hits=164 component-lookups=10885 shortcut-hits=375 misses=188 scans=10510 entries-scanned=4268936 us-in-lookup=6418123 (64% of the window) slowest=4.945 ms ...Batman - Arkham Knight/BmGame/CookedPCConsole/Hideout_B1.upk
+[footprint] rev=ml358 phys=1027 MB (peak 1027) internal=1025 MB compressed=0 MB external=128 MB reusable=16 MB (cycle=6)
+[xp-api-top] 22:05:09.972 344 samples: msvcr100.dll+0x62158=5833/s ntdll.dll+0x67dcc=4944/s ntdll.dll+0x6784c=4889/s kernelbase.dll+0x68a34=1333/s kernelbase.dll+0x51d48=667/s ntdll.dll+0x67d10=667/s kernelbase.dll+0x1bc28=444/s kernelbase.dll+0x220b4=333/s
+[free-delay] #1 release of 0x702d200000+0x400000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702d600000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702de00000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702e600000+0x400000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x702ea00000+0x400000 held for 2000 ms (5 in flight)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"atiadlxx.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"atiadlxy.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[xp-api-top] 22:05:11.157 4096 samples: ntdll.dll+0x6784c=154521/s ntdll.dll+0x67dcc=153493/s msvcr100.dll+0x62158=148349/s msvcr100.dll+0x7bcb4=65430/s msvcr100.dll+0x73d44=63372/s msvcr100.dll+0x7bc88=36418/s kernelbase.dll+0x636c4=35390/s msvcr100.dll+0x60420=33744/s kernelbase.dll+0x2b7c0=31480/s msvcr100.dll+0x6088c=29834/s kernelbase.dll+0x63644=27365/s msvcr100.dll+0x78e08=23867/s kernelbase.dll+0x1d8a8=14814/s kernelbase.dll+0x2ec38=13991/s ntdll.dll+0x67d10=2881/s msvcr100.dll+0x73eec=2675/s kernelbase.dll+0x68a34=2058/s msvcr100.dll+0x63944=1440/s msvcr100.dll+0x7ad3c=412/s msvcr100.dll+0x60bbc=206/s kernelbase.dll+0x1db8c=206/s kernelbase.dll+0x1e044=206/s kernelbase.dll+0x1e2c4=206/s kernelbase.dll+0x51d48=206/s kernel32.dll+0x26678=206/s
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[nls-getptr] type=11 id=10000 peb=0x71ffff0000
+[win-pos] #1 hwnd=0x2002a after=0x0 flags=00000014 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #1 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x2002a after=0x0 flags=00000010 vis={0,0,132,38} surface=0x0 rev=ml505 style=04c00000 visible=0 parent=0x10022
+[win-name] #2 hwnd=0x2002a class='OleMainThreadWndClass' text="" rev=ml853
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"C:\\windows\\system32\\gameux.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:ole:apartment_add_dll couldn't load in-process dll L"C:\\windows\\system32\\gameux.dll"
+[jit-pool] image 0x71fa170000+0x50000 (DXGI.dll) → pool 0x15089e000 used=0x88f2000/0x25000000 tramp+0x0
+D 24 Load module dxgi.dll (dxgi.dll-ba3e3a3584daa25f): 71FA170000
+[jit-pool] image 0x71fa030000+0x139000 (dxgi.dll) → pool 0x1508f1000 used=0x8a35000/0x25000000 tramp+0x4000
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): 71FA030000
+[jit-pool] image 0x71fa000000+0x28000 (winemetal.dll) → pool 0x150a36000 used=0x8a66000/0x25000000 tramp+0x4000
+D 24 Load module winemetal.dll (winemetal.dll-5dde309614d342ae): 71FA000000
+[winios-vk] Vulkan is off for this session (the game's file has no vulkan = moltenvk, or the library is not bundled)
+[vkmt] tid=0024 OpenAdapterFromLuid luid=fb060000:01000000 -> 0 hAdapter=0x40000000
+[vkmt] tid=0024 CloseAdapter hAdapter=0x40000000 -> 0
+[vmode] synthesized CURRENT = 960x540 @60Hz
+[free-delay] #6 release of 0x7046810000+0x100000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7046910000+0x200000 held for 2000 ms (7 in flight)
+[jit-pool] image 0x71f9fe0000+0x13000 (PhysXDevice64.dll) → pool 0x150a65000 used=0x8a7d000/0x25000000 tramp+0x0
+D 24 Load module PhysXDevice64.dll (physxdevice64.dll-81a65979f9819dc5): 71F9FE0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #4 L"nvcuda.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0x71f9fe0000+0x13000: 1 pool copy marked
+[jit-pool] image 0x71f9f00000+0xfc000 (nvapi64.dll) → pool 0x150a7d000 used=0x8b81000/0x25000000 tramp+0x4000
+D 24 Load module nvapi64.dll (nvapi64.dll-22148bd4b2c852a0): 71F9F00000
+[valloc] ml959 # base=0x7c10261000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c10261000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c10261000 size=0xf000 type=0x4000 tid=0024
+[valloc] ml959 # base=0x7c10261000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c10261000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c10261000 size=0xf000 type=0x4000 tid=0024
+[valloc] ml959 # base=0x7c10261000 size=0xf000 type=0x1000 prot=0x4 tid=0024 | req_hint=0x7c10261000 zero_bits=0x0 limit=0x0
+[vfree] ml842 # base=0x7c10261000 size=0xf000 type=0x4000 tid=0024
+info:  [nvapi] query 0x0150e828 NvAPI_Initialize
+[xp-api-top] 22:05:12.302 4096 samples: ntdll.dll+0x6784c=110262/s ntdll.dll+0x67dcc=106751/s msvcr100.dll+0x62158=103240/s msvcr100.dll+0x73d44=35204/s msvcr100.dll+0x7ad3c=14613/s msvcr100.dll+0x7bcb4=7496/s kernelbase.dll+0x68a34=1708/s msvcr100.dll+0x73eec=1423/s kernelbase.dll+0x2b7c0=1234/s msvcr100.dll+0x60420=1139/s kernelbase.dll+0x636c4=1139/s msvcr100.dll+0x6088c=759/s ntdll.dll+0x67d10=759/s msvcr100.dll+0x7bc88=474/s ntdll.dll+0x281ac=380/s msvcr100.dll+0x7b80c=285/s ntdll.dll+0x23c0c=285/s msvcr100.dll+0x60bbc=190/s kernelbase.dll+0x6db54=190/s msvcr100.dll+0x39d58=95/s msvcr100.dll+0x63944=95/s msvcr100.dll+0x750e4=95/s msvcr100.dll+0x7b76c=95/s kernelbase.dll+0x6a010=95/s kernelbase.dll+0x6c148=95/s kernelbase.dll+0x6c248=95/s kernelbase.dll+0x6c3e4=95/s kernelbase.dll+0x6ceec=95/s
+[xp-api-top] 22:05:13.486 58 samples: kernelbase.dll+0x68a34=1513/s ntdll.dll+0x67d10=811/s ntdll.dll+0x67dcc=811/s
+[xp-api-top] 22:05:14.735 63 samples: kernelbase.dll+0x68a34=1640/s ntdll.dll+0x67d10=820/s ntdll.dll+0x67dcc=769/s
+[xp-api-top] 22:05:15.947 60 samples: kernelbase.dll+0x68a34=1584/s ntdll.dll+0x67d10=792/s ntdll.dll+0x67dcc=792/s
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16d586220 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16d952290 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__semwait_signal+0x8 lr=libsystem_c.dylib`nanosleep+0xdc sp=0x16d83cc90 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16d60eb30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de409e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=1 threads=1 samples=200 buckets=1 span=0x0 [0x150a81598..0x150a81598] top: 0x150a81580=100%
+[cpu-split] ml1123 gen=1 running samples=200: x64 JIT 86%, ARM64EC images 13%, native 0%
+[cpu-split] ml1123 image top (PE address/256): 0x71ffd26300=27
+[cpu-split] ml1123 native top:
+[22:05:26.482] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=55 resident=1563MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de409e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=2 threads=1 samples=200 buckets=1 span=0x0 [0x150a81598..0x150a81598] top: 0x150a81580=100%
+[cpu-split] ml1123 gen=2 running samples=200: x64 JIT 82%, ARM64EC images 18%, native 0%
+[cpu-split] ml1123 image top (PE address/256): 0x71ffd26300=36
+[cpu-split] ml1123 native top:
+[window] 0x7048000000..0x7400000000 regions=433 occupied=8288 MB of 15232 MB free=6943 MB maxhole=6943 MB@0x7048000000 rev=ml787 (periodic)
+[window] 0x122c00000..0x7805000000 regions=76632 occupied=462787 MB of 486948 MB free=40624 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 919 MB in 248 views of the 16384 MB arena (0 MB of them in 0 unity-va views), highest end +1004 MB, largest free gap 15380 MB
+[22:05:56.639] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=54 resident=1567MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de409e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[launch-view] dismissed reason=button logs=1
+[rip-profile] ml981 gen=3 threads=3 samples=245 buckets=3 span=0xfb44aca [0x140f3cace..0x150a81598] top: 0x150a81580=81% 0x140f3cac0=9% 0x140f46940=8%
+[22:06:26.821] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+91s beats=3 gaps=0 iter=357 gen=1 threads=54 resident=1565MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de409e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[rip-profile] ml981 gen=4 threads=1 samples=200 buckets=1 span=0x0 [0x150a81598..0x150a81598] top: 0x150a81580=100%
+[cpu-split] ml1123 gen=4 running samples=200: x64 JIT 84%, ARM64EC images 16%, native 0%
+[cpu-split] ml1123 image top (PE address/256): 0x71ffd26300=32
+[cpu-split] ml1123 native top:
+[window] 0x7048000000..0x7400000000 regions=433 occupied=8288 MB of 15232 MB free=6943 MB maxhole=6943 MB@0x7048000000 rev=ml787 (periodic)
+[window] 0x122c00000..0x7805000000 regions=76635 occupied=462791 MB of 486948 MB free=40620 MB maxhole=16464 MB@0x73ffff0000 rev=ml787 (layerkit-span)
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16de409e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[22:06:56.930] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[freeze] alive t+121s beats=4 gaps=0 iter=476 gen=1 threads=55 resident=1570MB dbg=DEBUGGED rev=ml525
+[thread-sample] ml876 b1 "Game Thread" teb=0x71fffe0000 cpu=100% RUN pc=0x14c54670c lr=0x150afdce4 sp=0x702580f900 NATIVE (unresolved: hostPC outside block) sp-cand=[ BatmanAK.exe+0x1bc17f8 BatmanAK.exe+0x317a630 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x1136430 BatmanAK.exe+0x2d1af50 BatmanAK.exe+0x113657a BatmanAK.exe+0x1136656 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x11366a6 BatmanAK.exe+0x317a630 BatmanAK.exe+0x10a2b77 ]
+[thread-sample] ml876 modmap peb=0x71ffff0000 modules=62 first=BatmanAK.exe@0x140000000
+[thread-sample] ml876 b2 "Game Thread" teb=0x71fffe0000 cpu=100% RUN pc=0x14c54670c lr=0x150afdce4 sp=0x702580f900 NATIVE (unresolved: hostPC outside block) sp-cand=[ BatmanAK.exe+0x1bc17f8 BatmanAK.exe+0x317a630 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x1136430 BatmanAK.exe+0x2d1af50 BatmanAK.exe+0x113657a BatmanAK.exe+0x1136656 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x11366a6 BatmanAK.exe+0x317a630 BatmanAK.exe+0x10a2b77 ]
+[thread-sample] ml876 modmap peb=0x71ffff0000 modules=62 first=BatmanAK.exe@0x140000000
+[thread-sample] ml876 b3 "Game Thread" teb=0x71fffe0000 cpu=100% RUN pc=0x14c54670c lr=0x150afdce4 sp=0x702580f900 NATIVE (unresolved: hostPC outside block) sp-cand=[ BatmanAK.exe+0x1bc17f8 BatmanAK.exe+0x317a630 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x1136430 BatmanAK.exe+0x2d1af50 BatmanAK.exe+0x113657a BatmanAK.exe+0x1136656 BatmanAK.exe+0x1c1b878 BatmanAK.exe+0x11366a6 BatmanAK.exe+0x317a630 BatmanAK.exe+0x10a2b77 ]
+[thread-sample] ml876 burst done
+[rip-profile] ml981 gen=5 threads=1 samples=200 buckets=1 span=0x0 [0x150a81598..0x150a81598] top: 0x150a81580=100%
+[cpu-split] ml1123 gen=5 running samples=200: x64 JIT 81%, ARM64EC images 19%, native 0%
+[cpu-split] ml1123 image top (PE address/256): 0x71ffd26300=38
+[cpu-split] ml1123 native top:
+[footprint] rev=ml358 phys=1425 MB (peak 1426) internal=1422 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=64)
+[footprint] rev=ml358 phys=1424 MB (peak 1426) internal=1422 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=65)
+[footprint] rev=ml358 phys=1424 MB (peak 1426) internal=1422 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=66)
+[xp-api-top] 22:07:07.687 62 samples: kernelbase.dll+0x68a34=1528/s ntdll.dll+0x67d10=815/s ntdll.dll+0x67dcc=815/s
+[xp-api-top] 22:07:08.926 62 samples: kernelbase.dll+0x68a34=1654/s ntdll.dll+0x67d10=775/s ntdll.dll+0x67dcc=775/s
+[footprint] rev=ml358 phys=1425 MB (peak 1426) internal=1424 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=67)
+[xp-api-top] 22:07:10.173 62 samples: kernelbase.dll+0x68a34=1540/s ntdll.dll+0x67d10=821/s ntdll.dll+0x67dcc=821/s
+[xp-api-top] 22:07:11.298 55 samples: kernelbase.dll+0x68a34=1593/s ntdll.dll+0x67d10=796/s ntdll.dll+0x67dcc=740/s
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1425 MB (peak 1426) internal=1423 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=68)
+[xp-api-top] 22:07:12.423 56 samples: kernelbase.dll+0x68a34=1593/s ntdll.dll+0x67d10=797/s ntdll.dll+0x67dcc=797/s
+[xp] 22:07:12.749 +135.96 dt=326 cpu=334 (thr 333) P=333 E=1 run=337 pgw=0.0 GHz P=3.12 E=1.81 Minst=3560 IPC=3.42 mJ=1168 pin=0 rdKB=0 fpMB=1425
+[xp] 22:07:13.070 +136.29 dt=321 cpu=327 (thr 328) P=327 E=1 run=336 pgw=0.0 GHz P=3.12 E=1.71 Minst=3484 IPC=3.41 mJ=1168 pin=0 rdKB=0 fpMB=1425
+[xp] 22:07:13.342 +136.56 dt=272 cpu=278 (thr 278) P=278 E=1 run=284 pgw=0.0 GHz P=3.12 E=1.73 Minst=2967 IPC=3.42 mJ=985 pin=0 rdKB=0 fpMB=1425
+[xp] 22:07:13.600 +136.82 dt=258 cpu=266 (thr 266) P=266 E=1 run=268 pgw=0.0 GHz P=3.12 E=1.91 Minst=2821 IPC=3.40 mJ=923 pin=0 rdKB=0 fpMB=1425
+[xp-api-top] 22:07:13.600 58 samples: kernelbase.dll+0x68a34=1577/s ntdll.dll+0x67dcc=816/s ntdll.dll+0x67d10=761/s
+[footprint] rev=ml358 phys=1424 MB (peak 1426) internal=1422 MB compressed=0 MB external=130 MB reusable=15 MB (cycle=69)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[xp] 22:07:13.864 +137.08 dt=264 cpu=286 (thr 286) P=284 E=2 run=312 pgw=0.0 GHz P=3.09 E=2.02 Minst=2915 IPC=3.30 mJ=978 pin=0 rdKB=0 fpMB=1424
+[xp] 22:07:14.174 +137.39 dt=310 cpu=323 (thr 323) P=321 E=2 run=335 pgw=0.0 GHz P=3.11 E=2.06 Minst=3379 IPC=3.37 mJ=1140 pin=0 rdKB=0 fpMB=1424
+[22:07:14.416] [INFO] [session] length=143s partial=1 play=0s frames=0 stalls=0/0s peak=1427MB limit=8191MB thermal=nominal lpm=0 api=D3D10/D3D11/D3D12/D3D9/64 res=960x540 cap=30 game=BatmanAK

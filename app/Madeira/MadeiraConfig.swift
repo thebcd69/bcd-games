@@ -1,3 +1,6 @@
+// Portions copyright 2026 spenstars1: reading and writing bcd.cfg as bytes (`all`, `set`), taken from https://github.com/willfaust/Madeira
+// (pull request #629, commit 0d057f1b) under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026.
+// See THIRD-PARTY-NOTICES.md.
 import Foundation
 
 /// ml1095: ONE configuration file for every runtime switch: Documents/bcd.cfg
@@ -22,10 +25,14 @@ enum MadeiraConfig {
     static var url: URL? { documents?.appendingPathComponent(fileName) }
     static var present: Bool { url.map { FileManager.default.fileExists(atPath: $0.path) } ?? false }
 
-    /// All key/value pairs of bcd.cfg (empty when the file is absent).
+    /// All key/value pairs of bcd.cfg (empty when the file is absent or cannot be read).
+    ///
+    /// A byte that is not UTF-8 (a comment saved as Windows-1252 by an editor on a PC) reads as U+FFFD in its own
+    /// line instead of hiding the whole file: build/madeira_cfg.h reads the file as bytes and applies every line, so
+    /// Settings has to see the same keys.
     static func all() -> [String: String] {
-        guard let u = url, let text = try? String(contentsOf: u, encoding: .utf8) else { return [:] }
-        return parse(text)
+        guard let u = url, let data = try? Data(contentsOf: u) else { return [:] }
+        return parse(String(decoding: data, as: UTF8.self))
     }
 
     /// The key/value pairs of text in bcd.cfg's syntax, the last line winning.
@@ -142,20 +149,31 @@ enum MadeiraConfig {
     /// other line are kept; earlier lines for the key are dropped and the new
     /// value is appended; a nil value removes the key. Without bcd.cfg the
     /// file is created with that one line.
+    ///
+    /// Works on bytes, as build/madeira_cfg.h reads the file: a line that is not UTF-8 (a comment saved as
+    /// Windows-1252 by an editor on a PC) is written back byte for byte, and a file that exists but cannot be read
+    /// is left alone (false) instead of being rewritten with only this key. Line ends are written as LF, as before.
     @discardableResult
     static func set(_ key: String, _ value: String?) -> Bool {
         guard let u = url else { return false }
-        let text = (try? String(contentsOf: u, encoding: .utf8)) ?? ""
-        var lines = text.split(omittingEmptySubsequences: false, whereSeparator: { $0 == "\n" || $0 == "\r\n" }).map(String.init)
-        if lines.last == "" { lines.removeLast() }
+        var data = Data()
+        if FileManager.default.fileExists(atPath: u.path) {
+            guard let d = try? Data(contentsOf: u) else { return false }
+            data = d
+        }
+        var lines = data.split(separator: 0x0A, omittingEmptySubsequences: false).map { line -> Data in
+            line.last == 0x0D ? Data(line.dropLast()) : Data(line)
+        }
+        if lines.last?.isEmpty == true { lines.removeLast() }
         lines.removeAll { line in
-            let t = line.trimmingCharacters(in: .whitespaces)
+            let t = String(decoding: line, as: UTF8.self).trimmingCharacters(in: .whitespaces)
             guard !t.hasPrefix("#"), let eq = t.firstIndex(of: "=") else { return false }
             return t[..<eq].trimmingCharacters(in: .whitespaces) == key
         }
-        if let value { lines.append("\(key) = \(value)") }
-        let out = lines.joined(separator: "\n") + (lines.isEmpty ? "" : "\n")
-        do { try out.write(to: u, atomically: true, encoding: .utf8); return true } catch { return false }
+        if let value { lines.append(Data("\(key) = \(value)".utf8)) }
+        var out = Data(lines.joined(separator: [0x0A]))
+        if !lines.isEmpty { out.append(0x0A) }
+        do { try out.write(to: u, options: .atomic); return true } catch { return false }
     }
 
     /// An app-side switch spelled like the native ones: `env.NAME = value` in

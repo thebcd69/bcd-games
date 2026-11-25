@@ -276,7 +276,9 @@ respective owners; BCD is not affiliated with or endorsed by them.
 
 **Madeira**, which BCD is a fork of, by Will Faust ([willfaust](https://github.com/willfaust)) and its contributors. BCD carries
 code from Madeira and from the people who contribute to it; every file, author and source is listed in
-[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). From open pull requests to Madeira and to its Wine, FEX and DXMT forks, BCD also
+carries fixes by [Dragooon](https://github.com/Dragooon), [spenstars1](https://github.com/spenstars1) and
+[wenze-allen](https://github.com/wenze-allen).
 
 **Porthole** ([tylerkaska112/Porthole](https://github.com/tylerkaska112/Porthole)), another fork of Madeira, by The Porthole
 authors: BCD carries their code for frame generation with Lossless Scaling, live MetalFX upscaling, floating sticks and touch
@@ -286,7 +288,8 @@ layouts, the Amazon Games store and more, listed file by file in THIRD-PARTY-NOT
 [le0-VV](https://github.com/le0-VV), [rtmtree](https://github.com/rtmtree), [vancez](https://github.com/vancez),
 [creeper4004](https://github.com/creeper4004), [iqui27](https://github.com/iqui27), [Taala2](https://github.com/Taala2),
 [pauloec](https://github.com/pauloec), [rbarton124](https://github.com/rbarton124), [bogsen](https://github.com/bogsen),
-[RageMC](https://github.com/RageMC), [netheritenee](https://www.reddit.com/user/netheritenee) and [SeeTheBridges](https://github.com/SeeTheBridges).
+[RageMC](https://github.com/RageMC), [noralstat](https://github.com/noralstat), [sky9662](https://github.com/sky9662),
+[netheritenee](https://www.reddit.com/user/netheritenee) and [SeeTheBridges](https://github.com/SeeTheBridges).
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by
@@ -294,6 +297,6 @@ David Acevedo (dacevedo12), rpmalloc by Mattias Jansson, StikDebug, StikJIT, ide
 FreeType, and every library listed in THIRD-PARTY-NOTICES.md. Thank you to everyone who
 works on them.
 
-**BCD** by thebcd69, with the AltStore and SideStore source by **le0-VV** ([le0-VV](https://github.com/le0-VV)).
+**BCD** by thebcd69, with the AltStore and SideStore source, live logs over Wi-Fi and the LiveContainer 3.8.14 helper fix by **le0-VV** ([le0-VV](https://github.com/le0-VV)).
 
 **The app icon** by **Mila** (mudcatpot on Discord). Thank you!

@@ -1,0 +1,391 @@
+[19:50:15.905] [INFO] Checking entitlements...
+[19:50:15.906] [INFO] [build] v0.1.712 (712)
+[19:50:15.906] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 26.7.3 (Build 23H131) ram=5662MB available=4073MB cores=6
+[19:50:15.907] [INFO] [device] address-map=[0x100844000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[19:50:15.907] [INFO] [device] signing: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 profile=development lifetime=7d left=6d profile-get-task-allow=1 profile-increased-memory=1 profile-extended-va=0 appid-match=1 wildcard=0 lc=0
+[19:50:15.920] [INFO] [device] settings: low-power=0 thermal=nominal screen=1179x2556@3.0x max-fps=120 utc-offset=+02:00 free-disk=13GB stikdebug-url=0
+[19:50:15.924] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:50:19.041] [INFO] [epic-launch] start app=Bulbul signed-in=1 ovt=0 deployment=0 host=1 tree=1 services=0 desktop=0 arguments=epic held=0
+[19:50:19.055] [INFO] [bcd] library launch MudRunner.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=0
+[19:50:19.082] [INFO] Running full Wine sequence...
+[19:50:19.082] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100844000,0xfc0000000) 63GB available=4062MB low-power=0 thermal=nominal
+[19:50:19.084] [INFO] [game-cfg] env.MADEIRA_D3D9_X64=dxmt env.MADEIRA_EC_HOOK_TRACE=0 env.MADEIRA_X86_FAULT_DUMP=1
+[19:50:19.086] [INFO] [msiexec64] Epic game: msiexec in system32 for this session
+[19:50:19.087] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[19:50:19.092] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:50:19.094] [INFO] Allocating 896MB JIT pool via debugger...
+[19:50:19.094] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:50:19.095] [INFO] [jit-debugger] attached=1 at the pool request
+[19:50:19.095] [INFO] [jit-age] attach age=5s source=at-start method=builtin thermal=0
+[19:50:19.096] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[19:50:23.011] [INFO] RX pool at 0x300000000
+[19:50:23.069] [OK] JIT pool ready (debugger still attached).
+[19:50:23.071] [INFO] BRK suspension lasted 3.98s
+[19:50:23.072] [INFO] Detaching debugger...
+[19:50:23.078] [OK] Debugger detached.
+[19:50:23.080] [OK] [early-detach] rev=ml524 took 8 ms
+[19:50:23.081] [INFO] Starting wineserver...
+[phase] wine-start             t+  4.031s rev=ml526
+[19:50:23.124] [wineserver] send_client_fd: fd=37 handle=0x3a2 msg_fd_unix=34 proc=0020 tid=0000
+[game-cfg] <container>/Library/Application Support/GameConfigs/autotune-launch.cfg (read)
+[madeira-env] game MADEIRA_X86_FAULT_DUMP=1
+[WineProc] Target exe: C:\Program Files\Epic Games\MudRunner\MudRunner.exe (bundle=arm64ec-windows)
+[msiexec64] system32\msiexec.exe -> i386 msiexec: linked
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[WineProc] MADEIRA_D3D9_X64=dxmt: d3d9.dll -> d3d9-dxmt.dll (DXMT's Direct3D 9 for 64-bit programs; system32 + sysx64)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[valloc] ml959 # base=0x109660000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbfe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0xfbffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0xfbffe0000 zero_bits=0x0 limit=0x0
+[fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[19:50:23.551] [fdtrace] pipes tid=0000 peb=0xfbfff0000 master=35 reply=40/41 wait=42/43 rev=ml586
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=3151 MB + phys_footprint=944 MB = 4096 MB (hw.memsize says 5662 MB)
+ml992: clamping reported physical memory 5662 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+ml985: preferred base 0x140000000+0xc31000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0xc34000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x123800000+0xc31000 (MudRunner.exe) → pool 0x300004000 used=0xc38000/0x38000000 tramp+0x0
+[copy-verify] MudRunner.exe: OK, 603 .text pages executable (copy @0x300004000)
+[fex-arena] ml793 PUBLISHED [0xb30000000,0xd30000000) size=0x200000000 version=1 -- the emulator must CONSUME this range; it must not run its own selector
+[jit-pool] image 0xfbfcd0000+0x130000 (ntdll.dll) → pool 0x300c38000 used=0xd70000/0x38000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x300c38000)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 283)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Performance, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x15c8: 680 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x15c8: 680 slot(s), 0 data import(s) bound
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x109660320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[jit-pool] image 0xfbf6a0000+0x421000 (libarm64ecfex.dll) → pool 0x300d73000 used=0x119f000/0x38000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x300d73000)
+[window] 0x123800000..0xb30000000 regions=100001 occupied=7854 MB of 41160 MB free=33305 MB maxhole=31974 MB@0x361978000 rev=ml787 (layerkit-span)
+[fex-arena] r669 fill (periodic): 0 MB in 0 views of the 8192 MB arena (0 MB of them in 0 unity-va views), highest end +0 MB, largest free gap 8192 MB
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=979 MB (peak 979) internal=975 MB compressed=1 MB external=74 MB reusable=2 MB (cycle=1)
+[jit-pool] image 0xfbf570000+0x130000 (ucrtbase.dll) → pool 0x30119c000 used=0x12d0000/0x38000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x30119c000)
+[jit-pool] image 0xfbf4b0000+0xc0000 (kernel32.dll) → pool 0x3012d0000 used=0x1398000/0x38000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x3012d0000)
+[jit-pool] image 0xfbf1c0000+0x2f0000 (kernelbase.dll) → pool 0x301398000 used=0x1698000/0x38000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x301398000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+ml992: clamping reported physical memory 5662 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+ml992: clamping reported physical memory 5662 MB -> 4096 MB (jetsam kills us at the limit regardless of installed RAM)
+[nls-getptr] type=11 id=20127 peb=0xfbfff0000
+[exec-alloc] NtAllocateVirtualMemoryEx #1 req_addr=0x0 size=0x4000 type=0x103000 protect=0x40
+I 24 FEX: TSO config tso=true halfbar=true vector=false memcpyset=false rev=ml513
+D 24 Load module MudRunner.exe (mudrunner.exe-49b298594ace5c2a): 123800000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBFCD0000
+[exec-alloc] NtAllocateVirtualMemory #1 req_addr=0x0 size=0x1000 type=0x101000 protect=0x40
+[exec-alloc] NtAllocateVirtualMemoryEx #2 req_addr=0x0 size=0x1000000 type=0x103000 protect=0x40
+[nls-getptr] type=11 id=1252 peb=0xfbfff0000
+[nls-getptr] type=11 id=437 peb=0xfbfff0000
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x1000: 503 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x1000: 503 slot(s), 0 data import(s) bound
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): FBEF40000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): FBEE50000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): FBEDA0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBED20000
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x15c8: 680 slot(s), 0 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x15c8: 680 slot(s), 0 data import(s) bound
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x302b4c000)
+[copy-verify] d3d9.dll: OK, 96 .text pages executable (copy @0x302c81000)
+[copy-verify] winemetal.dll: OK, 2 .text pages executable (copy @0x303012000)
+[copy-verify] d3dx9_43.dll: OK, 26 .text pages executable (copy @0x303040000)
+[copy-verify] d3dcompiler_43.dll: OK, 8 .text pages executable (copy @0x303154000)
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x1000: 503 slot(s), 2 data import(s) bound
+[x64-data-imp] ml1245 importer pe=0x123800000 IAT window 0x12416a000+0x1000: 503 slot(s), 4 data import(s) bound
+D 24 Load module EOSSDK-Win64-Shipping.dll (eossdk-win64-shipping.dll-d8c53b2c62d25e19): FBBAE0000
+[copy-verify] nsi.dll: OK, 2 .text pages executable (copy @0x3053b8000)
+[x64-data-imp] ml1245 importer pe=0xfbbae0000 IAT window 0xfbca0f000+0x1000: 486 slot(s), 2 data import(s) bound
+D 24 Load module DINPUT8.dll (dinput8.dll-fa63f814948e9838): FBAEC0000
+[xp] 19:50:24.207 +0.57 dt=310 cpu=189 (thr 189) P=188 E=0 run=193 pgw=0.0 GHz P=3.41 E=1.47 Minst=2231 IPC=3.47 mJ=449 pin=1582 rdKB=47208 fpMB=1106
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[image-reload] unmapped image 0xfba910000+0xb0000: 1 pool copy marked
+[unixlib] opengl32 (GL-absent stub table) (module 0xfbd170000) -> 64-bit table (0x1043fd220)
+0024:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "..............."
+[image-reload] unmapped image 0xfba8b0000+0xc0000: 1 pool copy marked
+[xp-names] m700184 "wine-x18-exc"
+[xp] 19:50:24.515 +0.88 dt=308 cpu=275 (thr 270) P=274 E=0 run=280 pgw=0.0 GHz P=3.41 E=1.47 Minst=3554 IPC=3.80 mJ=783 pin=243 rdKB=5628 fpMB=1134
+E 44 [thr-term] rev=ml435 deinit #1 tid=0x44
+[xp] 19:50:24.806 +1.17 dt=291 cpu=251 (thr 234) P=249 E=2 run=263 pgw=0.0 GHz P=3.41 E=1.74 Minst=3679 IPC=4.32 mJ=752 pin=301 rdKB=4196 fpMB=1214
+[xp] 19:50:25.076 +1.44 dt=269 cpu=272 (thr 270) P=258 E=14 run=312 pgw=0.0 GHz P=3.43 E=1.99 Minst=4408 IPC=4.83 mJ=864 pin=0 rdKB=0 fpMB=1224
+[xp] 19:50:25.399 +1.76 dt=324 cpu=327 (thr 327) P=325 E=2 run=334 pgw=0.0 GHz P=3.43 E=0.98 Minst=5594 IPC=5.01 mJ=1093 pin=0 rdKB=0 fpMB=1224
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): FBA040000
+info:  [nvapi] query 0x0150e828 NvAPI_Initialize
+info:  [nvapi] NvAPI_Initialize -> -6
+[image-reload] unmapped image 0xfba180000+0xfc000: 1 pool copy marked
+[image-reload] unmapped image 0xfba040000+0x139000: 1 pool copy marked
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): FBA040000
+info:  [nvapi] query 0x0150e828 NvAPI_Initialize
+info:  [nvapi] NvAPI_Initialize -> -6
+[image-reload] unmapped image 0xfba180000+0xfc000: 1 pool copy marked
+[image-reload] unmapped image 0xfba040000+0x139000: 1 pool copy marked
+[footprint] rev=ml358 phys=1231 MB (peak 1231) internal=1017 MB compressed=211 MB external=130 MB reusable=2 MB (cycle=2)
+[xp] 19:50:25.699 +2.06 dt=300 cpu=312 (thr 311) P=309 E=3 run=317 pgw=0.0 GHz P=3.42 E=1.23 Minst=4924 IPC=4.64 mJ=972 pin=7 rdKB=3044 fpMB=1232
+[win-pos] #1 hwnd=0x10030 after=0x0 flags=8000003c vis={-640,-360,1280,720} surface=0x103e2ce98 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #1 hwnd=0x10030 class='MudRunner WindowClass' text="" rev=ml853
+[win-pos] #2 hwnd=0x10038 after=0x0 flags=0000003c vis={0,0,1,1} surface=0x103e2ce98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #2 hwnd=0x10038 class='IME' text="" rev=ml853
+[win-pos] #3 hwnd=0x10038 after=0x0 flags=00000018 vis={0,0,1,1} surface=0x103e2ce98 rev=ml505 style=8c000000 visible=0 parent=0x10020
+[win-name] #3 hwnd=0x10038 class='IME' text="Default IME" rev=ml853
+[win-pos] #4 hwnd=0x10030 after=0x0 flags=80000018 vis={-640,-360,1280,720} surface=0x103e2ce98 rev=ml505 style=04cf0000 visible=0 parent=0x10020
+[win-name] #4 hwnd=0x10030 class='MudRunner WindowClass' text="MudRunner?" rev=ml853
+[win-pos] #5 hwnd=0x10030 after=0x0 flags=80001967 vis={-640,-360,1280,720} surface=0x10e4eef40 rev=ml505 style=14cf0000 visible=1 parent=0x10020
+[win-name] #5 hwnd=0x10030 class='MudRunner WindowClass' text="MudRunner?" rev=ml853
+[win-pos] #6 hwnd=0x2003c after=0x0 flags=0000003c vis={0,0,1,1} surface=0x103e2ce98 rev=ml505 style=84000000 visible=0 parent=0x10020
+[win-name] #6 hwnd=0x2003c class='Wine IME' text="" rev=ml853
+[win-name] #7 hwnd=0x2003c class='Wine IME' text="" rev=ml853
+info:  [d3d9-modes] adapter 0 count=3 current=1280x720@60 | 640x480@60 | 800x600@60 | 1280x720@60
+info:  [d3d9-caps] ... capped at 256 lines; further distinct queries are not printed
+[jit-pool] image 0xfba1f0000+0x90000 (xinput1_3.dll) → pool 0x306700000 used=0x6794000/0x38000000 tramp+0x4000
+0054:err:thread:RtlExitUserThread [thr-exit] ml806 RtlExitUserThread tid=0054 status=00000001 caller=00000003012F6474
+E 54 [thr-term] rev=ml435 deinit #2 tid=0x54
+[winios] game window hwnd=0x10030 presents through Metal; its GDI surface is not drawn
+[ptr-map] the picture is window hwnd=0x10030's client (-4,-4 1288x728) on a 1280x720 screen: points on it go there (a swapchain window)
+[vmode] synthesized CURRENT = 1280x720 @60Hz
+[ptr-map] off: points map to the whole screen (window frame)
+[jit-pool] image 0xfb9f70000+0xfc000 (nvapi64.dll) → pool 0x306795000 used=0x6899000/0x38000000 tramp+0x4000
+D 24 Load module nvapi64.dll (nvapi64.dll-22148bd4b2c852a0): FB9F70000
+[jit-pool] image 0xfb9e30000+0x139000 (dxgi.dll) → pool 0x306899000 used=0x69dd000/0x38000000 tramp+0x4000
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): FB9E30000
+info:  [nvapi] query 0x0150e828 NvAPI_Initialize
+info:  [nvapi] NvAPI_Initialize -> -6
+[image-reload] unmapped image 0xfb9f70000+0xfc000: 1 pool copy marked
+[image-reload] unmapped image 0xfb9e30000+0x139000: 1 pool copy marked
+[jit-pool] image 0xfb9f70000+0xfc000 (nvapi64.dll) → pool 0x306795000 used=0x6899000/0x38000000 tramp+0x4000
+D 24 Load module nvapi64.dll (nvapi64.dll-22148bd4b2c852a0): FB9F70000
+[jit-pool] image 0xfb9e30000+0x139000 (dxgi.dll) → pool 0x306899000 used=0x69dd000/0x38000000 tramp+0x4000
+D 24 Load module dxgi.dll (dxgi.dll-ba28aa35b054c084): FB9E30000
+info:  [nvapi] query 0x0150e828 NvAPI_Initialize
+info:  [nvapi] NvAPI_Initialize -> -6
+[image-reload] unmapped image 0xfb9f70000+0xfc000: 1 pool copy marked
+[image-reload] unmapped image 0xfb9e30000+0x139000: 1 pool copy marked
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[bc-remap] ml678 130 -> 70  n=1  (sRGB-in=0 sRGB-out=0)
+[jit-pool] image 0xfb9fc0000+0xb0000 (xaudio2_8.dll) → pool 0x3069dc000 used=0x6a90000/0x38000000 tramp+0x4000
+D 24 Load module xaudio2_8.dll (xaudio2_8.dll-6d69cf073a0a771a): FB9FC0000
+[ios_audio] ml2303 slot=1 first audible buffer 0.05 s after create_stream (peak 0.009; endpoint running, mute=0, paused=0, held=0, halt=0)
+[rb-tex] madeira-bcd new readback #1: fmt 10 1920x1080 level 0 (texture 1920x1080, 1 mips)
+[rb-tex] madeira-bcd new readback #2: fmt 10 960x540 level 0 (texture 960x540, 1 mips)
+[launch-view] dismissed reason=present logs=0
+[19:50:26.662] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[bc-remap] ml678 132 -> 70  n=1  (sRGB-in=0 sRGB-out=0)
+[footprint] rev=ml358 phys=1734 MB (peak 1734) internal=570 MB compressed=942 MB external=133 MB reusable=0 MB (cycle=3)
+[footprint] rev=ml358 phys=2064 MB (peak 2064) internal=567 MB compressed=1083 MB external=133 MB reusable=0 MB (cycle=4)
+D 7C Load module usp10.dll (usp10.dll-96a99906564711c6): D32C00000
+[rb-tex] madeira-bcd new readback #16: fmt 1 1024x1024 level 0 (texture 1024x1024, 1 mips)
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[footprint] rev=ml358 phys=2448 MB (peak 2448) internal=631 MB compressed=1078 MB external=133 MB reusable=0 MB (cycle=5)
+E 7C [thr-term] rev=ml435 deinit #3 tid=0x7c
+[footprint] rev=ml1060 fast phys=2335 MB compressed=1068 MB internal=674 MB
+[mem-burst] rev=624 +297 MB in 251 ms phys=2632 internal=702 compressed=1068 other=862 | guest commits since the last sample: n=95, 25 MB, biggest 2 MB tid=0024 | swap backed=0 MB | pool head=106 MB tail=16 MB
+[footprint] rev=ml1060 fast phys=2632 MB compressed=1068 MB internal=702 MB
+[bc-remap] ml678 134 -> 70  n=1  (sRGB-in=0 sRGB-out=0)
+[dns] madeira-bcd begin #1 "api.epicgames.dev" "443" family=0 flags=0x0 type=1
+[footprint] rev=ml1060 fast phys=2658 MB compressed=1097 MB internal=758 MB
+[dns] madeira-bcd end #1 "api.epicgames.dev" = 0 after 91 ms (2 result(s))
+E 90 [thr-term] rev=ml435 deinit #4 tid=0x90
+[srv-conn] owner=32 wsfam=2 ufam=2 lport=54995 dport=443 nb=1 ret=-1 plen=16 rev=ml478
+[srv-conn-done] dport=443 event=OUT err=0 fd=300 peer=YES path=REAL-kernel-completion rev=ml576
+[footprint] rev=ml358 phys=2649 MB (peak 2649) internal=756 MB compressed=1095 MB external=133 MB reusable=0 MB (cycle=6)
+[file-census] r624 10s: case-sensitive=1 full-path-tries=6883 full-path-hits=1479 component-lookups=32369 shortcut-hits=21759 misses=10510 scans=10610 entries-scanned=78582 us-in-lookup=3321400 (31% of the window) slowest=0.668 ms ...ts/wine/dosdevices/c:/users/mobile/AppData/Roaming/MudRunner
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[ios_audio] ml1230 pacing stream=0x111fdf000 lead 60 ms: client wrote 10.00 s of audio in 10.01 s (99.9%) over 200 wakes; device short 0.0 ms in 0 of 1001 passes (largest pass 480 frames); ring 2400..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (0,0) hit win=00010030 thread=0x11b703300
+[xp-api-top] 19:50:36.239 4096 samples: msvcr110.dll+0x857e8=162591/s d3dx9_43.dll+0x34b4c=79507/s d3dx9_43.dll+0x39c6c=68090/s msvcr110.dll+0x4187c=60937/s msvcr110.dll+0x63a94=58186/s d3d9.dll+0x2fc00=22559/s ntdll.dll+0x6784c=8666/s msvcr110.dll+0x64980=8528/s ntdll.dll+0x67dcc=8391/s d3d9.dll+0x2e41c=7841/s ntdll.dll+0x71aac=5502/s d3d9.dll+0x72260=5365/s msvcr110.dll+0x1e970=3852/s d3d9.dll+0x81428=3164/s msvcr110.dll+0x64c74=2889/s kernelbase.dll+0x68958=2751/s d3d9.dll+0x2f820=2614/s d3d9.dll+0x2fab4=2338/s msvcr110.dll+0x3a688=2338/s msvcr110.dll+0x3a7f8=2338/s d3d9.dll+0x2e564=2201/s d3d9.dll+0x2f988=2063/s d3d9.dll+0x3dd08=1926/s msvcr110.dll+0x7d564=1926/s d3dx9_43.dll+0x39e1c=1926/s d3d9.dll+0x2f408=1788/s msvcr110.dll+0x84bf0=1788/s d3d9.dll+0x29be8=1513/s
+[ios_audio] ml1230 pacing stream=0x111fdcf00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 200 wakes; device short 0.0 ms in 0 of 1000 passes (largest pass 480 frames); ring 2400..4800 frames; worst late wake 0.2 ms; clamped 0 samples
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[srv-input] btn msg=0x201 at (567,424) hit win=00010030 thread=0x11b703300
+[xp-api-top] 19:50:37.359 4096 samples: msvcr110.dll+0x857e8=162676/s d3dx9_43.dll+0x34b4c=84923/s d3dx9_43.dll+0x39c6c=65071/s msvcr110.dll+0x4187c=60935/s msvcr110.dll+0x63a94=59005/s d3d9.dll+0x2fc00=22471/s ntdll.dll+0x67dcc=10615/s ntdll.dll+0x6784c=8547/s msvcr110.dll+0x64980=7582/s d3d9.dll+0x2e41c=6755/s d3d9.dll+0x72260=4963/s kernelbase.dll+0x68958=4687/s msvcr110.dll+0x1e970=3998/s d3d9.dll+0x2e564=3447/s ntdll.dll+0x71aac=3171/s d3d9.dll+0x2f820=3033/s d3d9.dll+0x81428=2619/s msvcr110.dll+0x3a688=2482/s msvcr110.dll+0x3a7f8=2482/s d3dx9_43.dll+0x39e1c=2482/s d3d9.dll+0x3dd08=2344/s d3d9.dll+0x2b6c0=2068/s msvcr110.dll+0x7d564=1792/s msvcp110.dll+0x75748=1792/s msvcr110.dll+0x84bf0=1654/s msvcr110.dll+0x64c74=1516/s d3dx9_43.dll+0x3475c=1516/s d3d9.dll+0x2cd44=1379/s
+[xp-api-top] 19:50:38.509 4096 samples: msvcr110.dll+0x857e8=154175/s d3dx9_43.dll+0x34b4c=88081/s d3dx9_43.dll+0x39c6c=72338/s msvcr110.dll+0x4187c=56866/s msvcr110.dll+0x63a94=56187/s d3d9.dll+0x2fc00=21579/s ntdll.dll+0x6784c=11265/s ntdll.dll+0x67dcc=7736/s d3d9.dll+0x2e41c=6514/s msvcr110.dll+0x64980=4886/s d3d9.dll+0x2e564=4207/s msvcr110.dll+0x3a7f8=3936/s kernelbase.dll+0x68958=3936/s msvcr110.dll+0x1e970=3664/s d3d9.dll+0x72260=3393/s msvcr110.dll+0x64c74=3393/s d3d9.dll+0x81428=3257/s msvcr110.dll+0x3a688=3257/s d3dx9_43.dll+0x24a2c=2714/s d3d9.dll+0x2fab4=2579/s d3d9.dll+0x2f408=2171/s msvcp110.dll+0x75748=2171/s msvcr110.dll+0x84bf0=2036/s ntdll.dll+0x71aac=1900/s d3d9.dll+0x2f820=1764/s d3d9.dll+0x3dd08=1764/s d3dx9_43.dll+0x39e1c=1764/s d3d9.dll+0x2f988=1629/s
+E 78 [thr-term] rev=ml435 deinit #5 tid=0x78
+E 74 [thr-term] rev=ml435 deinit #6 tid=0x74
+[xp-api-top] 19:50:39.678 4096 samples: msvcr110.dll+0x857e8=64523/s msvcr110.dll+0x64980=61376/s msvcr110.dll+0x63a94=56512/s d3d9.dll+0x2fc00=47212/s d3dx9_43.dll+0x34b4c=46783/s d3dx9_43.dll+0x39c6c=37054/s msvcr110.dll+0x4187c=30187/s d3dx9_43.dll+0x22440=22748/s msvcr110.dll+0x3a7f8=20888/s msvcr110.dll+0x3a688=20172/s msvcr110.dll+0x61d5c=16739/s d3d9.dll+0x2e41c=13019/s d3dx9_43.dll+0x24dcc=9156/s ntdll.dll+0x6784c=8727/s ntdll.dll+0x67dcc=6867/s d3dx9_43.dll+0x24704=6724/s d3dx9_43.dll+0x275bc=5293/s msvcr110.dll+0x1e970=5007/s d3d9.dll+0x4a28=4435/s d3d9.dll+0x2e564=4149/s d3d9.dll+0x72260=4149/s msvcr110.dll+0x65280=4149/s d3d9.dll+0x2e60=4006/s d3d9.dll+0x419bc=4006/s d3d9.dll+0x32d34=3577/s d3dx9_43.dll+0x4d430=3577/s d3dx9_43.dll+0x4d39c=3434/s kernelbase.dll+0x68958=3434/s
+[footprint] rev=ml1060 fast phys=2690 MB compressed=1069 MB internal=807 MB
+[xp-api-top] 19:50:40.763 4096 samples: d3d9.dll+0x2fc00=286810/s d3dx9_43.dll+0x34b4c=89609/s d3dx9_43.dll+0x39c6c=68469/s d3d9.dll+0x2e41c=59318/s msvcr110.dll+0x4187c=57425/s msvcr110.dll+0x857e8=46066/s ntdll.dll+0x6784c=37547/s d3dx9_43.dll+0x24dcc=35654/s ntdll.dll+0x67dcc=33130/s d3d9.dll+0x32d34=31868/s d3d9.dll+0x4a28=30921/s d3d9.dll+0x41418=30606/s d3dx9_43.dll+0x290c8=30606/s d3dx9_43.dll+0x4d430=29659/s d3dx9_43.dll+0x275bc=29344/s d3d9.dll+0x419bc=27451/s d3d9.dll+0x2e60=26819/s d3dx9_43.dll+0x28974=26188/s msvcr110.dll+0x1e970=25242/s d3dx9_43.dll+0x4d39c=24611/s msvcr110.dll+0x65280=16092/s d3dx9_43.dll+0x4c774=13567/s d3d9.dll+0x2e564=12621/s d3d9.dll+0x72260=12305/s d3d9.dll+0x2b56c=11043/s d3dx9_43.dll+0x24a2c=8204/s d3d9.dll+0x81428=7257/s d3d9.dll+0x2f408=6942/s
+[xp-api-top] 19:50:41.910 4096 samples: d3d9.dll+0x2fc00=265102/s d3dx9_43.dll+0x34b4c=101819/s d3dx9_43.dll+0x39c6c=88781/s d3d9.dll+0x2e41c=56808/s msvcr110.dll+0x4187c=55566/s msvcr110.dll+0x857e8=41907/s ntdll.dll+0x6784c=38803/s ntdll.dll+0x67dcc=37561/s d3dx9_43.dll+0x24dcc=34457/s d3d9.dll+0x32d34=29801/s d3d9.dll+0x41418=28559/s d3dx9_43.dll+0x275bc=27628/s d3d9.dll+0x2e60=27007/s d3dx9_43.dll+0x4d430=26386/s d3dx9_43.dll+0x290c8=25455/s d3d9.dll+0x419bc=25144/s d3dx9_43.dll+0x28974=25144/s msvcr110.dll+0x1e970=24523/s d3dx9_43.dll+0x4d39c=24213/s d3d9.dll+0x4a28=22661/s d3d9.dll+0x72260=18315/s d3dx9_43.dll+0x4c774=14900/s msvcr110.dll+0x65280=13348/s d3d9.dll+0x2e564=12417/s d3dx9_43.dll+0x24a2c=9002/s d3d9.dll+0x41c68=8381/s d3d9.dll+0x2b56c=7140/s d3d9.dll+0x2f820=7140/s
+[nls-getptr] type=11 id=10000 peb=0xfbfff0000
+[win-name] #16 hwnd=0x10048 class='#32770' text="" rev=ml853
+[win-name] #17 hwnd=0x10048 class='#32770' text="" rev=ml853
+[win-name] #21 hwnd=0x10048 class='#32770' text="" rev=ml853
+[win-name] #25 hwnd=0x10048 class='#32770' text="" rev=ml853
+[win-name] #29 hwnd=0x10048 class='#32770' text="" rev=ml853
+[win-name] #33 hwnd=0x10048 class='#32770' text="" rev=ml853
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16f5ba1d0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`__workq_kernreturn+0x8 lr=libsystem_pthread.dylib`_pthread_wqthread+0x170 sp=0x16f6ceb30 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 b0 "wine-x18-exc" teb=0x0 cpu=0% wait pc=libsystem_kernel.dylib`mach_msg2_trap+0x8 lr=libsystem_kernel.dylib`mach_msg2_internal+0x4c sp=0x16fe749e0 NATIVE (unresolved: OffsetToBlockTail implausible) sp-cand=[ ]
+[thread-sample] ml876 b0 "" teb=0xfbfe70000 cpu=1% wait pc=libsystem_kernel.dylib`__select+0x8 lr=Madeira`NtDelayExecution+0x368 sp=0xd32d1fb00 NATIVE (no FEX state) sp-cand=[ MudRunner.exe+0x8e9660 ] last-syscall id=0x34 pc=0x300c93748 user-sp=0x3756bfdf0 user-cand=[ MudRunner.exe+0x8e992b MudRunner.exe+0xb88c88 ]
+[thread-sample] ml876 b0 "" teb=0xfbfe60000 cpu=1% wait pc=libsystem_kernel.dylib`__select+0x8 lr=Madeira`NtDelayExecution+0x368 sp=0xd32f1fb00 NATIVE (no FEX state) sp-cand=[ MudRunner.exe+0x896fd0 ] last-syscall id=0x34 pc=0x300c93748 user-sp=0x375ebfe70 user-cand=[ MudRunner.exe+0x89710c ]
+[thread-sample] ml876 b1 "" teb=0x0 cpu=0% RUN pc=libsystem_kernel.dylib`__proc_info+0x8 lr=libsystem_kernel.dylib`proc_pidinfo+0x28 sp=0x16f988cd0 NATIVE (no FEX state) sp-cand=[ ]
+[thread-sample] ml876 modmap peb=0xfbfff0000 modules=68 first=MudRunner.exe@0x123800000
+[thread-sample] ml876 b2 "HttpManagerThread" teb=0xfbffd0000 cpu=0% RUN pc=libsystem_kernel.dylib`swtch_pri+0x8 lr=libsystem_pthread.dylib`cthread_yield+0x24 sp=0xd300ffa50 NATIVE (unresolved: hostPC outside block) sp-cand=[ EOSSDK-Win64-Shipping.dll+0x78207b ]
+[thread-sample] ml876 burst done
+[ios_audio] ml1230 pacing stream=0x111fdf000 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 200 wakes; device short 0.0 ms in 0 of 1000 passes (largest pass 480 frames); ring 2400..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x111fdcf00 lead 60 ms: client wrote 10.00 s of audio in 10.00 s (100.0%) over 200 wakes; device short 0.0 ms in 0 of 1000 passes (largest pass 480 frames); ring 2400..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[19:50:46.911] [OK] Early detach: game presenting and settled
+[rip-profile] ml981 gen=1 threads=1 samples=42 buckets=3 span=0xe9b1603e8 [0x1240e4368..0xfbf244750] top: 0x1240e4680=80% 0x1240e4340=16% 0xfbf244740=2%
+[cpu-split] ml1123 gen=1 running samples=16: x64 JIT 43%, ARM64EC images 0%, native 56%
+[cpu-split] ml1123 image top (PE address/256):
+[cpu-split] ml1123 native top: libsystem_kernel.dylib`macx_triggers+0x4=7 libsystem_kernel.dylib`__semwait_signal+0=2
+[19:50:48.917] [INFO] Detaching debugger...
+[win-name] #145 hwnd=0x20062 class='#32770' text="EOS SDK" rev=ml853
+[win-pos] #146 hwnd=0x20062 after=0x0 flags=0000181f vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #146 hwnd=0x20062 class='#32770' text="EOS SDK" rev=ml853
+[win-pos] #147 hwnd=0x20062 after=0x0 flags=0000181f vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #147 hwnd=0x20062 class='#32770' text="EOS SDK" rev=ml853
+[footprint] rev=ml358 phys=2493 MB (peak 2649) internal=624 MB compressed=1094 MB external=142 MB reusable=0 MB (cycle=15)
+[win-pos] #148 hwnd=0x10048 after=0x0 flags=000018bf vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #148 hwnd=0x10048 class='#32770' text="EOS SDK" rev=ml853
+[win-pos] #149 hwnd=0x10048 after=0x0 flags=0000181f vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #149 hwnd=0x10048 class='#32770' text="EOS SDK" rev=ml853
+[win-pos] #150 hwnd=0x10048 after=0x0 flags=0000181f vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #150 hwnd=0x10048 class='#32770' text="EOS SDK" rev=ml853
+[win-pos] #151 hwnd=0x10048 after=0x0 flags=0000181f vis={499,306,780,414} surface=0x103e2ce98 rev=ml505 style=84c801c4 visible=0 parent=0x10020
+[win-name] #151 hwnd=0x10048 class='#32770' text="EOS SDK" rev=ml853
+[store-noalias] #1 rev=ml348 addr=0x74 insn=0x19474346 pc=0x33778a14c NO pool/anon alias | region 0x100844000+0x342c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x74 hostpc=0x33778a14c hinsn=0x19474346 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x123952320 pc=0x33778a14c addr=0x74 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100844000+0x342c000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x33778a14c addr=0x74 x18=0xfbffe0000 type=1 lr=0x337b101e4 sp=0xfbf1a0000 x16=0x300c919a4 x17=0xfbf19ff20
+[guest-code] rev=ml333 pool_rip=0x300156320 (PE 0x123952320): 48 89 5c 24 08 57 48 83 ec 20 8b da 48 8b f9 e8
+[ec-fault-regs] x8=0x124c3f398 x9=0x0 x10=0x33778a0f0 x11=0x0 x0=0x3843d8250 x2=0x80 | teb=0xfbffe0000 peb=0xfbfff0000 peb->EcCodeBitMap=0xfbfad0000
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x74 at host pc=0x33778a14c; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   RAX=0x124c3f398 [RAX]=MudRunner.exe+0x81ee30
+[av-args]   RCX=RSI=0x3843d8250 [RCX]=MudRunner.exe+0xa21b18
+[rwx-fault] rev=ajan5-mhs3 #1 guest rip=0x12401ef9a (block entry 0x123952320) rva 0x81ef9a, section #0 '.text' rva 0x1000+0x9689af chars 0x60000020 (R-X CODE) | host region 0x123800000+0x96c000 prot=r-- max=rw- | Wine vprot of the 4 KB pages of host page 0x12401c000: 25 25 25 25 (this page 25) | trap: armed (a guest store here faults) | pool copy: 0x300822f9a | 32 bytes at rip, loaded image: 38 57 74 0f 84 de 01 00 00 45 33 ff 4c 89 78 d0 4c 89 78 d8 4c 89 78 e0 84 d2 75 34 e8 c5 63 7e | pool copy: 38 57 74 0f 84 de 01 00 00 45 33 ff 4c 89 78 d0 4c 89 78 d8 4c 89 78 e0 84 d2 75 34 e8 c5 63 7e | image and pool copy equal
+[x64-fault] #1 a 64-bit guest faulted at address 0x74 at RIP 0x12401ef9a (MudRunner.exe+0x81ef9a) [exact RIP from FEX's block table]; RAX=0x124c3f398 RCX=0x3843d8250 RDX=0x0 RBX=0x0 RSP=0x124c3f330 RBP=0x0 RSI=0x3843d8250 RDI=0x0 R8=0x80 R9=0x50 R10=0x124c3e9e0 R11=0x124c3eab0 R12=0x10030 R13=0x1900247 R14=0x10030 R15=0x202
+[fault-host] 33778a04c: 5405806e 86401052 10058012 8a044562 35456106 10623170 81100082 00000000
+[fault-host] 33778a06c: d503201f 00000050 10ffffea f900038a b945eb8b 3400004b d4395fc0 aa1703e8
+[fault-host] 33778a08c: d503201f d902011b f81f8efd f84086fd 910002ff d28a2509 f2b7ae49 f2c001e9
+[fault-host] 33778a0ac: f943338b d61f0160 37ffc20c 00000003 00000000 00000080 00000000 bd770c90
+[fault-host] 33778a0cc: 0000000f 0000000e 00000000 00000005 00000028 00000000 00000000 31250180
+[fault-host] 33778a0ec: 00000000 00000700 10ffffea f900038a b945eb8b 3400004b d4395fc0 aa1703e8
+[mach_exc] insn_stream PC-12..PC+8: aa0003f9 d940801a d503201f [19474346] ca0100d8 53081cca 6b01615f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbffe0000 TEB=0xfbffe0000 TEB[0x58]=0x1252d4570 *(gs_cached+0x58)=0x1252d4570
+[x86_live] RAX=0x124c3f398 RCX=0x3843d8250 RDX=0x0 RBX=0x0 RSP=0x124c3f330 RBP=0x0 RSI=0x3843d8250 RDI=0x0
+[x86_live]  R8=0x80  R9=0x50 R10=0x124c3e9e0 R11=0x124c3eab0 R12=0x10030 R13=0x1900247 R14=0x10030 R15=0x202
+[x86_live] State.RIP=0x123952320 callret_sp=0xb31001000
+[store-noalias] #2 rev=ml348 addr=0x74 insn=0x19474346 pc=0x33778a14c NO pool/anon alias | region 0x100844000+0x342c000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x74 hostpc=0x33778a14c hinsn=0x19474346 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x336ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x123952320 pc=0x33778a14c addr=0x74 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x100844000+0x342c000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x33778a14c addr=0x74 x18=0xfbffe0000 type=1 lr=0x337b101e4 sp=0xfbf1a0000 x16=0x300c919a4 x17=0xfbf19ff20
+[guest-code] rev=ml333 pool_rip=0x300156320 (PE 0x123952320): 48 89 5c 24 08 57 48 83 ec 20 8b da 48 8b f9 e8
+[ec-fault-regs] x8=0x124c3f398 x9=0x0 x10=0x33778a0f0 x11=0x0 x0=0x3843d8250 x2=0x80 | teb=0xfbffe0000 peb=0xfbfff0000 peb->EcCodeBitMap=0xfbfad0000
+[fault-host] 33778a0ac: f943338b d61f0160 37ffc20c 00000003 00000000 00000080 00000000 bd770c90
+[fault-host] 33778a0cc: 0000000f 0000000e 00000000 00000005 00000028 00000000 00000000 31250180
+[fault-host] 33778a0ec: 00000000 00000700 10ffffea f900038a b945eb8b 3400004b d4395fc0 aa1703e8
+[fault-host] 33778a10c: a9bf6af5 f81f8ef6 d10142f7 92800026 d503201f d91c8106 d503201f d900811b
+[fault-host] 33778a12c: d503201f d901811d d503201f d9020119 53001c3b aa0003f9 d940801a d503201f
+[fault-host] 33778a14c: 19474346 ca0100d8 53081cca 6b01615f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: aa0003f9 d940801a d503201f [19474346] ca0100d8 53081cca 6b01615f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0xfbffe0000 TEB=0xfbffe0000 TEB[0x58]=0x1252d4570 *(gs_cached+0x58)=0x1252d4570
+[x86_live] RAX=0x124c3f398 RCX=0x3843d8250 RDX=0x0 RBX=0x0 RSP=0x124c3f330 RBP=0x0 RSI=0x3843d8250 RDI=0x0
+[x86_live]  R8=0x80  R9=0x50 R10=0x124c3e9e0 R11=0x124c3eab0 R12=0x10030 R13=0x1900247 R14=0x10030 R15=0x202
+[x86_live] State.RIP=0x123952320 callret_sp=0xb31001000
+0024:err:seh:segv_handler SEGV #1: pc=0x33778a14c addr=0x74 uctx_x18=0xfbffe0000 disp=0 mach_exc=15772
+0024:err:seh:segv_handler SEGV at pc=0x33778a14c addr=0x74 esr=0x92000006 TPIDR_EL0=0x0 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0x3843d8250 x1=0x0 x2=0x80 x3=0x50
+0024:err:seh:segv_handler   x8=0x124c3f398 x9=0x0 x10=0x33778a0f0 x16=0x300c919a4 x17=0xfbf19ff20 x18=0xfbffe0000 x19=0x10030 x20=0x1900247
+0024:err:seh:segv_handler   fp=0x0 lr=0x337b101e4 sp=0xfbf1a0000
+0024:err:seh:segv_handler   [teb-tsd] base=0x16f75b0e0 offset=0x8d8 raw=0xfbffe0000 teb_key_val=0xfbffe0000
+0024:err:seh:segv_handler   [guest-state] x28=0xb30801140 rip=0x123952320
+0024:err:seh:segv_handler   [guest-rip-sec] rip=0x123952320 in image 0x123800000: rva 0x152320, section #0 '.text' rva 0x1000+0x9689af chars 0x60000020 (R-X CODE), vprot=0x25
+0024:err:seh:segv_handler   [guest-exact] ml885 block=0x33778a0f0 rip=0x12401ef9a x86=38 57 74 0f 84 de 01 00 00 45 33 ff 4c 89 78 d0
+0024:err:seh:segv_handler   [guest-state]   rax=0x124221b18 rcx=0x3843d8250 rdx=0x1 rbx=0x1
+0024:err:seh:segv_handler   [guest-state]   rsp=0x124c3f3d8 rbp=0x1900247 rsi=0x0 rdi=0x3843d8250
+0024:err:seh:segv_handler   [guest-state]   r8 =0x80 r9 =0x50 r10=0x124c3e9e0 r11=0x124c3eab0
+0024:err:seh:segv_handler   [guest-state]   r12=0x10030 r13=0x1900247 r14=0x10030 r15=0x202
+0024:err:seh:segv_handler   [guest-state] plausible-ptr gregs=6/16 (low => uninitialised frame, high => only rsp clobbered)
+0024:err:seh:segv_handler   [emit-dump]   +-24  d503201f d9020119 53001c3b aa0003f9 d940801a d503201f
+0024:err:seh:segv_handler   [emit-dump]   +0    19474346 ca0100d8 53081cca 6b01615f 4b0100c9 54002920
+0024:err:seh:segv_handler   [emit-dump]   +24   52800016 d503201f d91d0116 d503201f d91d8116 d503201f
+0024:err:seh:segv_handler   [rsp-forensics] x23(SRA RSP)=0x124c3f330  gregs[RSP]=0x124c3f3d8  NZCV/flags[24]=0x20000000  callret_sp=0xb31001000 base=0xb30c01000  x28=0xb30801140
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: aa0003f9 d940801a d503201f [19474346] ca0100d8 53081cca 6b01615f
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x33778a14c addr=0x74 (virtual_handle_fault failed)
+[fault-rgn] addr=0x74 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x33778a14c pc=33778a14c nparams=2 p0=0 p1=74
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x33778a14c RX from -32, 64 of 64 bytes: 1f 20 03 d5 1d 81 01 d9 1f 20 03 d5 19 01 02 d9 3b 1c 00 53 f9 03 00 aa 1a 80 40 d9 1f 20 03 d5 46 43 47 19 d8 00 01 ca ca 1c 08 53 5f 61 01 6b c9 00 01 4b 20 29 00 54 16 00 80 52 1f 20 03 d5 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x33778a14c (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 33778A14C AV READ of 74
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x12401ef9a RX from -32, 64 of 64 bytes: ec 50 48 c7 40 c8 fe ff ff ff 48 89 58 08 48 89 68 18 48 89 70 20 0f b6 da 48 8b f1 48 8b 79 08 38 57 74 0f 84 de 01 00 00 45 33 ff 4c 89 78 d0 4c 89 78 d8 4c 89 78 e0 84 d2 75 34 e8 c5 63 7e 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x12401ef9a (not an anon-JIT page)
+D 24 Exception: Code: C0000005 Address: 12401EF9A AV READ of 74
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=000000012401EF9A flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:call_seh_handlers [unwind-root] ml633 ACCEPTING terminal root frame 124c40000 (== stack hi) ControlPc=fbfd32dd8 handler=0000000FBFCF5388 — this is the unhandled-exception filter frame
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=7307
+[unwind] term ml661 begin rip=3014101fc rsp=124c3d918 window=[124c3d918..12543d918) max=32
+[unwind] term ml661 #00 pc=3014101fc rsp=124c3d918  <no module — STOP>
+[unwind] term ml661 end
+[term-stack] ml660 sp+030:   ? fbfcf5388  ntdll.dll+0x25388
+[term-stack] ml660 sp+0f0: call* 123fe93f6  MudRunner.exe+0x7e93f6
+[term-stack] ml660 sp+0f8: CALL 123fb6bc3  MudRunner.exe+0x7b6bc3
+[term-stack] ml660 sp+100: CALL 123a09291  MudRunner.exe+0x209291
+[term-stack] ml660 sp+108:   ? fbf4e1b0c  kernel32.dll+0x31b0c
+[term-stack] ml660 sp+110:   ? fbf4d6468  kernel32.dll+0x26468
+[term-stack] ml660 sp+118:   ? fbfd32dd8  ntdll.dll+0x62dd8
+[term-stack] ml660 sp+120:   ? fbef8bb04  user32.dll+0x4bb04
+[srv-kill] kill_thread tid=006c pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0070 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0080 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0084 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=0088 pid=0020 violent=1 rev=ml586
+[srv-kill] kill_thread tid=008c pid=0020 violent=1 rev=ml586
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[19:50:52.583] [INFO] [session] length=33s play=17s frames=911 avg=54.7 low1=28.4 worst=772ms stalls=0/0s peak=2816MB limit=4095MB thermal=nominal lpm=0 api=D3D11/D3D12/D3D9/64 res=1280x720 cap=60 game=MudRunner
+[19:50:52.601] [INFO] [exit-report] status=0xc0000005
+[hwinput] keyboard focus: elsewhere (responder)
+[frontend] returned to library
+[19:50:52.812] [INFO] [bcd-host] no report
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=36 resident=814MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2523 MB (peak 2649) internal=658 MB compressed=1090 MB external=145 MB reusable=0 MB (cycle=16)
+[ios_audio] ml1230 pacing stream=0x111fdf000 lead 60 ms: client wrote 7.35 s of audio in 10.00 s (73.5%) over 409 wakes; device short 2560.0 ms in 256 of 1000 passes (largest pass 480 frames); ring 0..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[footprint] rev=ml358 phys=2523 MB (peak 2649) internal=658 MB compressed=1090 MB external=145 MB reusable=0 MB (cycle=17)
+[ios_audio] ml1230 pacing stream=0x111fdcf00 lead 60 ms: client wrote 5.85 s of audio in 10.00 s (58.5%) over 529 wakes; device short 4060.0 ms in 406 of 1000 passes (largest pass 480 frames); ring 0..4800 frames; worst late wake 0.1 ms; clamped 0 samples
+[xp-api-top] 19:50:57.569 112 samples: kernelbase.dll+0x68958=3579/s ntdll.dll+0x71aac=2069/s ntdll.dll+0x71d04=280/s msvcr110.dll+0x4187c=224/s msvcr110.dll+0x64c74=112/s
+[footprint] rev=ml358 phys=2515 MB (peak 2649) internal=528 MB compressed=1212 MB external=146 MB reusable=0 MB (cycle=18)
+[xp-api-top] 19:50:58.752 116 samples: kernelbase.dll+0x68958=3517/s ntdll.dll+0x71aac=2164/s msvcr110.dll+0x4187c=271/s msvcr110.dll+0x64c74=216/s ntdll.dll+0x71d04=108/s
+[xp-api-top] 19:51:00.042 127 samples: kernelbase.dll+0x68958=3421/s ntdll.dll+0x71aac=2182/s ntdll.dll+0x71d04=298/s msvcr110.dll+0x4187c=248/s msvcr110.dll+0x64c74=149/s
+[footprint] rev=ml358 phys=2515 MB (peak 2649) internal=528 MB compressed=1212 MB external=146 MB reusable=0 MB (cycle=19)
+[xp-api-top] 19:51:01.288 123 samples: kernelbase.dll+0x68958=3493/s ntdll.dll+0x71aac=2157/s ntdll.dll+0x71d04=411/s msvcr110.dll+0x4187c=257/s
+[footprint] rev=ml358 phys=2517 MB (peak 2649) internal=530 MB compressed=1212 MB external=149 MB reusable=0 MB (cycle=20)
+[xp-api-top] 19:51:02.470 117 samples: kernelbase.dll+0x68958=3575/s ntdll.dll+0x71aac=2058/s ntdll.dll+0x71d04=325/s msvcr110.dll+0x4187c=271/s msvcr110.dll+0x64c74=108/s
+[xp] 19:51:03.063 +39.42 dt=260 cpu=69 (thr 68) P=0 E=69 run=99 pgw=0.0 GHz P=0.00 E=0.81 Minst=64 IPC=1.15 mJ=3 pin=0 rdKB=0 fpMB=2517
+[xp] 19:51:03.360 +39.72 dt=299 cpu=62 (thr 63) P=25 E=36 run=102 pgw=0.0 GHz P=1.81 E=1.38 Minst=135 IPC=1.40 mJ=16 pin=3 rdKB=80 fpMB=2517
+[xp] 19:51:03.627 +39.99 dt=267 cpu=181 (thr 180) P=12 E=169 run=202 pgw=0.0 GHz P=1.36 E=1.82 Minst=831 IPC=2.56 mJ=41 pin=5 rdKB=112 fpMB=2518
+[xp-api-top] 19:51:03.627 115 samples: kernelbase.dll+0x68958=3593/s ntdll.dll+0x71aac=2156/s ntdll.dll+0x71d04=387/s msvcr110.dll+0x4187c=166/s msvcr110.dll+0x64c74=55/s
+[xp] 19:51:03.966 +40.32 dt=327 cpu=373 (thr 349) P=17 E=356 run=384 pgw=0.0 GHz P=1.50 E=2.01 Minst=2469 IPC=3.33 mJ=117 pin=1 rdKB=176 fpMB=2520
+[19:51:03.967] [xp] 19:51:03.966 +40.32 dt=327 cpu=373 (thr 349) P=17 E=356 run=384 pgw=0.0 GHz P=1.50 E=2.01 Minst=2469 IPC=3.33 mJ=117 pin=1 rdKB=176 fpMB=2520
+[19:51:04.239] [xp] 19:51:04.238 +40.60 dt=284 cpu=281 (thr 305) P=14 E=267 run=288 pgw=0.0 GHz P=1.58 E=2.01 Minst=1747 IPC=3.12 mJ=86 pin=0 rdKB=8 fpMB=2522

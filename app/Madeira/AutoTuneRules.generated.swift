@@ -702,6 +702,62 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[pool-section-reach]",
+     "NOT clamped"
+    ]
+   },
+   {
+    "has": [
+     "[exec-recover] pg=",
+     "mprotect_rx=-1",
+     "pool-rx"
+    ]
+   },
+   {
+    "has": [
+     "[fault_rip]",
+     "PROTECTION_FAILURE",
+     "entryprot=3 nowprot=3"
+    ]
+   }
+  ],
+  "evidence": [
+   "fallout-new-vegas-pcr-pool-section-reach-2026-11-24 (Send Log SE1VEF, build 712)",
+   "9SSBFY, DM71HT, ZDQYB3, SV3PGW, 2QWXFW",
+   "DNT6PK / TH5V0A, 0F04N7 (the line in force: played 651 s / 380 s)"
+  ],
+  "id": "pool-section-reach-clamp-image-copy",
+  "lines": [
+   "env.MADEIRA_POOL_CLAMP_SECTIONS = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[pool-section-reach]",
+     "clamped to the copy"
+    ]
+   },
+   {
+    "has": [
+     "[av-detail] ml613",
+     "p0=EXECUTE",
+     "p1_in_carve=1"
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "exited-early",
+   "hung"
+  ],
+  "priority": 4,
+  "reason": "A 32-bit program of the game declares a data section far larger than itself, and protecting it took away the right to run code from the pool pages behind it; a later system library copy was placed there and could not start. The line keeps that protection inside the module."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[exec-recover]",
      "mprotect_rx=-1(errno=13)"
     ]
@@ -6809,12 +6865,12 @@ enum AutoTuneBuiltInRules {
    }
   ],
   "evidence": [
-   "hogwarts-legacy-exe-window-intruder-2026-11-17 (Send Logs 6EW662 and EAQKAS, build 665)"
+   "hogwarts-legacy-exe-window-intruder-2026-11-17 (Send Logs 6EW662 and EAQKAS, build 665)",
+   "1RM2SS, G8DR3D (712)"
   ],
-  "fixedIn": 669,
   "id": "exe-window-widened-below-intruder",
   "lines": [],
-  "noRetry": true,
+  "noFix": true,
   "none": [
    {
     "has": [
@@ -6827,7 +6883,7 @@ enum AutoTuneBuiltInRules {
    "exited-early"
   ],
   "priority": 5,
-  "reason": "Something iOS had put in the game's memory range kept BCD from making room for the game's large program. From build 669 BCD takes the part of that range that is free when it is large enough. Update BCD; until then quit BCD and open it again."
+  "reason": "iOS had put memory of its own inside the range the game's large program must load at, in this start of BCD, and the free part below it was too small for the program. No setting changes it: quit BCD completely (swipe it away in the app switcher), open it again and start the game; iOS lays memory out anew at every start. From build 715 BCD also uses the free part when it holds the program's own size."
  },
  {
   "all": [
@@ -8245,6 +8301,75 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[dock-report] ceg-service-start=-1"
+    ]
+   },
+   {
+    "has": [
+     "[dock-report] ceg-service-start-retry=1053"
+    ]
+   }
+  ],
+  "any": [
+   {
+    "has": [
+     "RpcServerAssoc_FindContextHandle no context handle found"
+    ]
+   },
+   {
+    "has": [
+     "service_run_main_thread failed to open service manager error 1726"
+    ]
+   }
+  ],
+  "evidence": [
+   "ceg-service-svcctl-1726-2026-11-23 (Send Log 066P0C, build 712)",
+   "CSP7E6, CT98X6, NS4R70, EYCX54, PKTC7C (712)"
+  ],
+  "id": "dock-ceg-service-svcctl-1726",
+  "lines": [],
+  "noFix": true,
+  "priority": 3,
+  "reason": "The Steam helper service that builds this game's executable could not start in this start of BCD: it ended at once, after its first call to Windows' service manager was lost (RPC error 1726). The same stop hits other helper services; it does not happen in every start. Quit BCD completely and start the game again; no setting is known to change it.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[dock-report] ceg-service-start=0"
+    ]
+   },
+   {
+    "has": [
+     "[pool-section-overrun]",
+     ".cegm",
+     "ends past the copy"
+    ]
+   }
+  ],
+  "evidence": [
+   "ceg-service-pool-overrun-2026-11-23 (Send Log JAWSRV, build 686)"
+  ],
+  "id": "dock-ceg-service-pool-overrun",
+  "lines": [],
+  "noFix": true,
+  "none": [
+   {
+    "has": [
+     "[pool-section-reach]",
+     "clamped to the copy"
+    ]
+   }
+  ],
+  "priority": 3,
+  "reason": "Valve's helper service started, but while it built this game's executable BCD's code memory lost its execute permission (a 32-bit part of the copy protection has a section table that reaches 256 MB). Steam then answered 55 after about 100 seconds. Not solved yet.",
+  "session": "dock"
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[dock-report] ceg-result=55"
     ]
    }
@@ -8273,6 +8398,11 @@ enum AutoTuneBuiltInRules {
    {
     "has": [
      "[wow-window] refused: map too small"
+    ]
+   },
+   {
+    "has": [
+     "[dock-report] ceg-service-start=-1"
     ]
    }
   ],
@@ -8323,6 +8453,11 @@ enum AutoTuneBuiltInRules {
    {
     "has": [
      "[dock-report] ceg-result=55"
+    ]
+   },
+   {
+    "has": [
+     "[dock-report] ceg-service-start=-1"
     ]
    }
   ],
@@ -12903,6 +13038,11 @@ enum AutoTuneBuiltInRules {
   ],
   "noRetry": true,
   "none": [
+   {
+    "has": [
+     "Load module UnityPlayer.dll"
+    ]
+   },
    {
     "has": [
      "Adobe AIR.dll",
@@ -20790,6 +20930,19 @@ enum AutoTuneBuiltInRules {
   "id": "game-folder-missing-steam-api",
   "lines": [],
   "noFix": true,
+  "none": [
+   {
+    "has": [
+     "[jit-pool] EXHAUSTED"
+    ]
+   },
+   {
+    "has": [
+     "failed (error c0000017)",
+     "steam_api"
+    ]
+   }
+  ],
   "outcomes": [
    "crashed",
    "exited-early"
@@ -24034,6 +24187,29 @@ enum AutoTuneBuiltInRules {
   "all": [
    {
     "has": [
+     "[fex-arena] ml774 NO ARENA RESERVED"
+    ]
+   }
+  ],
+  "evidence": [
+   "fex-no-arena-kdp7sa-2026-11-24 (Send Log KDP7SA, build 712)",
+   "KXK1MJ (712), 3E13MW, 5X5G4K, 8RKH8J, XCMD9J"
+  ],
+  "id": "fex-no-arena-small-address-map",
+  "lines": [],
+  "noFix": true,
+  "outcomes": [
+   "crashed",
+   "exited-early",
+   "hung"
+  ],
+  "priority": 3,
+  "reason": "BCD could not reserve address space for the emulator itself, so no program can start on this install. If the install lacks the increased memory limit, add it with GetMoreRam (with SideStore or LiveContainer), or sign BCD with a paid developer account. A device whose address space is this small (an iPhone XR, 13 GB) cannot run BCD's Windows programs."
+ },
+ {
+  "all": [
+   {
+    "has": [
      "[fex-fault] pc="
     ]
    }
@@ -24048,6 +24224,11 @@ enum AutoTuneBuiltInRules {
    {
     "has": [
      "[fex-fault] pc=libarm64ecfex.dll+0x1123c4"
+    ]
+   },
+   {
+    "has": [
+     "[fex-arena] ml774 NO ARENA RESERVED"
     ]
    },
    {
@@ -26751,10 +26932,588 @@ enum AutoTuneBuiltInRules {
   ],
   "outcomes": [
    "crashed",
-   "exited-early"
+   "exited-early",
+   "hung"
   ],
   "priority": 61,
   "reason": "Hitman: Blood Money's start-up code (its packer) runs a second time and reads memory that does not exist. The line makes the emulator translate the game's code one block at a time (slower); if the game stops at the same place, nothing in BCD's settings is known to change it."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "Device error at frame"
+    ]
+   },
+   {
+    "has": [
+     "kIOGPUCommandBufferCallbackError"
+    ]
+   }
+  ],
+  "any": [
+   {
+    "has": [
+     "Caused GPU Hang Error"
+    ]
+   },
+   {
+    "count": 4,
+    "has": [
+     "kIOGPUCommandBufferCallbackErrorInnocentVictim"
+    ]
+   }
+  ],
+  "evidence": [
+   "witcher3-gpu-hang-2026-11-22 (Send Log 0DXDPE, build 686; also 2MTTPH, CT0AQ6, S3FFJ5)",
+   "RE7 2BFAP2, DMC5 36MCH0 (712)",
+   "Discord 2026-11-24: RE7's freeze gone with env.MADEIRA_DXMT_FRESH = 1"
+  ],
+  "id": "dxmt-hang-fresh-set",
+  "lines": [
+   "env.MADEIRA_DXMT_FRESH = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[WineProc] MADEIRA_DXMT_FRESH=1:"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_DXMT_FRESH="
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/GTA5.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/GTA5_Enhanced.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/PlayGTAV.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/RDR2.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/PlayRDR2.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/GhostOfTsushima.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/GoW.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/GoWR.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/HorizonZeroDawn.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/HorizonZeroDawnRemastered.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/HorizonForbiddenWest.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/Spider-Man.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/MilesMorales.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/Spider-Man2.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/RiftApart.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/tlou-i.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/HogwartsLegacy.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/FlightSimulator2024.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Session log: logs/Cyberpunk2077.exe-"
+    ]
+   },
+   {
+    "has": [
+     "Steam game GTA5.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game GTA5_Enhanced.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game PlayGTAV.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game RDR2.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game PlayRDR2.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game GhostOfTsushima.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game GoW.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game GoWR.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game HorizonZeroDawn.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game HorizonZeroDawnRemastered.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game HorizonForbiddenWest.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game Spider-Man.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game MilesMorales.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game Spider-Man2.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game RiftApart.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game tlou-i.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game HogwartsLegacy.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game FlightSimulator2024.exe:"
+    ]
+   },
+   {
+    "has": [
+     "Steam game Cyberpunk2077.exe:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Grand Theft Auto V:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Grand Theft Auto V Legacy:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Grand Theft Auto V Enhanced:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Red Dead Redemption 2:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Ghost of Tsushima:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Ghost of Tsushima DIRECTOR'S CUT:"
+    ]
+   },
+   {
+    "has": [
+     "library launch God of War:"
+    ]
+   },
+   {
+    "has": [
+     "library launch God of War Ragnar\u00f6k:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Horizon Zero Dawn:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Horizon Zero Dawn Remastered:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Horizon Forbidden West:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Horizon Forbidden West Complete Edition:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Marvel's Spider-Man Remastered:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Marvel's Spider-Man: Miles Morales:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Marvel's Spider-Man 2:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Ratchet & Clank: Rift Apart:"
+    ]
+   },
+   {
+    "has": [
+     "library launch The Last of Us Part I:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Hogwarts Legacy:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Microsoft Flight Simulator 2024:"
+    ]
+   },
+   {
+    "has": [
+     "library launch Cyberpunk 2077:"
+    ]
+   }
+  ],
+  "outcomes": [
+   "hung",
+   "crashed",
+   "exited-early"
+  ],
+  "priority": 23,
+  "reason": "The GPU hung while the game was drawing. The next start runs BCD's newer Direct3D 11 translation layer, which fixes one known cause of this. If it still happens, send the log."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[x86-fault] #1 a 32-bit guest faulted",
+     "0x7c2e6df0",
+     "HitmanBloodMoney.exe+0x5c7770"
+    ]
+   },
+   {
+    "has": [
+     "[madeira-env] game FEX_MULTIBLOCK=0"
+    ]
+   }
+  ],
+  "evidence": [
+   "hitman-blood-money-packer-smc-full-2026-11-22 (Send Log 3JPY0H, build 686)",
+   "TZ96M6, E8BSR5 (712)"
+  ],
+  "id": "packer-stub-double-init-smc-full",
+  "lines": [
+   "env.FEX_SMCCHECKS = full"
+  ],
+  "maxStage": 3,
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[madeira-env] game FEX_SMCCHECKS="
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed",
+   "exited-early",
+   "hung"
+  ],
+  "priority": 62,
+  "reason": "Hitman: Blood Money's start-up code (its packer) ran a second time from a translation of the old code and read memory that does not exist. The line makes BCD's translator check every instruction against the program's current bytes (slower); if the game stops at the same place, nothing in BCD's settings is known to change it."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "failed assertion `Render Pipeline Descriptor Validation"
+    ]
+   },
+   {
+    "has": [
+     "Dual source blending is used in combination with multiple render targets"
+    ]
+   }
+  ],
+  "evidence": [
+   "cyberpunk-metal-src1-later-target-2026-11-23 (Send Log D1DGGH, build 712; also 5DE5T4, DNXJPE, B2RSK8, M4Y4B4, P85MWH)",
+   "tests/host/check-d3d12-src1-later-targets.py"
+  ],
+  "fixedIn": 715,
+  "id": "d3d12-metal-src1-later-target-assert",
+  "lines": [],
+  "outcomes": [
+   "crashed"
+  ],
+  "priority": 20,
+  "reason": "The game asked for a blend that reads the pixel shader's second colour on a render target other than the first, and Metal ends the whole process for such a pipeline. From build 715 BCD builds that pipeline without that blend. Update BCD."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[madeira-env] game MADEIRA_WOW_ALLOC_INSIDE=1"
+    ]
+   },
+   {
+    "has": [
+     "[jumbo-wow] r652 #1",
+     "size=0x40000000",
+     " inside=0 guest-visible=0x"
+    ]
+   },
+   {
+    "has": [
+     "[x86-fault] #1 a 32-bit guest faulted",
+     "isaac-ng.exe+0x"
+    ]
+   }
+  ],
+  "evidence": [
+   "isaac-repentance-noceiling-2026-11-23 (Send Log WVTJ39, build 712)",
+   "EYBPCX (712), FWN9ZF and ASYB2E (712)",
+   "tests/host/check-wow-ex-noceiling.py"
+  ],
+  "fixedIn": 715,
+  "id": "wow-ex-noceiling-outside-window",
+  "lines": [],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[wow-inside] r714"
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed"
+  ],
+  "priority": 7,
+  "reason": "The 32-bit game was handed memory outside the part of the address space it can reach and crashed: its memory requests name no upper limit, and BCD's setting for it only looked at requests that name one. Build 715 gives such requests memory inside the game's own part. Update BCD."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[thread-sample]",
+     "Galaxy64.dll+0x"
+    ]
+   },
+   {
+    "has": [
+     "[winios-gl] ml1341 no GL present for"
+    ]
+   }
+  ],
+  "evidence": [
+   "stardew-galaxy64-blocks-2026-11-24 (Send Log 28ZPFC, build 712)",
+   "BDPYYK (the one run: Galaxy64.dll failed to load)"
+  ],
+  "id": "galaxy-sdk-blocks-main-thread",
+  "lines": [],
+  "noFix": true,
+  "none": [
+   {
+    "has": [
+     "[madeira-env] game WINEDLLOVERRIDES="
+    ]
+   },
+   {
+    "has": [
+     "Loading library Galaxy64.dll",
+     "failed (error c0000017)"
+    ]
+   }
+  ],
+  "outcomes": [
+   "hung",
+   "exited-early"
+  ],
+  "priority": 25,
+  "reason": "The game stopped on a call into GOG Galaxy's online library, which waits for a Galaxy program that is not here. Adding env.WINEDLLOVERRIDES = galaxy64= to the game's settings switches that library off for this game (it then runs without GOG's online features); Stardew Valley's recommended settings have it from build 715."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "Load module EOSSDK-Win64-Shipping.dll"
+    ]
+   },
+   {
+    "has": [
+     "[epic-launch] start",
+     "host=1"
+    ]
+   },
+   {
+    "has": [
+     "[bcd-host] no report"
+    ]
+   },
+   {
+    "has": [
+     "Exception: Code: C0000005"
+    ]
+   }
+  ],
+  "evidence": [
+   "mudrunner-epic-host-lost-2026-11-23 (Send Log S3A2NP, build 712; also BR12YM)",
+   "tests/host/check-epic-host-hold.py (build 598)"
+  ],
+  "id": "epic-host-start-lost-eos64-played",
+  "lines": [
+   "env.BCD_EPIC_HOST_START = 1"
+  ],
+  "noRetry": true,
+  "none": [
+   {
+    "has": [
+     "[epic-launch] host start held"
+    ]
+   }
+  ],
+  "outcomes": [
+   "crashed"
+  ],
+  "priority": 14,
+  "reason": "The Epic game uses Epic's online services and ended in a fault; BCD meant to start it through its sign-in helper but did not, and the line makes the start go through it."
+ },
+ {
+  "all": [
+   {
+    "has": [
+     "[nvapi] query 0x0150e828 NvAPI_Initialize"
+    ]
+   },
+   {
+    "has": [
+     "detach-wait: presents=0 running=1 elapsed=120s"
+    ]
+   }
+  ],
+  "evaluateWhenRan": true,
+  "evidence": [
+   "batman-arkham-knight-nvapi-initialize-never-answered-2026-11-24 (Send Log E874ZD, build 712; also 09S4HT, 8P4FZX)"
+  ],
+  "id": "nvapi-initialize-never-answered",
+  "lines": [],
+  "noFix": true,
+  "none": [
+   {
+    "has": [
+     "NvAPI_Initialize ->"
+    ]
+   }
+  ],
+  "outcomes": [
+   "hung",
+   "exited-early",
+   "crashed"
+  ],
+  "priority": 28,
+  "reason": "The game asked BCD's NVIDIA stand-in whether an NVIDIA card is present and the answer never came back, so the game never started drawing. No setting is known to change this yet; send the log (Settings > Send log)."
  },
  {
   "all": [

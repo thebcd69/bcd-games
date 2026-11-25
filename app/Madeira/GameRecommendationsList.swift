@@ -424,9 +424,9 @@ struct RecommendationsPolicy {
     static let allowedEnvNames: Set<String> = [
         "BCD_EPIC_HOST_START",
         "_JAVA_OPTIONS", "DOTNET_EnableWriteXorExecute", "DOTNET_GCRegionRange",
-        "DXMT_SMALL_RINGS", "DXMT_WSI_MODE_TABLE", "DXMT_WSI_MONITOR_IDENTITY", "FEX_MEMCPYSETTSOENABLED", "FEX_TSOENABLED", "FEX_VECTORTSOENABLED", "FEX_X87REDUCEDPRECISION", "FEX_MULTIBLOCK", "LC_ALL",
+        "DXMT_SMALL_RINGS", "DXMT_WSI_MODE_TABLE", "DXMT_WSI_MONITOR_IDENTITY", "FEX_MEMCPYSETTSOENABLED", "FEX_TSOENABLED", "FEX_VECTORTSOENABLED", "FEX_X87REDUCEDPRECISION", "FEX_MULTIBLOCK", "FEX_SMCCHECKS", "LC_ALL",
         "MADEIRA_ALIAS_RELEASE", "MADEIRA_ANON_CAS_FLUSH", "MADEIRA_ANON_LDADDAL32", "MADEIRA_APP_DLL_SHADOW", "MADEIRA_BAND_CENSUS", "MADEIRA_CAGE_RELEASE",
-        "MADEIRA_CHILD_ARGS", "MADEIRA_CTX_FRAME", "MADEIRA_D3D11_SRC", "MADEIRA_D3D9", "MADEIRA_D3D9_LAST", "MADEIRA_D3D9_X64", "MADEIRA_DEVICE_STATS", "MADEIRA_STEAM_IDENTITY", "MADEIRA_DOCK_GAME_SCM",
+        "MADEIRA_CHILD_ARGS", "MADEIRA_CTX_FRAME", "MADEIRA_D3D11_SRC", "MADEIRA_DXMT_FRESH", "MADEIRA_D3D9", "MADEIRA_D3D9_LAST", "MADEIRA_D3D9_X64", "MADEIRA_DEVICE_STATS", "MADEIRA_STEAM_IDENTITY", "MADEIRA_DOCK_GAME_SCM",
         "MADEIRA_DOCK_KEEP_ALIVE", "MADEIRA_DOCK_SCRIPT_REGISTRY", "MADEIRA_DXGI_BUDGET_EVENTS", "MADEIRA_DXGI_SRC", "MADEIRA_EC_HOOK_TRACE", "MADEIRA_ECO_NATIVE",
         "MADEIRA_EXECREQ_LEAVE", "MADEIRA_FASTSYNC_SEM", "MADEIRA_FAULT_GUARD_GUEST_RIP", "MADEIRA_FAULT_GUARD_RATE", "MADEIRA_FEX_AVX", "MADEIRA_FEX_BAND_KEEP_MB",
         "MADEIRA_FILE_TRACE", "MADEIRA_FILE_TRACE_LIMIT", "MADEIRA_FREE_DELAY_MS", "MADEIRA_GUEST_LOG", "MADEIRA_GUEST_LOG_LIMIT",
@@ -623,7 +623,8 @@ struct RecommendationsPolicy {
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): MADEIRA_WG_VPROC is 0 or 1")
                 }
-            case "MADEIRA_DINPUT_PAD", "MADEIRA_WER", "MADEIRA_GUARD_NEIGHBOUR_PASS", "MADEIRA_WOW_ALLOC_INSIDE", "MADEIRA_CODESIGN_ROOTS":
+            // build 717 (round 714, agent D1 S2): MADEIRA_DXMT_FRESH, the 64-bit DXMT set built from the pin (the engine reads only "1").
+            case "MADEIRA_DINPUT_PAD", "MADEIRA_WER", "MADEIRA_GUARD_NEIGHBOUR_PASS", "MADEIRA_WOW_ALLOC_INSIDE", "MADEIRA_CODESIGN_ROOTS", "MADEIRA_DXMT_FRESH":
                 // build 708 (round 707): joystick_ios.c turns the DirectInput view on for a value starting with 1; WineProcessBridge.m links
                 // wer-optin.dll as wer.dll for 1; virtual_ios.c's guard neighbour pass is on for exactly 1. A list says 1 for the game that needs it
                 // (0 is the default, written out).
@@ -767,6 +768,11 @@ struct RecommendationsPolicy {
                 // build 630 (Resident Evil 5, agent O2 S9): FEX's own switch, 0 or 1.
                 guard value == "0" || value == "1" else {
                     throw RecommendationsError.policy("\(path): FEX_MULTIBLOCK is 0 or 1")
+                }
+            case "FEX_SMCCHECKS":
+                // build 715 (Hitman: Blood Money, round 714 M2 S1): FEX's own self-modifying-code switch, none | mtrack (FEX's default) | full.
+                guard value == "none" || value == "mtrack" || value == "full" else {
+                    throw RecommendationsError.policy("\(path): FEX_SMCCHECKS is none, mtrack or full")
                 }
             case "MADEIRA_FEX_CPUID_CLASSIC":
                 // build 626 (Burnout Paradise): the emulator reports CPUID.1:EDX DE and PSE (tools/patch-fex-ios-cpuid-classic.py); off unless 1.

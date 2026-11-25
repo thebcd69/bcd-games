@@ -2,6 +2,8 @@
  * under GPL-3.0-or-later with the Madeira Converter Exception and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 SirDank, ft7t8drgwf-wq and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #349, #353, #360 and #363; commits 4e568c1, ba617bb and ada55ec)
  * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
+/* Portions copyright 2026 spenstars1: reading bcd.cfg's env.* lines as bytes, taken from https://github.com/willfaust/Madeira (pull request #629, commit 0d057f1b)
+ * under GPL-3.0-or-later and modified for BCD in November 2026. See THIRD-PARTY-NOTICES.md. */
 // WineProcessBridge.m - Initialize Wine's ntdll Unix-side on iOS
 // This calls __wine_main() to bootstrap the Wine process, connecting
 // to the already-running wineserver thread.
@@ -2280,7 +2282,30 @@ static void *wine_process_thread(void *arg) {
                 NSString *text = nil;
                 if (madeira_cfg_present()) {
                     NSMutableString *acc = [NSMutableString string];
-                    NSString *cfg = [NSString stringWithContentsOfFile:[docs stringByAppendingPathComponent:@MADEIRA_CFG_FILE] encoding:NSUTF8StringEncoding error:nil];
+                    /* madeira-bcd: bcd-cfg-bytes-v1 (Madeira pull request #629, spenstars1). A byte that is not UTF-8 (a comment
+                     * saved as Windows-1252 by an editor on a PC) made the whole file nil, so no env line was exported though
+                     * build/madeira_cfg.h applied the rest of the file. Such a file is read line by line: a line that is UTF-8
+                     * stays as it is, and only the line with the stray byte is read as Latin 1. */
+                    NSString *cfg = nil;
+                    NSData *cfgData = [NSData dataWithContentsOfFile:[docs stringByAppendingPathComponent:@MADEIRA_CFG_FILE]];
+                    if (cfgData) {
+                        cfg = [[NSString alloc] initWithData:cfgData encoding:NSUTF8StringEncoding];
+                        if (!cfg) {
+                            NSMutableString *joined = [NSMutableString string];
+                            const uint8_t *cfgBytes = cfgData.bytes;
+                            NSUInteger cfgFrom = 0;
+                            for (NSUInteger i = 0; i <= cfgData.length; i++) {
+                                if (i < cfgData.length && cfgBytes[i] != '\n') continue;
+                                NSData *one = [NSData dataWithBytes:cfgBytes + cfgFrom length:i - cfgFrom];
+                                NSString *oneLine = [[NSString alloc] initWithData:one encoding:NSUTF8StringEncoding]
+                                    ?: [[NSString alloc] initWithData:one encoding:NSISOLatin1StringEncoding];
+                                [joined appendFormat:@"%@\n", oneLine];
+                                cfgFrom = i + 1;
+                            }
+                            cfg = joined;
+                        }
+                    }
+                    /* end madeira-bcd: bcd-cfg-bytes-v1 */
                     for (NSString *raw in [cfg componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]]) {
                         NSString *line = [raw stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
                         NSRange eq = [line rangeOfString:@"="];

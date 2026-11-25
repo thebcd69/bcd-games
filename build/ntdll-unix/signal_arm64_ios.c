@@ -2233,6 +2233,9 @@ done:
 /* ajan7-arkham: [wow-null32], a 32-bit guest's use of the NULL page: registers, stack and the thread's TLS cells with module+RVA
  * (see ios_wow_null_diag.h). Failure path only, capped. Uses the helpers of ios_av_args_diag.h. */
 #include "ios_wow_null_diag.h"
+/* round 714 (agent M4 D7): [stack-narrow], a 64-bit program's access to the low 32 bits of its own stack (Gal*Gun: Double Peace's
+ * ApexFramework_x64.dll); log only, failure path only, at most 4 lines (see ios_stack_narrow_diag.h). Uses ios_av_args_read. */
+#include "ios_stack_narrow_diag.h"
 /* [nw-tls] (bcd-games#33 by Taala2): the TLS key, the faulting thread's cell and the Slot::Get object of a NULL-page AV in a process with nw.dll (see ios_nw_tls_diag.h).
  * Failure path only, once per faulting TID, only for a guest instruction inside one function of the analysed nw.dll, and only with
  * MADEIRA_TLS_DIAG=1 (default off). Uses ios_av_args_pc_is_jit of ios_av_args_diag.h. */
@@ -7709,6 +7712,8 @@ skip_reclaim_band: ;
                     /* ajan7-arkham: [wow-null32], the NULL page of a 32-bit guest (Wine Mono in BmLauncher.exe, Batman: Arkham City GOTY);
                      * see ios_wow_null_diag.h. */
                     ios_wow_null_diag( &state, thread_teb, req->exception, fault_addr );
+                    /* round 714 (agent M4 D7): [stack-narrow], see ios_stack_narrow_diag.h. */
+                    ios_stack_narrow_diag( thread_teb, req->exception, (uint64_t)fault_addr );
                     /* [nw-tls]: TLS key / cell / Slot::Get object, NULL-class faults in a guest function of nw.dll; see ios_nw_tls_diag.h.
                      * nw_fault_seq / nw_fault_t were taken at the start of this report (top of the block), not here. */
                     if (ios_tls_diag_enabled()) ios_nw_tls_diag( &state, thread_teb, req->exception, fault_addr, nw_fault_seq, nw_fault_t );

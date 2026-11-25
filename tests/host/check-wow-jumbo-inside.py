@@ -53,7 +53,8 @@ census_call = 'if (is_jumbo) ios_jumbo_census( jumbo_hint, jumbo_size, st ? NULL
 # so "without limits" never ran for one; the guest's own limit (at or below 4 GB, never none) is the test now, in both entry points.
 check('the refusal (1) and the retry (2) sit once each, right after the census of NtAllocateVirtualMemory, only for an unhinted request with a 32-bit '
       'program\'s own limit; the Ex entry point (VirtualAlloc2, mimalloc) has one more site for its own limit only',
-      native.count(site) == 1 and native.count(site2) == 1 and native.count('ios_wow_jumbo_inside_on()') == 3 and
+      native.count(site) == 1 and native.count(site2) == 1 and native.count('ios_wow_jumbo_inside_on()') == 4 and   # round 714 (G1 S1): ios_wow_ex_noceiling_on reads it too
+     
       'if (!st && !jumbo_hint && ios_wow_base() && limit_high && ios_wow_guest_limit( limit_low, limit_high ) &&' in native and
       native.index(census_call) < native.index(site2) < native.index(site) < native.index('/* madeira-bcd: remember a helper\'s large reservation for ios_sc_reap_dead */'))
 retry = native[native.index(site2):native.index(site)]

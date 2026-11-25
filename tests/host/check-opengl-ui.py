@@ -160,7 +160,7 @@ for rid, (app, folder, prog, word) in want.items():
     lines = [c for c in (r or {}).get("config", []) if isinstance(c, dict) and c["line"].startswith("gl-backend")]   # night round 2026-11-11: Isaac v2 and Mewgenics v2 carry more lines
     check(f"list rule {rid}: Steam {app}, folder {folder!r}, program {prog}, `gl-backend = {word}` from build 632 only",
           r is not None and r["match"] == {"steamAppIDs": [app], "steamFolders": [folder], "programs": [{"name": prog}]}
-          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] in (1, 2, 3, 4) and any("Not tried on a device yet" in n for n in r["notes"]), r)   # round 660: Mewgenics v3, DOOM 3 BFG v2; round 707: Isaac v4
+          and lines == [{"line": f"gl-backend = {word}", "minBuild": 632}] and r["version"] in (1, 2, 3, 4, 5) and any("Not tried on a device yet" in n for n in r["notes"]), r)   # round 660: Mewgenics v3, DOOM 3 BFG v2; round 707: Isaac v4; round 714: Isaac v5 (notes)
 for rid in ("jetboard-joust", "stardew-valley"):
     lines = [c for c in by[rid]["config"] if isinstance(c, dict) and c["line"].startswith("gl-backend")]
     check(f"list rule {rid}: carries `gl-backend = zink` from build 632 only, its version raised", lines == [{"line": "gl-backend = zink", "minBuild": 632}], by[rid]["config"])

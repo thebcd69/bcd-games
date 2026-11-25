@@ -49,6 +49,7 @@ struct MadeiraApp: App {
                 .modifier(BCDThemeTint())   // BCD Violet (the default) leaves the app's tint as it was; another profile tints the app
                 .modifier(ClaimGamepadEvents())
                 .onAppear {
+                    BCDLiveLogAccess.shared.restore()
                     // External drives (ExternalDrives.swift, from Madeira #464): each saved drive is opened again and linked
                     // as C:\External\<name> and its letter before Wine starts.
                     ExternalDrives.shared.mountAll()

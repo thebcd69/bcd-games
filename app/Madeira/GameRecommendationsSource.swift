@@ -327,7 +327,7 @@ final class RecommendationsSource: ObservableObject {
     /// The start's check runs unless an answer came less than 6 hours ago (a clock set back
     /// does not stop it).
     static func backgroundCheckDue(lastChecked: Date?, now: Date = Date()) -> Bool {
-        guard let lastChecked, now >= lastChecked else { return true }
+        guard let lastChecked, now.timeIntervalSinceReferenceDate >= lastChecked.timeIntervalSinceReferenceDate else { return true }
         return now.timeIntervalSince(lastChecked) >= backgroundInterval
     }
 

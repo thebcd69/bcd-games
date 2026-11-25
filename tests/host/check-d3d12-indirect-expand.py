@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 noralstat: from thebcd69/bcd-games pull request #67
 """ExecuteIndirect signatures with several arguments per record, drawn from the CPU's records (madeira-bcd indirect-expand,
 build 687, opt-in per game); no GPU, no Wine.
 

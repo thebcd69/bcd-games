@@ -348,6 +348,10 @@ enum MadeiraDock {
                 case -5: return "Steam couldn't prepare this game's executable: its Windows service isn't installed in BCD's Windows setup."
                 // Round 623 (Just Cause 2, feedback BEQD9Y): result 55 (Valve's "remote call failed") ends every CEG start whose service is
                 // registered (Call of Duty: Black Ops, Saints Row, Just Cause 2); the auto-tune rule dock-ceg-result-55 names it the same way.
+                // Round 714 (agent F1 S4; Mafia II 066P0C, CoD Black Ops CSP7E6 CT98X6, Sniper Elite V2 EYCX54, Hitman: Absolution PKTC7C): when the
+                // host's start of Valve's service failed (ceg-service-start=-1), the service ended at once in this start of BCD; another start may pass.
+                case 55 where fields["ceg-service-start"] == "-1":
+                    return "Steam's helper service could not start, so Steam could not get this game's executable ready (code 55). It does not happen in every start of BCD: quit BCD completely, then try again."
                 case 55: return "Steam's copy protection couldn't start the game: Steam couldn't get this game's executable ready for your account (code 55). This is a known stop: Steam's request to build it failed, and no BCD setting is known to change it."
                 default: return "Steam's copy protection couldn't start the game: Steam couldn't get this game's executable ready for your account (code \(fields["ceg-result"] ?? "?"))."
                 }
@@ -458,6 +462,8 @@ enum MadeiraDock {
         "ceg-service-start", "ceg-service-start-retry", "ceg-request-retry", "ceg-already-prepared",
         // night round 2026-11-11 (tools/patch-dock-ceg-service-restart.py): the service seen again after its settle (1 running, 0 gone) and the rounds it was started again
         "ceg-service-alive-after-settle", "ceg-service-restarts",
+        // round 714 (tools/patch-dock-ceg-scm-restart.py): after a start of -1, one fresh services.exe (1), its error, and the service's start in it
+        "ceg-scm-restarted", "ceg-scm-restart-error", "ceg-service-start-after-restart",
         "ceg-scm", "ceg-scm-started", "ceg-scm-error", "ceg-service-registered", "ceg-service-install", "ceg-service-stop", "ceg-scm-stopped",
         "game-scm", "game-scm-timeout", "launch-keep-alive",
         // round 624 (Steam 113; tools/patch-dock-steam-readback.py): the published values read back while the game starts (bits:

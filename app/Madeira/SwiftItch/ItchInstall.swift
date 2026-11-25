@@ -177,7 +177,7 @@ enum ItchSetup {
             for child in names where !child.lastPathComponent.hasPrefix(".") && !skip.contains(child.lastPathComponent.lowercased())
                 && !child.lastPathComponent.lowercased().hasPrefix("madeira") && !child.lastPathComponent.lowercased().hasPrefix("bcd") {
                 let values = try? child.resourceValues(forKeys: [.isDirectoryKey, .creationDateKey])
-                guard values?.isDirectory == true, let made = values?.creationDate, made >= since.addingTimeInterval(-60) else { continue }
+                guard values?.isDirectory == true, let made = values?.creationDate, made.timeIntervalSinceReferenceDate >= since.addingTimeInterval(-60).timeIntervalSinceReferenceDate else { continue }
                 fresh.append(root.isEmpty ? child.lastPathComponent : root + "/" + child.lastPathComponent)
             }
         }

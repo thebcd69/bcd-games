@@ -1344,6 +1344,25 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
     }
 }
 
+struct BCDLiveLogPreferences {
+    static let defaultPort: UInt16 = 8766
+    static let historyRange = 1...5
+    var port = defaultPort
+    var historyMB = historyRange.lowerBound
+    var historyBytes: UInt64 { UInt64(historyMB) * 1_000_000 }
+}
+
+enum BCDLiveLogState {
+    case off, starting, waitingForWiFi, sharing(URL), failed(String)
+
+    var isOn: Bool {
+        switch self {
+        case .starting, .waitingForWiFi, .sharing, .failed: return true
+        case .off: return false
+        }
+    }
+}
+
 @MainActor protocol BCDLogsBackend: ObservableObject {
     /// Said before a log is sent (an install without the increased memory limit); nil: nothing.
     var sendLogAdvice: String? { get }
@@ -1357,6 +1376,11 @@ enum BCDDiagnostic: String, CaseIterable, Identifiable {
     func copy(_ code: String)
     /// BCD's own logs, ready for the share sheet.
     func exportable() -> [URL]
+    var liveLogState: BCDLiveLogState { get }
+    var liveLogPreferences: BCDLiveLogPreferences { get }
+    func setLiveLogAccess(_ on: Bool)
+    func setLiveLogPort(_ port: UInt16)
+    func setLiveLogHistoryMB(_ count: Int)
     var extendedLogging: Bool { get }
     func setExtendedLogging(_ on: Bool)
     func diagnostic(_ item: BCDDiagnostic) -> Bool
@@ -1403,9 +1427,45 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
     @EnvironmentObject private var model: BCDSettingsModel
     @State private var sharing: BCDShareItems?
     @State private var copied: String?
+    @State private var portText = ""
+    @State private var invalidPort = false
+    @FocusState private var editingPort: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
+            BCDSettingsGroup(title: "Live logs",
+                             footer: "The log is sent over unencrypted HTTP to devices on this Wi-Fi. Only the copied URL reads it: it carries a key that changes each time access turns on or BCD starts. Share it only with your own devices. BCD shows the .local hostname when Bonjour finds it.") {
+                BCDSettingsToggleRow(id: BCDSettingsID.control(.logs, "live"), title: "Allow live log access",
+                                     note: "Stream this run's log while BCD is running. This setting stays on after a restart.",
+                                     isOn: backend.liveLogState.isOn) { backend.setLiveLogAccess($0) }
+                preferredPortRow
+                BCDSettingsValueRow(id: BCDSettingsID.control(.logs, "live-history"), title: "Endpoint history size",
+                                    note: "Amount sent when a reader connects.",
+                                    choices: BCDLiveLogPreferences.historyRange.map { BCDSettingsChoice(value: String($0), label: "\($0) MB") },
+                                    value: String(backend.liveLogPreferences.historyMB), showsMenuButton: true) { value in
+                    if let count = Int(value) { backend.setLiveLogHistoryMB(count) }
+                }
+                switch backend.liveLogState {
+                case .off:
+                    EmptyView()
+                case .starting:
+                    BCDSettingsInfoRow(title: "Starting live log access…", value: "")
+                case .waitingForWiFi:
+                    BCDSettingsInfoRow(title: "Waiting for Wi-Fi", note: "Live logs need a Wi-Fi connection with an IPv4 address.", value: "")
+                case .sharing(let url):
+                    if let port = url.port, port != Int(backend.liveLogPreferences.port) {
+                        BCDSettingsInfoRow(title: "Preferred port was in use", value: "Using \(port)")
+                    }
+                    BCDSettingsActionRow(id: BCDSettingsID.control(.logs, "copy-live-url"), title: "Copy live log URL",
+                                         note: url.absoluteString, detail: copied == url.absoluteString ? "Copied" : nil,
+                                         symbol: "doc.on.doc") {
+                        backend.copy(url.absoluteString)
+                        copied = url.absoluteString
+                    }
+                case .failed(let message):
+                    BCDSettingsInfoRow(title: "Live logs unavailable", note: message + " Turn access off and on to retry.", value: "")
+                }
+            }
             BCDSettingsGroup(title: "Send a log",
                              footer: "Choose a log to send it. On this device BCD first takes out folder paths, user names, e-mail and IP addresses, then compresses it and sends it; the compressed copy is deleted right after. You get a code: quote it when you report a problem.") {
                 if backend.recent.isEmpty {
@@ -1487,6 +1547,35 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
         }
         .sheet(item: $sharing) { BCDShareSheet(items: $0.urls) }
         .onAppear { backend.refresh() }
+    }
+
+    private var preferredPortRow: some View {
+        BCDSettingsRowLabel(title: "Preferred port", note: invalidPort ? "Enter a number from 1 to 65535." : nil) {
+            TextField("Port", text: $portText)
+                .font(.system(size: 14, design: .monospaced)).foregroundStyle(BCDStyle.lavender)
+                .multilineTextAlignment(.trailing).frame(maxWidth: 100)
+                .keyboardType(.numbersAndPunctuation).submitLabel(.done)
+                .focused($editingPort)
+                .onSubmit { editingPort = false }
+        }
+        .onAppear { portText = String(backend.liveLogPreferences.port) }
+        .onChange(of: backend.liveLogPreferences.port) { _, port in
+            if !editingPort { portText = String(port) }
+        }
+        .onChange(of: editingPort) { _, focused in
+            if focused { invalidPort = false } else { savePort() }
+        }
+        .bcdSettingsControl(BCDSettingsID.control(.logs, "live-port"), token: portText) { editingPort = true }
+    }
+
+    private func savePort() {
+        guard let port = UInt16(portText.trimmingCharacters(in: .whitespacesAndNewlines)), port != 0 else {
+            invalidPort = true
+            portText = String(backend.liveLogPreferences.port)
+            return
+        }
+        portText = String(port)
+        backend.setLiveLogPort(port)
     }
 
     private func confirmSend(_ log: BCDLogFile) {

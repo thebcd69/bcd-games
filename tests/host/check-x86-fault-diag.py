@@ -276,7 +276,9 @@ check('the bundled lists that carry the switch are exactly Most Wanted, Undergro
                           # round 677 (agent A1 S11): Thief: Deadly Shadows, beside its d3d8to9 line
                           + [('thief-deadly-shadows', 'env.MADEIRA_X86_FAULT_DUMP = 1', 624)]
                           # round 707 (agent M3): Detroit: Become Human's new row, to make the next log name its fault
-                          + [('detroit-become-human', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]),
+                          + [('detroit-become-human', 'env.MADEIRA_X86_FAULT_DUMP = 1', 598)]
+                          # round 714 (agents A1 S5, G1 S8): Dead Space 2's x87 experiment and Grim Dawn's diagnostic row
+                          + [('dead-space-2', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630), ('grim-dawn', 'env.MADEIRA_X86_FAULT_DUMP = 1', 630)]),
       str(carriers))
 
 # ---------------------------------------------------------------- 3. compiled runs

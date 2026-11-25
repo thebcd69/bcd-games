@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Taala2: the [prev-end] skip and the exits of a system32 program Wine could not start, from thebcd69/bcd-games pull request #64
 //
 //  AutoTuneCore.swift
 //  Madeira

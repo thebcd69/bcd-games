@@ -549,10 +549,14 @@ final class SteamOwnedLibrary: ObservableObject {
     /// `env.MADEIRA_STEAM_CLOUD_AUTO = 0`: compare only; nothing is copied
     /// either way without the user asking on the game's page.
     static var cloudAutomatic: Bool { SteamSignIn.flag("MADEIRA_STEAM_CLOUD_AUTO", default: true) }
-    /// `env.MADEIRA_STEAM_CLOUD_REMOTECACHE = 1`: after each comparison Valve's client's
-    /// remotecache.vdf is rewritten from the device (SteamRemoteCache). Off unless set: the file is
-    /// then left as the client wrote it, which is what every game BCD runs has seen so far.
-    static var cloudRemoteCache: Bool { SteamSignIn.flag("MADEIRA_STEAM_CLOUD_REMOTECACHE", default: false) }
+    enum CloudRemoteCacheMode: String { case off, whenMissing = "when-missing", always }
+    /// `env.MADEIRA_STEAM_CLOUD_REMOTECACHE`: Valve's client's remotecache.vdf, rewritten from the device after a comparison
+    /// (SteamRemoteCache). Unset: only when a save identical on the device and in the cloud is missing from the list, which is
+    /// when a game in a Dock session sees no saves (Isaac, Don't Starve). 0: never. 1: after every comparison.
+    static var cloudRemoteCacheMode: CloudRemoteCacheMode {
+        guard let value = SteamSignIn.setting("MADEIRA_STEAM_CLOUD_REMOTECACHE") else { return .whenMissing }
+        return value.trimmingCharacters(in: .whitespaces) == "0" ? .off : .always
+    }
 
     /// Steam Cloud state of the games checked in this app run, by App ID.
     @Published private(set) var cloud: [Int: SteamCloudState] = [:]
@@ -735,8 +739,17 @@ final class SteamOwnedLibrary: ObservableObject {
             let audit = result.0
             // Valve's client in a session shows the game only the files its list
             // names (SteamRemoteCache); not while that client runs.
-            if Self.cloudRemoteCache, !inSession, let written = SteamRemoteCache.write(appID: appID, audit: audit, paths: paths) {
-                SteamLog.event("[steam-cloud] app=\(appID) remotecache synced=\(written.synced) device-only=\(written.local) dropped=\(written.dropped) change=\(audit.changeNumber)")
+            // madeira-bcd (round 714, D1-S1): by default only when the list misses a save the device and the cloud both hold.
+            let cacheMode = Self.cloudRemoteCacheMode
+            if cacheMode != .off, !inSession, cacheMode == .always || SteamRemoteCache.listMisses(audit: audit, paths: paths),
+               let written = SteamRemoteCache.write(appID: appID, audit: audit, paths: paths) {
+                SteamLog.event("[steam-cloud] app=\(appID) remotecache synced=\(written.synced) device-only=\(written.local) dropped=\(written.dropped) change=\(audit.changeNumber) mode=\(cacheMode.rawValue)")
+            }
+            // madeira-bcd (round 714, D1-S1 (d)): counts only, no file names. Roots of cloud paths this prefix cannot map (a save made on another OS).
+            let census = SteamRemoteCache.census(audit: audit, paths: paths)
+            if census.device > 0 || !audit.unmapped.isEmpty {
+                let unmappedRoots = Set(audit.unmapped.compactMap { SteamCloudPaths.split($0).root }).sorted().joined(separator: ",")
+                SteamLog.event("[steam-cloud] app=\(appID) remotecache listed=\(census.listed) device=\(census.device) missing=\(census.missing) unmapped-roots=\(unmappedRoots.isEmpty ? "-" : unmappedRoots)")
             }
             let plan = SteamCloudPlan.make(audit: audit, baseline: baseline(appID))
             recordBaseline(appID, settled: plan.settled)

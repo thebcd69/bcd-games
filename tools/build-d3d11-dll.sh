@@ -123,6 +123,8 @@ done
 #   tools/patch-dxmt-buffer-rtv.py            Frostbite 2 games (render target views on a buffer, [rtv-fail])
 #   tools/patch-dxmt-srv-getdesc-mips.py      Dark Souls III (an SRV's GetDesc reports the real mip count, [srv-getdesc]; round 624)
 #   tools/patch-dxmt-d11-query-stuck.py       WRC 9 ([query-stuck], DXMT_QUERY_TS_WATCHDOG; round 624: build 624's first IPA lacked it here)
+#   tools/patch-dxmt-d11-query-park.py        opt-in, env.MADEIRA_D3D11_QUERY_PARK = 1: a burst of GetData polls on an event query parks on the queue's
+#                                             event instead of spinning (2026-11-25, willfaust/dxmt #58 by Dragooon; [query-park], [gpu-perf] parked polls)
 #   tools/patch-dxmt-tess-pso-failed.py       Batman: Arkham City (a mesh pipeline that did not compile: its draws dropped, [mesh-skip] ml870; round 626)
 #   tools/patch-dxmt-update-subresource-staging.py  FIFA 23 (UpdateSubresource on a STAGING buffer is dropped, [update-subresource-staging]; night round 2026-11-11)
 #   tools/patch-dxmt-d11-swapchain-rotation.py      The Battle for Wesnoth / SDL2 (IDXGISwapChain1::SetRotation/GetRotation answer the identity rotation, [swapchain-rotation])
@@ -154,6 +156,7 @@ BCD_PATCHES=("patch-dxmt-copy-structure-count.py" "[copy-structure-count] skippe
              "patch-dxmt-buffer-rtv.py" "[rtv-fail] #"
              "patch-dxmt-srv-getdesc-mips.py" "[srv-getdesc] madeira-bcd #"
              "patch-dxmt-d11-query-stuck.py" "[query-stuck] madeira-bcd query="
+             "patch-dxmt-d11-query-park.py" "[query-park] madeira-bcd: "
              "patch-dxmt-tess-pso-failed.py" "[mesh-skip] ml870 "
              "patch-dxmt-update-subresource-staging.py" "[update-subresource-staging] skipped #"
              "patch-dxmt-d11-swapchain-rotation.py" "[swapchain-rotation] madeira-bcd: SetRotation("

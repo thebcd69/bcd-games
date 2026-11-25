@@ -787,6 +787,13 @@ final class HardwareInput: ObservableObject {
     /// MADEIRA_POINTER_AUTOLOCK=0: the pointer locks only on request, not
     /// while the program hides its cursor (see `AutoLock`).
     static let autoLockEnabled = lockEnabled && flag("MADEIRA_POINTER_AUTOLOCK", defaultOn: true)
+    /// Round 714 (agent G2 S13; ULTRAKILL YR16A5, feedback DJSMY8): iPadOS ends a lock BCD still asks for (Escape): treat it as the
+    /// user's release (Ctrl+Alt+P), or the mouse route stays blocked until an app switch. MADEIRA_POINTER_LOCK_END=0: the old behaviour.
+    static let lockEndRelease = lockEnabled && flag("MADEIRA_POINTER_LOCK_END", defaultOn: true)
+    /// Round 714 (agent A1 S10; feedback 9YXC9N): MADEIRA_RELATIVE_CURSOR=1: with Mouse-look as the finger mode, in a game
+    /// started directly, the program's own cursor is drawn where Wine has it while the program shows it (its menus) and
+    /// hidden while it hides it (play). A tap still does not click. Default off: Mouse-look draws no cursor, as before.
+    static let relativeCursorEnabled = directCursorEnabled && flag("MADEIRA_RELATIVE_CURSOR", defaultOn: false)
 
     /// Only `0` disables a default-on switch; only `1` enables a default-off one.
     private static func flag(_ name: String, defaultOn: Bool) -> Bool {
@@ -1251,10 +1258,24 @@ final class HardwareInput: ObservableObject {
         let scene = MetalBackedView.keyboardTarget?.window?.windowScene
         let granted = scene?.pointerLockState?.isLocked ?? false
         if granted != lockGranted {
+            let wasGranted = lockGranted
             lockGranted = granted
             if granted { lockRefusalLogged = false }
             log("pointer lock \(granted ? "granted" : "ended") by iPadOS (requested=\(pointerLocked ? 1 : 0); "
                 + "\(Self.sceneShape(scene)))")
+            // Round 714 (agent G2 S13): a lock iPadOS gave and took back while BCD still asks for it and the app is in front. UIKit sent no
+            // hover while the pointer was pinned and the request stays up, so the route stayed blocked. An app switch ends the lock too:
+            // look again a moment later, when a deactivation has arrived.
+            if Self.lockEndRelease, wasGranted, !granted, pointerLocked, appActive, baseFocused {
+                lockRefusalLogged = true   // not a refusal: the "iPadOS locks only a full-screen scene" line does not belong here
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                    guard let self, self.pointerLocked, !self.lockGranted, self.appActive, self.baseFocused else { return }
+                    self.pointerOver = true
+                    if self.lockedByUs || self.followsPointer { self.autoLockSuppressed = true }
+                    self.userReleased = true
+                    self.setPointerLocked(false, byUs: false, why: "iPadOS ended the lock (Escape): released; it locks again when the program's cursor changes or on Ctrl+Alt+P")
+                }
+            }
         }
         if pointerLocked, !granted, !lockRefusalLogged,
            CACurrentMediaTime() - lockRequestedAt >= Self.lockAnswerWindow {
@@ -2033,7 +2054,7 @@ final class HardwareInput: ObservableObject {
     private func renderCursor() {
         guard directCursorLive else { return }
         let shown = cursorState.shown != 0 || (touchCursorActive && cursorState.reports == 0)
-        let visible = (mouseInUse || touchCursorActive) && mouseFocused && shown && !InputSettings.shared.relative
+        let visible = (mouseInUse || touchCursorActive) && mouseFocused && shown && (!InputSettings.shared.relative || Self.relativeCursorEnabled)
         var pos = (x: cursorState.x, y: cursorState.y)   // screen pixels, where Windows has its cursor
         if let last = lastAbsolute {
             // madeira-bcd (build 646, [ptr-map]): lastAbsolute is in the picture's space; Wine clips in screen pixels. Unchanged

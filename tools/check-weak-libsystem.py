@@ -9,10 +9,20 @@ it without checking jumps to address 0. BCD 0.1.682 was the first build with the
 in iOS 27's libc), and every game launch on iOS 26 and older crashed in server_pipe. Swift and Objective-C calls are guarded by the
 compiler (availability checks, @backDeployed), so this looks only at libSystem, libc++ and libobjc imports.
 
-  check-weak-libsystem.py <Madeira.app>     every Mach-O in the bundle; fails on a weak import outside KNOWN
+Back-deployed Swift calls (2026-11-24): a @backDeployed API gets a thunk in the app (mangled name ending in Twb) that asks the OS
+version and then calls the system's copy through a weak import. On a beta that already reports the new version but lacks the
+symbol, the weak import is NULL and the thunk jumps to address 0. 0.1.712 crashed at launch that way on iOS 27.2 beta 24B5089g:
+Foundation's Date <= and >= are new in iOS 27.2 and their thunks ask for 27.2, so SteamSignIn.usable called NULL for every
+signed-in Steam account. The app now compares timeIntervalSinceReferenceDate instead (exactly what the thunk's own fallback does),
+and this script fails on any back-deploy thunk outside KNOWN_BACKDEPLOY.
+
+  check-weak-libsystem.py <Madeira.app>     every Mach-O in the bundle; fails on a weak C import outside KNOWN or a
+                                            back-deploy thunk outside KNOWN_BACKDEPLOY
 
 A new name here is not always a bug: if the code checks the function for NULL (or the call sits behind __builtin_available), add it
 to KNOWN with the reason. Otherwise make the build stop using it (for Wine: #undef its HAVE_ macro in config.h, as for pipe2).
+A new back-deploy thunk: if the OS version it asks for is no newer than the app's oldest iOS, the fallback never runs and the
+system copy is always there, so add it to KNOWN_BACKDEPLOY with the reason; otherwise write the call without the new API.
 """
 import re
 import subprocess
@@ -29,6 +39,9 @@ KNOWN = {
     "_pthread_mutexattr_settype": "always present; Mesa declares its pthread use weak",
     "_pthread_mutexattr_destroy": "always present; Mesa declares its pthread use weak",
 }
+KNOWN_BACKDEPLOY = {
+    "_$sScg4next9isolationxSgScA_pSgYi_tYaKFTwb": "ThrowingTaskGroup.next(isolation:), asks for iOS 18; the app needs iOS 18",
+}
 LIBS = ("libSystem", "libc++", "libobjc")
 LINE = re.compile(r"^\s*(?:0x[0-9A-Fa-f]+\s+)?(\S+)\s+\[weak-import\]\s+\(from ([^)]+)\)")
 
@@ -43,6 +56,11 @@ def weak_c_imports(listing):
     return out
 
 
+def backdeploy_thunks(listing):
+    """The back-deploy thunks defined in one `nm --defined-only` listing."""
+    return [f[-1] for f in (line.split() for line in listing.splitlines()) if len(f) >= 3 and f[-1].endswith("Twb")]
+
+
 def is_macho(path):
     try:
         with open(path, "rb") as f:
@@ -55,20 +73,26 @@ def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     app = Path(sys.argv[1])
-    bad, seen = [], 0
+    bad, thunks, seen = [], [], 0
     for f in sorted(p for p in app.rglob("*") if p.is_file() and not p.is_symlink() and is_macho(p)):
         r = subprocess.run(["xcrun", "dyld_info", "-imports", str(f)], capture_output=True, text=True)
         seen += 1
         for sym, lib in weak_c_imports(r.stdout):
             if sym not in KNOWN:
                 bad.append(f"{f.relative_to(app)}: {sym} (from {lib})")
-    if bad:
-        for b in bad:
-            print(f"::error::weak C import newer than the app's oldest iOS: {b}")
-        print(f"check-weak-libsystem: {len(bad)} unknown weak C import(s) in {seen} Mach-O files: on an older iOS each resolves "
-              "to NULL and a call to it crashes (see this script's header)")
+        r = subprocess.run(["xcrun", "nm", "--defined-only", str(f)], capture_output=True, text=True)
+        for sym in backdeploy_thunks(r.stdout):
+            if sym not in KNOWN_BACKDEPLOY:
+                thunks.append(f"{f.relative_to(app)}: {sym}")
+    for b in bad:
+        print(f"::error::weak C import newer than the app's oldest iOS: {b}")
+    for t in thunks:
+        print(f"::error::back-deployed Swift call: {t}")
+    if bad or thunks:
+        print(f"check-weak-libsystem: {len(bad)} unknown weak C import(s) and {len(thunks)} unknown back-deploy thunk(s) in {seen} "
+              "Mach-O files: each can call NULL on an older iOS or on a beta of the new one (see this script's header)")
         return 1
-    print(f"check-weak-libsystem: {seen} Mach-O files, no unknown weak C import")
+    print(f"check-weak-libsystem: {seen} Mach-O files, no unknown weak C import or back-deploy thunk")
     return 0
 
 

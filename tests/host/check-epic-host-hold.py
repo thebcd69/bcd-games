@@ -100,8 +100,9 @@ carriers = sorted(r['id'] for r in lists['rules'] if 'BCD_EPIC_HOST_START' in js
 # by the Epic start (BCDEpicStart), so the rows' other copies are untouched.
 # Round 631 (agent R3 S6; 6XG0C2): Red Dead Redemption 2 outside Steam too (Epic's RDR2 starts the same Rockstar chain).
 # Round 677 (agents G4 S6, G2 S1): Windbound and Frostpunk from the Epic store (MZN07P, APCRNF: a 64-bit EOS game whose host start left no report).
-check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic), (round 630) GTA V, (round 631) RDR2 outside Steam, (round 669) Jurassic World Evolution and (round 677) Windbound and Frostpunk (Epic) lists set it, from build 598',
-      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'frostpunk-epic', 'gta5e-other', 'gta5l-other', 'jurassic-world-evolution', 'rdr2-other', 'windbound-epic'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
+# Round 714 (agent G2 S5; S3A2NP, BR12YM): MudRunner from the Epic store, the same start; a Steam copy never reads the key.
+check('only the BioShock Infinite, BioShock Remastered, Farming Simulator 22 (Epic), (round 630) GTA V, (round 631) RDR2 outside Steam, (round 669) Jurassic World Evolution (round 677) Windbound and Frostpunk (Epic) and (round 714) MudRunner lists set it, from build 598',
+      carriers == ['bioshock-infinite-epic', 'bioshock-remastered-epic', 'farming-simulator-22-epic', 'frostpunk-epic', 'gta5e-other', 'gta5l-other', 'jurassic-world-evolution', 'mudrunner', 'rdr2-other', 'windbound-epic'] and all({'line': 'env.BCD_EPIC_HOST_START = 1', 'minBuild': 598} in
       next(r for r in lists['rules'] if r['id'] == i)['config'] for i in carriers))
 rules = (R / 'build/tools/autotune_rules.py').read_text()
 check('auto-tune: the rule epic-host-start-lost adds the line after an Epic game with the EOS SDK left with exit code 1 although the start line chose the host and the host left no report, never twice',

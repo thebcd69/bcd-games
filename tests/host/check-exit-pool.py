@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 Taala2: the probe and slot checks, from thebcd69/bcd-games pull request #64
 """A Wine thread that exits with a freed object in its autorelease pool (night round 2026-11-11, agent T1 S3; Alan Wake D6F62Q, build 634, and 22 archive
 logs of 18 games): BCD itself died at the game's exit.
 

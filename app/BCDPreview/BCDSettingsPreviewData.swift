@@ -337,6 +337,8 @@ extension BCDSettingsBackends {
     let sent = [BCDSentLog(code: "K7Q2-9XPA", name: "war3.exe-2026-10-16_22-24-07.txt", date: BCDPreviewLogs.now - 150_000)]
     @Published private(set) var sending = false
     @Published private(set) var sendStatus: String?
+    @Published private(set) var liveLogState = BCDLiveLogState.off
+    @Published private(set) var liveLogPreferences = BCDLiveLogPreferences()
     @Published private(set) var extendedLogging = false
     @Published private(set) var perfTrace = false   // round 604
     @Published private var diagnostics: Set<BCDDiagnostic> = []
@@ -346,6 +348,19 @@ extension BCDSettingsBackends {
     func send(_ log: BCDLogFile, comment: String) { sendStatus = "Sent. Code: P3MV-77KD (sample)" + (comment.isEmpty ? "" : ", with your comment") }
     func copy(_ code: String) {}
     func exportable() -> [URL] { [] }
+    func setLiveLogAccess(_ on: Bool) {
+        var endpoint = URLComponents()
+        endpoint.scheme = "http"
+        endpoint.host = "iphone.local"
+        endpoint.port = Int(liveLogPreferences.port)
+        endpoint.path = "/api/log"
+        liveLogState = on ? .sharing(endpoint.url!) : .off
+    }
+    func setLiveLogPort(_ port: UInt16) {
+        liveLogPreferences.port = port
+        if liveLogState.isOn { setLiveLogAccess(true) }
+    }
+    func setLiveLogHistoryMB(_ count: Int) { liveLogPreferences.historyMB = count }
     func setExtendedLogging(_ on: Bool) { extendedLogging = on }
     func setPerfTrace(_ on: Bool) { perfTrace = on }
     func diagnostic(_ item: BCDDiagnostic) -> Bool { diagnostics.contains(item) }

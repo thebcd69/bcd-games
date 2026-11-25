@@ -231,14 +231,21 @@ look = function(host, "private static func look() -> BCDLCHelper")
 body = look[look.index("{") + 1:].lstrip()
 require(body.startswith('guard getenv("LC_HOME_PATH") != nil else { return .notAvailable }'),
         "LiveContainer helper: outside LiveContainer the look returns at once (no call, no log line)")
-require("if !multitask, switchOn == true, let url = helperURL" in look and look.count("factory.extension(withIdentifier:") == 1
-        and look.index("if !multitask, switchOn == true") < look.index("factory.extension(withIdentifier:"),
-        "LiveContainer helper: the extension probe runs only with Helper Process Support switched on")
-require('else if probe == "LCGuestExtension" && prepared { state = .ready }' in look and look.count("state = .ready") == 1,
-        "LiveContainer helper: ready only with LiveContainer's own extension object and its install-time preparation")
+require("let shouldProbe = !multitask && switchOn == true && prepared" in look
+        and look.index("if shouldProbe, let url = helperURL, let identifier = Bundle(url: url)?.bundleIdentifier")
+            < look.index("factory.extension(withIdentifier: identifier)"),
+        "LiveContainer helper: lookup uses the prepared guest's bundle ID in full-screen mode with Helper Process Support on")
+require("var probe: String?" in look and look.count("factory.extension(withIdentifier:") == 1
+        and "if let found = try? factory.extension(withIdentifier: identifier), let cls = object_getClass(found)" in look
+        and "probe = String(cString: class_getName(cls))" in look and "discoveredClass: probe" in look
+        and 'probe ?? (shouldProbe ? "none" : "skipped")' in look and '"LCGuestExtension"' not in look,
+        "LiveContainer helper: success records the discovered class and failure leaves the lookup empty")
 reason_body = function(host, "static var unavailableReason: String?")
 require('if getenv("LC_HOME_PATH") != nil, LiveContainerHelper.state != .ready {' in reason_body,
         "built-in JIT: the LiveContainer gate opens only for a proven ready helper")
+memory_test = function((app / "BCDSettingsLive.swift").read_text(), "func runExtensionTest()")
+require(memory_test.index('if getenv("LC_HOME_PATH") != nil, LiveContainerHelper.state != .ready {')
+        < memory_test.index("MadeiraMemoryHostTest("), "manual helper-memory test uses the same LiveContainer readiness check")
 pool = (app / "MemoryPool.m").read_text()
 ident = function(pool, "NSString *MadeiraMemoryHostIdentifier(void)")
 require('NSString *fallback = [NSBundle.mainBundle.bundleIdentifier stringByAppendingString:@".MemoryHost"];\n    if (!getenv("LC_HOME_PATH")) return fallback;' in ident

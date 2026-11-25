@@ -1,3 +1,5 @@
+/* Portions copyright 2026 Taala2: the exit-pool slots of an autorelease pool's first objects, from thebcd69/bcd-games
+ * pull request #64 (LGPL-2.1-or-later, as the file). See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 meshoklv: code taken from https://github.com/willfaust/Madeira (pull request #401)
  * under LGPL-2.1-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /*

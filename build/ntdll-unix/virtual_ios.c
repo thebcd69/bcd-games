@@ -30570,6 +30570,128 @@ done:
 
 #ifdef WINE_IOS
 static unsigned int ios_fd_reuse( const void *addr, SIZE_T size, ULONG type );   /* madeira-bcd: defined below */
+
+/* madeira-bcd section-view-grow-v1 (env.MADEIRA_SECTION_VIEW_GROW, default on; 0 = Wine's plain refusal).
+ * Taken from willfaust/Madeira pull request #632 (Dragooon, commits 4e23f553, 4cf01a9a, 7bcd6c62) under GPL-3.0-or-later and adapted:
+ * the request size and the table of grown views are kept per call and checked against the live views, and the log names the end of
+ * the file's path, not the whole path.
+ *
+ * LMDB (Path of Exile 2's Shaders and Pipelines caches) opens its database with NtCreateSection(SEC_RESERVE) over a data file of two
+ * pages and maps a MEM_RESERVE view of its whole map size (PoE2: 0x1900000000, 100 GB) over it, then commits pages as the database
+ * grows. Windows accepts a reserve view past the end of a growable file; Wine answers STATUS_INVALID_VIEW_SIZE (ERROR_ACCESS_DENIED
+ * in Win32), so the game could not open either cache. BCD's own log of that game (build 625) shows two such refusals ([nt-fail]
+ * NtMapViewOfSection status=c000001f); it is the only status of that kind in the 6,404 logs I have.
+ *
+ * This code runs only in the branch of virtual_map_section that used to return that status. For a MEM_RESERVE view of a linked
+ * regular file whose size is exactly the section's, the file is extended (sparse: no blocks until written) to the end of the view
+ * right before the view is mapped, so no page of the view lies past the end of the file. The view is capped at
+ * env.MADEIRA_SECTION_VIEW_CAP_GB (default 16, 1-48), because the phone has about 58 GB of address space; the caller is told the
+ * smaller size. LMDB keeps its own map size and only reads pages it has written, so a capped view is safe while the database stays
+ * under the cap (a warning is logged at three quarters). Anything else keeps Wine's refusal, and so does a failed extension.
+ * A file view's pages are committed from the start in this port, so LMDB's VirtualAlloc(MEM_COMMIT) inside a grown view must
+ * succeed instead of answering STATUS_ALREADY_COMMITTED: the grown views are remembered (ios_grown_views, under virtual_mutex
+ * like both callers) and allocate_virtual_memory asks. The wineserver's section follows the file size (build/wineserver/mapping_ios.c).
+ * [section-grow] logs the first 16 cases. tests/host/check-section-view-grow.py compiles and drives the region below. */
+/* sectiongrow-test:begin */
+#define IOS_GROWN_VIEWS 16
+static struct { void *base; SIZE_T size; } ios_grown_views[IOS_GROWN_VIEWS];
+
+static int ios_section_view_grown( const struct file_view *view )
+{
+    int i;
+    for (i = 0; i < IOS_GROWN_VIEWS; i++)
+        if (ios_grown_views[i].base == view->base && ios_grown_views[i].size == view->size) return 1;
+    return 0;
+}
+
+static int ios_section_view_grow_ok( ULONG alloc_type )
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        const char *e = getenv( "MADEIRA_SECTION_VIEW_GROW" );
+        on = !(e && e[0] == '0');
+    }
+    return on && (alloc_type & MEM_RESERVE);
+}
+
+static ULONGLONG ios_section_view_cap( void )   /* bytes */
+{
+    static ULONGLONG cap;
+    if (!cap)
+    {
+        const char *e = getenv( "MADEIRA_SECTION_VIEW_CAP_GB" );
+        long long gb = e ? atoll( e ) : 0;
+        if (gb < 1 || gb > 48) gb = 16;
+        cap = (ULONGLONG)gb << 30;
+    }
+    return cap;
+}
+
+/* The slot for a new grown view: the one of the same base, an empty one, or one whose view is gone. -1: all 16 are live. */
+static int ios_grown_slot( void *base )
+{
+    int i, gone = -1;
+    for (i = 0; i < IOS_GROWN_VIEWS; i++)
+    {
+        struct file_view *v;
+        if (!ios_grown_views[i].base || ios_grown_views[i].base == base) return i;
+        v = find_view( ios_grown_views[i].base, ios_grown_views[i].size );
+        if (gone < 0 && (!v || v->base != ios_grown_views[i].base || v->size != ios_grown_views[i].size || !(v->protect & SEC_FILE))) gone = i;
+    }
+    return gone;
+}
+
+/* The last two components of a host path ("Shaders/data.mdb"): the container's own prefix is not worth logging. */
+static const char *ios_grow_path_tail( const char *path )
+{
+    const char *last = strrchr( path, '/' ), *prev;
+    if (!last || last == path) return path;
+    for (prev = last - 1; prev > path && *prev != '/'; prev--) {}
+    return *prev == '/' ? prev + 1 : prev;
+}
+
+/* base/size: the view map_view just made (virtual_mutex held); asked: the size the caller asked for; end: where the file must reach. */
+static unsigned int ios_section_view_grow( int fd, mem_size_t full_size, ULONGLONG end, ULONGLONG asked, void *base, SIZE_T size )
+{
+    static LONG said;
+    struct stat st;
+    char path[PATH_MAX];
+    const char *why = NULL;
+    int slot = -1;
+
+    strcpy( path, "?" );
+    if (fd < 0 || fstat( fd, &st )) why = "no file behind the section";
+    else
+    {
+        fcntl( fd, F_GETPATH, path );
+        if (!S_ISREG( st.st_mode ) || st.st_nlink < 1) why = "not a linked regular file";
+        else if ((mem_size_t)st.st_size != full_size) why = "the file's size is not the section's (not this section's file?)";
+        else if ((slot = ios_grown_slot( base )) < 0) why = "16 grown views are live";
+        else if ((ULONGLONG)st.st_size < end && ftruncate( fd, (off_t)end )) why = strerror( errno );   /* grow only, never shrink */
+    }
+    if (!why)
+    {
+        ios_grown_views[slot].base = base;
+        ios_grown_views[slot].size = size;
+    }
+    if (InterlockedIncrement( &said ) <= 16)
+    {
+        /* blocks written so far: how full a capped database is (the file itself is sparse) */
+        unsigned long long used_mb = why ? 0 : (unsigned long long)st.st_blocks * 512 >> 20;
+        dprintf( 2, "[section-grow] %s: reserve view %p+0x%lx (asked 0x%llx%s) over %s (0x%llx bytes, %llu MB written)%s%s "
+                    "(env.MADEIRA_SECTION_VIEW_GROW = 0 turns it off, MADEIRA_SECTION_VIEW_CAP_GB sets the cap)\n",
+                 why ? "REFUSED" : "file extended to cover the view", base, (unsigned long)size,
+                 (unsigned long long)asked, asked > size ? ", CAPPED" : "", ios_grow_path_tail( path ),
+                 (unsigned long long)full_size, used_mb, why ? ": " : "", why ? why : "" );
+        if (!why && asked > size && used_mb << 20 > (unsigned long long)size / 4 * 3)
+            dprintf( 2, "[section-grow] WARNING: %s has %llu MB written of a %lu MB view; past the view the game "
+                        "would read unmapped memory: raise MADEIRA_SECTION_VIEW_CAP_GB or delete the cache folder\n",
+                     ios_grow_path_tail( path ), used_mb, (unsigned long)(size >> 20) );
+    }
+    return why ? STATUS_INVALID_VIEW_SIZE : STATUS_SUCCESS;
+}
+/* sectiongrow-test:end */
 #endif
 
 /***********************************************************************
@@ -30596,6 +30718,9 @@ static unsigned int virtual_map_section( HANDLE handle, PVOID *addr_ptr, ULONG_P
     HANDLE shared_file;
     LARGE_INTEGER offset;
     sigset_t sigset;
+#ifdef WINE_IOS
+    ULONGLONG ios_grow_to = 0, ios_grow_asked = 0;   /* madeira-bcd section-view-grow-v1: extend the file to this before mapping */
+#endif
 
 #ifdef WINE_IOS
     /* WoW64 guest window: same rule as allocate_virtual_memory — a ceiling
@@ -30678,7 +30803,21 @@ static unsigned int virtual_map_section( HANDLE handle, PVOID *addr_ptr, ULONG_P
     if (*size_ptr)
     {
         size = *size_ptr;
-        if (size > full_size - offset.QuadPart) return STATUS_INVALID_VIEW_SIZE;
+        if (size > full_size - offset.QuadPart)
+        {
+#ifdef WINE_IOS
+            /* madeira-bcd section-view-grow-v1: a reserve view past the end of its file (the only way in here that used to fail) */
+            if (!image_info && ios_section_view_grow_ok( alloc_type ) && (ULONGLONG)offset.QuadPart < ios_section_view_cap())
+            {
+                ios_grow_asked = size;
+                if (size > ios_section_view_cap() - (ULONGLONG)offset.QuadPart)   /* capped; no overflow: offset < cap */
+                    size = ios_section_view_cap() - (ULONGLONG)offset.QuadPart;
+                ios_grow_to = (ULONGLONG)offset.QuadPart + size;
+            }
+            else
+#endif
+            return STATUS_INVALID_VIEW_SIZE;
+        }
     }
     else
     {
@@ -30710,6 +30849,15 @@ static unsigned int virtual_map_section( HANDLE handle, PVOID *addr_ptr, ULONG_P
 
     res = map_view( &view, base, size, alloc_type, vprot, limit_low, limit_high, 0 );
     if (res) goto done;
+#ifdef WINE_IOS
+    /* madeira-bcd section-view-grow-v1: only once the address range is ours; the view's size is the page-rounded one */
+    if (ios_grow_to && (res = ios_section_view_grow( unix_handle, full_size, (ULONGLONG)offset.QuadPart + size,
+                                                      ios_grow_asked, view->base, view->size )))
+    {
+        delete_view( view );
+        goto done;
+    }
+#endif
 
     TRACE( "handle=%p size=%lx offset=%s\n", handle, size, wine_dbgstr_longlong(offset.QuadPart) );
     /* iOS: SEC_COMMIT shared sections (e.g. \KernelObjects\__wine_session) need
@@ -35357,7 +35505,8 @@ static NTSTATUS allocate_virtual_memory( void **ret, SIZE_T *size_ptr, ULONG typ
         if (any_committed && ios_swap_fd >= 0 && ios_swap_n)
         { const char *pg; for (pg = base; pg < (const char *)base + size; pg += page_size) if (!(get_page_vprot( pg ) & VPROT_COMMITTED)) fresh_bytes += page_size; }
         if (!(view = find_view( base, size ))) status = STATUS_NOT_MAPPED_VIEW;
-        else if (view->protect & SEC_FILE) status = STATUS_ALREADY_COMMITTED;
+        else if (view->protect & SEC_FILE)   /* madeira-bcd section-view-grow-v1: a grown view's pages are committed already */
+            status = ios_section_view_grown( view ) ? STATUS_SUCCESS : STATUS_ALREADY_COMMITTED;
         else if (view->protect & VPROT_FREE_PLACEHOLDER) status = STATUS_CONFLICTING_ADDRESSES;
         else if (ios_commit_guard_clear( base, size, protect ), !(status = set_protection( view, base, size, protect )))   /* G5 S9: env.MADEIRA_COMMIT_GUARD_CLEAR first */
         {
@@ -38285,6 +38434,30 @@ static int ios_wow_alloc_inside_on( void )
     return e && e[0] == '1' && !e[1];
 }
 
+/* round 714 (G1 S1; Isaac Repentance+ WVTJ39, EYBPCX, W8X8ZF, N0QS49, FWN9ZF, ASYB2E): the premise above does not hold for VirtualAlloc2. mimalloc
+ * asks for aligned memory with a MEM_ADDRESS_REQUIREMENTS { Lowest 0, Highest 0, Alignment 4 MB }, and wow64 hands a guest's own block over as it
+ * is (dlls/wow64/virtual.c, mem_extended_parameters_32to64: the guest ceiling is added only when the guest passed no block), so limit_high reached
+ * this side as 0, "the 64-bit half's request": the 1 GB Lua reserve and every 4 MB segment were placed outside the window and the program got
+ * their low 32 bits. Windows reads Highest 0 as "the highest user address". The shape: a thread with a window, no address of its own, an
+ * address-requirements block that names neither limit. The emulator's requests never look like that (FEX's WOW64 hooks pass Lowest =
+ * HighestUserAddress or an explicit band), and a request without a block is the 64-bit half's. */
+static int ios_wow_ex_noceiling_shape( const MEM_EXTENDED_PARAMETER *parameters, ULONG count, const void *req_addr,
+                                       ULONG_PTR limit_low, ULONG_PTR limit_high )
+{
+    ULONG i;
+
+    if (req_addr || limit_low || limit_high || !ios_wow_base()) return 0;
+    for (i = 0; i < count; i++)
+        if (parameters[i].Type == MemExtendedParameterAddressRequirements) return 1;
+    return 0;
+}
+
+/* 1 when such a request should get the guest ceiling: MADEIRA_WOW_ALLOC_INSIDE = 1 (any size) or MADEIRA_WOW_JUMBO_INSIDE = 2 (1 GB or more). */
+static int ios_wow_ex_noceiling_on( SIZE_T size )
+{
+    return ios_wow_alloc_inside_on() || (size >= 0x40000000 && ios_wow_jumbo_inside_on() == 2);
+}
+
 /* The placement *ret (size *size_ptr) of a 32-bit program lies outside its window: ask for `want` bytes again with the window as range, keeping the
  * outside one until then. 1: *ret and *size_ptr now name a placement inside (the outside one released); 0: the window has no room, *ret unchanged. */
 static int ios_wow_reask_inside( void **ret, SIZE_T *size_ptr, SIZE_T want, ULONG type, ULONG protect, ULONG_PTR align, ULONG attributes )
@@ -40318,6 +40491,27 @@ static inline __attribute__((always_inline)) NTSTATUS ios_nt_impl_NtAllocateVirt
     if (!*size_ptr) return STATUS_INVALID_PARAMETER;
 
 #ifdef WINE_IOS
+    /* round 714 (G1 S1): a 32-bit program's own address requirements that name no ceiling get the guest's (see ios_wow_ex_noceiling_shape),
+     * behind the round-707 keys; allocate_virtual_memory turns the guest ceiling into the window (ios_wow_translate_limits). Without a key the
+     * request is placed as before and one line says so. */
+    if (ios_wow_ex_noceiling_shape( parameters, count, *ret, limit_low, limit_high ) && get_wow_user_space_limit())
+    {
+        static unsigned said_on, said_off;
+
+        if (ios_wow_ex_noceiling_on( *size_ptr ))
+        {
+            limit_high = get_wow_user_space_limit() - 1;
+            if (said_on++ < 16)
+                dprintf( 2, "[wow-inside] r714 MADEIRA_WOW_ALLOC_INSIDE/JUMBO_INSIDE (VirtualAlloc2): a 32-bit program's address requirements name no "
+                            "ceiling (0x%lx bytes, alignment 0x%lx, type 0x%x): the guest ceiling %p applies, so the block is placed inside its window\n",
+                         (unsigned long)*size_ptr, (unsigned long)align, type, (void *)limit_high );
+        }
+        else if (said_off++ < 8)
+            dprintf( 2, "[wow-ex] r714 a 32-bit program's VirtualAlloc2 names no ceiling (0x%lx bytes, alignment 0x%lx, type 0x%x): placed as the "
+                        "64-bit half's request, possibly outside its window (env.MADEIRA_WOW_ALLOC_INSIDE = 1 keeps it inside)\n",
+                     (unsigned long)*size_ptr, (unsigned long)align, type );
+    }
+
     /* madeira-bcd (night round 2026-11-11, R1 S1): a request the emulator's arena serves is the moment to look at what a process that ended
      * left in it (ios_fexreap_q); nothing is queued, so this is one load, unless a process ended in the last minutes. No lock is held here. */
     if (__atomic_load_n( &ios_fexreap_n, __ATOMIC_ACQUIRE ) && limit_high && fex_arena_covers( (void *)limit_low, (void *)limit_high ))

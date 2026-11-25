@@ -200,6 +200,9 @@ jobs:
       - name: Check Send logs to BCD
         run: python3 tests/host/check-log-upload.py --require-swift
 
+      - name: Check live log access
+        run: python3 tests/host/check-live-log-server.py
+
       # The performance trace (round 604; BCDPerfTrace*.swift): one line a second, an hour at most, the newest 20 kept, sent after a log's
       # last line when the player turned it on (or a guided debug run did), nothing at all while it is off, and tools/log-facts.py reading it.
       - name: Check the performance trace
@@ -505,6 +508,7 @@ jobs:
           python3 tests/host/check-fex-thread-init-nomem.py
           python3 tests/host/check-fex-exit-runaway.py
           python3 tests/host/check-fex-inval-null-thread.py
+          python3 tests/host/check-fex-section-skip.py
           python3 tests/host/check-fex-processorid.py
           python3 tests/host/check-fex-moffs-rip.py
           python3 tests/host/check-ntdll-rtcs-null-area.py
@@ -538,6 +542,7 @@ jobs:
           python3 tests/host/check-d9-texfmt.py
           python3 tests/host/check-d9-query-stuck.py
           python3 tests/host/check-d11-query-stuck.py
+          python3 tests/host/check-d11-query-park.py
           python3 tests/host/check-soft-pool-decommit.py
           python3 tests/host/check-mem-burst.py
 
@@ -2170,6 +2175,29 @@ jobs:
       - name: Patch wine wintrust code-signing root pin
         run: python3 tools/patch-wine-wintrust-root-pin.py wine
 
+      # madeira-bcd (upstream check 2026-11-25; Madeira's Wine fork pull request #78 by wenze-allen): a Media Foundation session keeps an
+      # output node whose renderer cannot initialize its video sample allocator (the node and every node after it were dropped, the session
+      # started and never asked for a sample), where the allocator init failed. Failure path only; a node whose allocator initializes is as before.
+      # The i386 farm's mf.dll; the 64-bit mf.dll is a committed binary: tools/build-wine-fresh-dlls.sh applies it again (env.MADEIRA_WIN64_FRESH = 1).
+      - name: Patch wine mf session to keep a renderer node without a sample allocator
+        run: python3 tools/patch-wine-mf-session-keep-node.py wine
+
+      # madeira-bcd (same pull request): the Windows Media Format sync reader reads compressed samples per stream (SetReadStreamSamples is per stream,
+      # the reader used the last call's flag for all), and a failed reinit keeps the reader's streams instead of freeing the array (the next call wrote
+      # through NULL: KiriKiri's movie plugin, krmovie.dll). Failure paths and compressed reading only. The i386 farm's winegstreamer.dll; put back
+      # below, before the extra-DLL builds, so the 64-bit winegstreamer.dll stays as it is.
+      - name: Patch wine wm_reader to read compressed samples per stream
+        run: python3 tools/patch-wine-wmreader-compressed-streams.py wine
+
+      # madeira-bcd (same pull request): ContiguousCopyFrom of a Direct3D 9 surface buffer locks the surface with D3DLOCK_DISCARD instead of reading
+      # it back first (a GPU wait per frame on DXMT). Reached only by a program that copies into a d3d9 surface buffer (Media Foundation's EVR path).
+      # The i386 farm's mfplat.dll; the 64-bit mfplat.dll is a committed binary: tools/build-wine-fresh-dlls.sh applies it again.
+      - name: Patch wine mfplat so a d3d9 surface buffer's copy discards its contents
+        run: python3 tools/patch-wine-mfplat-d3d9-discard-copy.py wine
+
+      - name: Check the Wine pull request 78 patches
+        run: python3 tests/host/check-wine-mf-patches.py
+
       - name: Check the wintrust code-signing root pin
         run: python3 tests/host/check-wintrust-root-pin.py
 
@@ -2514,6 +2542,10 @@ jobs:
       # compiles, is built once more without those factors after Metal's refusal (Freddy's House, Poppy Playtime, ReSkate: draws skipped).
       - name: Check the Direct3D 12 dual-source blend fallback
         run: python3 tests/host/check-d3d12-dual-source-drop.py
+      # madeira-bcd (round 714, M1 S1): SRC1 blend factors where Metal cannot honour them (a later target, or target 0 beside a second
+      # target) are neutralised before the pipeline is built: Metal ends the process for them (Cyberpunk 2077, six logs).
+      - name: Check the Direct3D 12 SRC1 blend factors on later targets
+        run: python3 tests/host/check-d3d12-src1-later-targets.py
 
       # madeira-bcd (round 660, M011): Settings › Storage › Find games never makes a crash handler or reporter a game's card (Timberborn 5BM9HV).
       - name: Check the external drive game scan
@@ -3177,6 +3209,10 @@ jobs:
           # night round 2026-11-11 (G2 S3; R0GHX7, HJZJ1P, 7XG9VK, WFRZ8A): the service is looked at once more after its settle and started again when it died
           python3 tests/host/check-dock-ceg-service-restart.py
           python3 tools/patch-dock-ceg-service-restart.py madeira-dock/src/scm.c || echo "::warning::Dock CEG service restart patch not applied"
+          # round 714 (F1 S3; CEG class A: 066P0C, CSP7E6, CT98X6, NS4R70, EYCX54, PKTC7C): a service start of -1 in a manager this host started gets one
+          # fresh services.exe and one more start (env.MADEIRA_DOCK_CEG_SCM_RESTART = 0 skips it)
+          python3 tests/host/check-dock-ceg-scm-restart.py
+          python3 tools/patch-dock-ceg-scm-restart.py madeira-dock/src/scm.c || echo "::warning::Dock CEG services.exe restart patch not applied"
           python3 tools/patch-dock-ceg-retry.py madeira-dock/src/launch.c || echo "::warning::Dock CEG retry patch not applied"
           python3 tools/patch-dock-ceg-already-prepared.py madeira-dock/src/launch.c madeira-dock/src/validation.c || echo "::warning::Dock CEG already-prepared patch not applied"
           # 2026-11-20 (a Discord request: Steam launch options): a Steam game's Launch arguments go to Valve's LaunchApp as its user arguments
@@ -3344,6 +3380,13 @@ jobs:
       # game's file sets it) answers a timestamp query pending 2 s as complete. The i386 d3d11.dll and d3d11-src.dll. Before the farm key.
       - name: Patch DXMT D3D11 stuck query report
         run: python3 tools/patch-dxmt-d11-query-stuck.py
+
+      # Opt-in (owner's decision 2026-11-25; willfaust/dxmt pull request #58 by Dragooon, commit 3dacbe5b): env.MADEIRA_D3D11_QUERY_PARK = 1
+      # parks a burst of GetData polls on an event query on the queue's shared event (up to 1 ms a poll) instead of spinning; BCD's logs show
+      # the spin in 42 logs of 21 titles. Off unless a game's file sets it. After the stuck-query patch (it reuses its accessor and probe).
+      # The i386 d3d11.dll and d3d11-src.dll. Before the farm key.
+      - name: Patch DXMT D3D11 event query parking
+        run: python3 tools/patch-dxmt-d11-query-park.py
 
       # Alan Wake (A6232G, round 630 agent O1 S3): 67 pipelines a run failed ("Fragment input(s) user(NORMAL0) ... not written by vertex
       # shader") because the SM3 vertex-output walk dropped NORMAL/TANGENT/BINORMAL/BLENDWEIGHT/BLENDINDICES/DEPTH; it emits them now,
@@ -3971,6 +4014,7 @@ jobs:
           git -C wine checkout -- dlls/ntdll/loader.c
           git -C wine checkout -- dlls/dinput   # round 669: tools/patch-wine-dinput-cdecl-callbacks.py
           git -C wine checkout -- dlls/kernelbase/file.c   # build 666: the overlapped poll (i386 farm here; arm64ec only in kernelbase-optin.dll)
+          git -C wine checkout -- dlls/winegstreamer/wm_reader.c   # 2026-11-25: tools/patch-wine-wmreader-compressed-streams.py (i386 farm here; the extra-DLL step builds the 64-bit winegstreamer.dll from this tree)
 
       # madeira-bcd: DXMT's Direct3D 9 frontend compiled for arm64ec (tools/build-d3d9-x64-dll.sh), shipped as
       # arm64ec-windows/d3d9-dxmt.dll NEXT TO Wine's d3d9.dll, which stays the default: a 64-bit game gets it as its d3d9.dll only
@@ -4366,6 +4410,13 @@ jobs:
       # env.MADEIRA_WOW_JUMBO_INSIDE (default off) refuses a placement outside the window; the two helpers compiled on the host.
       - name: Check 32-bit jumbo reservations
         run: python3 tests/host/check-wow-jumbo-inside.py
+      # madeira-bcd (round 714, G1 S1): a 32-bit program's VirtualAlloc2 with no ceiling of its own gets the guest's (Isaac Repentance+).
+      - name: Check 32-bit VirtualAlloc2 requests without a ceiling
+        run: python3 tests/host/check-wow-ex-noceiling.py
+
+      # madeira-bcd (round 714, M4 D7): [stack-narrow], the failure-path line for a 64-bit program's access to the low 32 bits of its own stack.
+      - name: Check the narrowed stack address line
+        run: python3 tests/host/check-stack-narrow.py
 
       # madeira-bcd: env.MADEIRA_ALIAS_RELEASE (off by default): anonymous JIT aliases follow
       # MEM_RELEASE and MEM_DECOMMIT (Ratchet & Clank: Rift Apart froze loading a save).
@@ -4399,6 +4450,12 @@ jobs:
         run: |
           python3 tests/host/check-nt-fail-log.py
           python3 tests/host/check-map-name-log.py
+
+      # madeira-bcd: section-view-grow (willfaust/Madeira #632 by Dragooon): a MEM_RESERVE view of a file section that is longer than its file
+      # (Path of Exile 2's LMDB caches: [nt-fail] NtMapViewOfSection status=c000001f, build 625) is mapped by extending the file, capped at
+      # env.MADEIRA_SECTION_VIEW_CAP_GB (16); only the branch that used to return that status runs it. env.MADEIRA_SECTION_VIEW_GROW = 0 turns it off.
+      - name: Check section-view-grow
+        run: python3 tests/host/check-section-view-grow.py
 
       # round 579: an AnyCPU IL-only .NET program (PE32, no 32BITREQUIRED) was run as a native ARM64 process, whose set has no
       # mscoree.dll: "mscoree.dll not found, IL-only binary ... cannot be loaded", c000007b (The Dishwasher: Vampire Smile,
@@ -5445,9 +5502,10 @@ jobs:
           # d3d11-src.dll without the second: tools/build-d3d11-dll.sh's BCD_PATCHES did not name it). Night round 2026-11-11: FIFA 23's
           # [update-subresource-staging], Wesnoth's [swapchain-rotation], [dxmt-tex-limit] and Hatred's [view-ref] too.
           # Round 660: LEGO City Undercover's [layer-format] too (BHZRNE, 536JZ2: a 64-bit game never had the 32-bit DLLs' fix).
+          # 2026-11-25 (owner's decision): the opt-in event-query parking too (tools/patch-dxmt-d11-query-park.py, [query-park]).
           # 2026-11-15 (owner's decision): the short constant buffers and 16-bit index realignment the pin compiles for i386 only, the tiny
           # fullscreen window and the opt-in fault report too (tools/patch-d3d11-src-all-arch.py, BCD_PATCHES).
-          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[mesh-skip] ml870 " "[update-subresource-staging] skipped #" "[swapchain-rotation] madeira-bcd: SetRotation(" "[dxmt-tex-limit] CreateTexture2D refused " "[layer-format] madeira-bcd: back buffer format " "[view-ref] madeira-bcd #" "[lsfg] madeira-bcd " "[cb-short] madeira-bcd #" "[idx-align] madeira-bcd" "[wsi-fullscreen] a fullscreen swapchain" "[fault-enc] madeira-bcd frame "; do
+          for m in "[copy-structure-count] skipped #" "[rtv-fail] #" "[srv-getdesc] madeira-bcd #" "[query-stuck] madeira-bcd query=" "[query-park] madeira-bcd: " "[mesh-skip] ml870 " "[update-subresource-staging] skipped #" "[swapchain-rotation] madeira-bcd: SetRotation(" "[dxmt-tex-limit] CreateTexture2D refused " "[layer-format] madeira-bcd: back buffer format " "[view-ref] madeira-bcd #" "[lsfg] madeira-bcd " "[cb-short] madeira-bcd #" "[idx-align] madeira-bcd" "[wsi-fullscreen] a fullscreen swapchain" "[fault-enc] madeira-bcd frame "; do
             LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11.dll && continue
             [ -f app/Madeira/arm64ec-windows/d3d11-src.dll ] && LC_ALL=C grep -aqF "$m" app/Madeira/arm64ec-windows/d3d11-src.dll && continue
             NEED="$NEED \"$m\""
@@ -5817,9 +5875,13 @@ jobs:
         run: python3 tests/host/check-steam-cloud.py
 
       # madeira-bcd (upstream port 2026-10-25): SteamRemoteCache, which rewrites the list Valve's client answers Steam Cloud API saves
-      # from, compiled on the host over temporary prefixes; off in BCD unless env.MADEIRA_STEAM_CLOUD_REMOTECACHE is set.
+      # from, compiled on the host over temporary prefixes; in BCD only when a save is missing from it (round 714), 0 never, 1 always.
       - name: Check Valve's client's remotecache.vdf
         run: python3 tests/host/check-steam-remotecache.py
+
+      # madeira-bcd (round 714, A1 S10): env.MADEIRA_RELATIVE_CURSOR = 1 shows the game's cursor in Mouse-look while the game shows it.
+      - name: Check Mouse-look and the game's own cursor
+        run: python3 tests/host/check-relative-cursor.py
 
       # madeira-bcd (upstream port 2026-10-25): the Steam game language (depots, install record, DLC depots, device mapping) and the
       # download and install sizes, on the production app info and record writer; English unless a language is chosen.

@@ -200,6 +200,11 @@ func sample() -> BCDSessionSummary {
         check("... no limit anywhere: unknown; none of the three lines: no end line",
               BCDPrevTail.endLine(Data("[footprint] rev=ml358 phys=1000 MB\n".utf8))?.hasSuffix("verdict: unknown") == true
               && BCDPrevTail.endLine(Data("line 1\nline 2\n".utf8)) == nil)
+        // Round 714 (A1 S2; T2TYGT): the previous start's own [prev-end] line quotes a footprint; it is not this run's.
+        let nested = Data(("[INFO] [prev-end] last footprint \"[footprint] rev=ml358 phys=1445 MB limit=6143 MB\" | last alive none | last summary none | verdict: no memory pressure (23 % of the limit)\n"
+                           + "[game-cfg] wrote 12 lines\n").utf8)
+        check("a [prev-end] line of the previous start is not this run's footprint: no end line",
+              BCDPrevTail.endLine(nested) == nil, BCDPrevTail.endLine(nested) ?? "nil")
         check("the read is the last 256 KB (night round 2026-11-11, A1 S9), 60 lines at most", BCDPrevTail.maxBytes == 262144 && BCDPrevTail.maxLines == 60)
         // Night round 2026-11-11 (A1 S9; 1WYNY2, 5WC97M, C2VRHJ, CT4ND5, TFTCJ5): the idle samples go, the real lines stay.
         let real = ["wine: a real line 1", "err:module:load_dll one", "[srv-stuck] tid=0084 age=30590ms op=1", "[session] length=3s partial=1", "[thread-sample] ml876 modmap pid=0024 explorer.exe"]

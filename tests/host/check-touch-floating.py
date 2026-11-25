@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright 2026 thebcd69 (BCD)
 # BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+# Portions copyright 2026 sky9662: from thebcd69/bcd-games pull request #69
 """Floating sticks and six more built-in touch layouts (Porthole port, item 9). No iPhone.
 
 1. The geometry, compiled and run on the host: a floating stick's zone and where its ring is drawn (TouchGamepad.swift,

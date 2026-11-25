@@ -224,7 +224,7 @@ check(".gitignore: the library, its version file and the temporary file are igno
 notices = (R / "THIRD-PARTY-NOTICES.md").read_text()
 check("THIRD-PARTY-NOTICES.md and its bundled copy are the same file", notices == (R / "app/Madeira/legal/THIRD-PARTY-NOTICES.md").read_text())
 need = ["**MoltenVK, patched**", "bcd-games pull request #57 by **RageMC**", "github.com/nivogli/MoltenVK", "Apache-2.0 section 4(b)", "### The patched MoltenVK, file by file",
-        "#57 by RageMC)", "| #57, 2026-11-16 | RageMC |", "#2860 jamesdolan", "#2873 MaxLikesCode", "#2887 imellag", "#2889 prosperkartik", "Isabella Basso", "Anshul Noori", "utzcoz",
+        "#57 by RageMC", "| #57, 2026-11-16 | RageMC |", "#2860 jamesdolan", "#2873 MaxLikesCode", "#2887 imellag", "#2889 prosperkartik", "Isabella Basso", "Anshul Noori", "utzcoz",
         "dttdrv", "osy", "hopesuffers", "hstdt", "Courtney Andrew Richardson", "squidbus", "David Grinberg", "Alexander Devaikin", "Denis Korobov", "Axel Gneiting",
         "Francisco Ramirez de Anton", "M4rc68", "Bill Hollings", "KhronosWebservices", "`build/moltenvk-ios/build-patched.sh`", "instance_relative_patch_id"]
 check("the notices name the library, the pull request, the fork, the licence, the open pull requests and every author of the commits found in the patch",

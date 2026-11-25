@@ -158,6 +158,26 @@ OVERLAY = {
                         "(Crysis 3 Remastered: \"MSVCP140.dll failed to initialize\", c000001d). Logged as "
                         "[app-dll-shadow]. Read at every DLL load.",
                 "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    # round 714 (agent A1 S10; feedback 9YXC9N: "the cursor appears in the menus with Trackpad but not with Mouse-look")
+    "env.MADEIRA_RELATIVE_CURSOR": {"category": "Windows, display & input", "title": "Mouse-look: show the game's cursor in its menus",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: with Mouse-look as the finger mode, in a game started directly (not a Windows "
+                        "desktop or Dock session), the game's own cursor is drawn where Windows has it while the game "
+                        "shows it (its menus) and hidden while the game hides it (play). Dragging moves it as Mouse-look "
+                        "moves the camera; a tap still does not click, so use the on-screen buttons or switch to Trackpad "
+                        "to press a menu item. Restart BCD after changing it.",
+                "sources": ["app/Madeira/HardwareInput.swift"]},
+    # round 714 (agent D1 S1; Isaac and Don't Starve on Discord: "no cloud saves")
+    "env.MADEIRA_STEAM_CLOUD_REMOTECACHE": {"category": "Steam & Dock", "title": "Steam Cloud: Valve's client's file list",
+                "kind": "choice", "default": "",
+                "choices": [("", "When a save is missing from it (default)"), ("1", "After every comparison"), ("0", "Never")],
+                "note": "In a Dock session a game that keeps its saves through Steam Cloud (Isaac, Don't Starve, Slay "
+                        "the Spire 2) sees only the files Valve's client lists in remotecache.vdf. Unset (from build "
+                        "718; before it this was 0): after a comparison, while no game runs, BCD rewrites that list "
+                        "from the device only when a save that is the same on the device and in the cloud is missing "
+                        "from it, which is when the game would start a new profile. 1: after every comparison. 0: the "
+                        "list stays as Valve's client wrote it. Logged as [steam-cloud] ... remotecache.",
+                "sources": ["app/Madeira/SteamOwnedLibrary.swift"]},
     "env.MADEIRA_ALIAS_RELEASE": {"category": "Memory & JIT pool", "title": "Drop a released arena's code copies",
                 "kind": "choice", "default": "",
                 "choices": [("", "Released views (default)"), ("1", "Released views and decommits"), ("0", "Off")],
@@ -1102,6 +1122,17 @@ OVERLAY = {
                 "note": "Default off (build 652). 1: before a commit without PAGE_GUARD, a guard bit on a page of the same 16 KB host page that is outside the commit and not committed is cleared "
                         "(PAGE_GUARD means nothing for an uncommitted page; a leftover one turned the whole host page unreadable: Half-Life 2 with its browser died 9 s after the start). "
                         "An experiment; a committed page's guard bit is never touched. Logged as [commit-guard]. Read once per session."},
+    # section-view-grow (willfaust/Madeira #632 by Dragooon; Path of Exile 2's LMDB caches, build 625 log KQBXZH).
+    "env.MADEIRA_SECTION_VIEW_GROW": {"category": "Memory & JIT pool", "title": "Map a reserve view that is larger than its file", "kind": "bool", "default": "1",
+                "sources": ["build/ntdll-unix/virtual_ios.c", "build/wineserver/mapping_ios.c"],
+                "note": "On by default. A MEM_RESERVE view of a file section that is longer than the file (LMDB maps its whole map size over a two-page data file: Path of Exile 2's "
+                        "Shaders and Pipelines caches failed to open with status c000001f / ERROR_ACCESS_DENIED) is mapped: the file is extended, sparse, to the end of the view and the "
+                        "section follows its size. Only a call that used to fail runs this code. 0: Wine's plain refusal. Logged as [section-grow]. Read once per process."},
+    "env.MADEIRA_SECTION_VIEW_CAP_GB": {"category": "Memory & JIT pool", "title": "Largest reserve view over a file (GB)", "kind": "int", "default": "16",
+                "sources": ["build/ntdll-unix/virtual_ios.c"],
+                "note": "1-48, default 16 (anything else is 16). A reserve view over a file is mapped only up to this size and the program is told the "
+                        "smaller size (Path of Exile 2 asks LMDB for 100 GB; the phone has about 58 GB of address space). A database larger than the cap is read past its view: the log warns "
+                        "at three quarters. Needs env.MADEIRA_SECTION_VIEW_GROW on. Read once per process."},
     # round 707 (agent M4 S5; S.T.A.L.K.E.R.: Call of Pripyat 13CYSY): read by the patched vkd3d-shader (tools/patch-wine-vkd3d-loop-fallback.py).
     "env.MADEIRA_HLSL_LOOP_FALLBACK": {"category": "Wine libraries", "title": "Write loops of old Direct3D 9 shaders as repeated steps", "kind": "int",
                 "default": "0", "sources": ["tools/patch-wine-vkd3d-loop-fallback.py"],
@@ -1549,6 +1580,20 @@ OVERLAY = {
                         "complete (\"[query-watchdog]\"); BCD makes up those two queries' data anyway (0, and 1 GHz not disjoint). In the "
                         "32-bit d3d11.dll and, for a 64-bit game, with env.MADEIRA_D3D11_SRC = 1 (the source-built d3d11-src.dll). WRC 9.",
                 "sources": ["tools/patch-dxmt-d11-query-stuck.py"]},
+    # 2026-11-25 (owner's decision; willfaust/dxmt pull request #58 by Dragooon): read by DXMT's Direct3D 11 only in the build
+    # (tools/patch-dxmt-d11-query-park.py), not in a scanned source
+    "env.MADEIRA_D3D11_QUERY_PARK": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Direct3D 11: park a game's event-query polling", "kind": "bool",
+                "default": "0",
+                "note": "Default off. 1: a game that waits for the GPU with `while (GetData(event) == S_FALSE) {}` stops spinning. Once the polls of one "
+                        "event, timestamp or timestamp-disjoint query come in a burst (a third pending poll under 250 microseconds after the one "
+                        "before), the call waits for the GPU's signal, at most 1 ms, and then answers; a one-off poll never waits, and nothing waits "
+                        "before the work that holds the signal has been submitted. Without it such a game keeps one performance core busy, which "
+                        "on a phone is heat that slows the threads doing real work (BCD's logs: Schedule I, NSUNS1, Shroom and Gloom, Lonely "
+                        "Mountains, GalGun 2, Palworld, Rocket League and others poll 100,000 to 15 million times a second). The \"[gpu-perf]\" "
+                        "line then says how many polls parked and for how long a frame, and \"[query-park]\" says once that the switch is on. "
+                        "Only the exact value 1 turns it on. In the 32-bit d3d11.dll and, for a 64-bit game, with env.MADEIRA_D3D11_SRC = 1 "
+                        "(the source-built d3d11-src.dll). Not tried on a device yet.",
+                "sources": ["tools/patch-dxmt-d11-query-park.py"]},
     # round 624 (agent D2 S18): read by DXMT's Direct3D 9 only in the build (tools/patch-dxmt-d9-query-stuck.py), not in a scanned source
     "env.DXMT_D9_QUERY_LOST_MS": {"category": "Direct3D 9/10/11 (DXMT)", "title": "Direct3D 9: answer a lost occlusion query (ms)", "kind": "int",
                 "default": "",
@@ -1780,6 +1825,13 @@ OVERLAY = {
                         "waits until it runs and two seconds more. On: the service is looked at once more after that, and a service that has died is started "
                         "again (three rounds at most); the log shows ceg-service-alive-after-settle and ceg-service-restarts. 0: no second look.",
                 "sources": ["tools/patch-dock-ceg-service-restart.py"]},
+    "env.MADEIRA_DOCK_CEG_SCM_RESTART": {"category": "Steam & Dock", "title": "Steam client service: a fresh service manager when it cannot run",
+                "kind": "bool", "default": "1",
+                "note": "Default on (build 718). When Valve's client service still cannot be kept running after its restarts (ceg-service-start=-1, "
+                        "the copy-protection step then fails with 55 and the start ends in 49), and BCD Dock started the Windows service manager "
+                        "itself, that services.exe is ended, a fresh one is started and the service is started once more in it (about 25 s, only on "
+                        "a start that fails today). The log shows ceg-scm-restarted and ceg-service-start-after-restart. 0: no second manager.",
+                "sources": ["tools/patch-dock-ceg-scm-restart.py"]},
     "env.MADEIRA_DOCK_REGISTRY_CREATE": {"category": "Steam & Dock", "title": "Steam client entries: create a missing key",
                 "kind": "bool", "default": "1",
                 "note": "Default on (build 652). Before it asks Steam to start the game, BCD Dock opens two keys of BCD's Windows registry "
@@ -3387,6 +3439,17 @@ OVERLAY = {
                         "atomic runs as before. Without it the trap stays. Set by the Dock for a game that runs Ubisoft Connect and by the "
                         "recommended lists of Ubisoft Connect, Far Cry 3 and Far Cry 4. Read when each program starts.",
                 "sources": ["tools/patch-fex-ios-split-lock.py"]},
+    # 2026-11-25 (owner's decision; willfaust/FEX pull request #40 by Dragooon): read by the emulator only in the build (tools/patch-fex-ios-section-skip.py)
+    "env.MADEIRA_FEX_SECTION_SKIP": {"category": "x86 emulation (FEX)", "title": "No code invalidation for an unmapped section that was never code",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: when a game unmaps a section view that was never executable (an asset streamed through a file view), the "
+                        "emulator no longer takes its exclusive code-invalidation lock and walks every thread's cache for it, and says \"[iOS-xrem] "
+                        "via=section-data\" for the first 8 and then every 1024th instead of one line each. BCD's logs hold 1.85 million such lines "
+                        "(Red Dead Redemption 2, GTA V and IV, Call of Duty: World at War, Far Cry 3, Fallout 4). A section that was executable, or "
+                        "whose range touches a sub-floor image's window (either of its two addresses), is invalidated as before. Only the exact "
+                        "value 1 turns it on. 64-bit and 32-bit games. Set it in the game's own file; read when each program starts. Not tried on a "
+                        "device yet.",
+                "sources": ["tools/patch-fex-ios-section-skip.py"]},
     # Porthole port, item 14 (tools/patch-fex-ios-callret-lean.py): an A/B experiment, off by default.
     "env.MADEIRA_FEX_CALLRET_LEAN": {"category": "x86 emulation (FEX)", "title": "64-bit JIT: no suspend check after a call returns (experiment)",
                 "kind": "bool", "default": "0", "sources": ["tools/patch-fex-ios-callret-lean.py"],

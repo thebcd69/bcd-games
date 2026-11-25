@@ -5,6 +5,7 @@
 import SwiftUI
 import UIKit
 import Combine
+import Network
 
 // Settings' live backends: the one part of Settings that touches the engine (it is listed in
 // tools/ui-preview.py's ENGINE_BOUND, so the preview app never compiles it). Every read and
@@ -934,6 +935,116 @@ struct BCDTouchEditorHost: View {
 
 // MARK: - Logs
 
+/// Kept for the app run so closing Settings can leave the stream open during a game.
+@MainActor final class BCDLiveLogAccess: ObservableObject {
+    static let shared = BCDLiveLogAccess()
+    static let defaultsKey = "bcd.logs.liveAccess"
+    private static let portKey = "bcd.logs.livePort"
+    private static let historyKey = "bcd.logs.liveHistoryMB"
+    @Published private(set) var state = BCDLiveLogState.off
+    @Published private(set) var preferences: BCDLiveLogPreferences
+    private let defaults: UserDefaults
+    private var monitor: NWPathMonitor?
+    private var server: BCDLiveLogServer?
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        var preferences = BCDLiveLogPreferences()
+        if let savedPort = UInt16(exactly: defaults.integer(forKey: Self.portKey)), savedPort != 0 {
+            preferences.port = savedPort
+        }
+        let savedHistory = defaults.integer(forKey: Self.historyKey)
+        if BCDLiveLogPreferences.historyRange.contains(savedHistory) {
+            preferences.historyMB = savedHistory
+        }
+        self.preferences = preferences
+    }
+
+    func restore() {
+        guard case .off = state, defaults.bool(forKey: Self.defaultsKey) else { return }
+        start()
+    }
+
+    func setEnabled(_ on: Bool) {
+        defaults.set(on, forKey: Self.defaultsKey)
+        if on { start() } else { stop(.off) }
+    }
+
+    func setPort(_ port: UInt16) {
+        guard port != 0, port != preferences.port else { return }
+        defaults.set(Int(port), forKey: Self.portKey)
+        preferences.port = port
+        guard state.isOn else { return }
+        if case .sharing(let url) = state, url.port == Int(port) { return }
+        stop(.starting)
+        start()
+    }
+
+    func setHistoryMB(_ count: Int) {
+        guard BCDLiveLogPreferences.historyRange.contains(count), count != preferences.historyMB else { return }
+        defaults.set(count, forKey: Self.historyKey)
+        preferences.historyMB = count
+        server?.setReplayBytes(preferences.historyBytes)
+    }
+
+    private func start() {
+        guard monitor == nil else { return }
+        let monitor = NWPathMonitor(requiredInterfaceType: .wifi)
+        self.monitor = monitor
+        state = .starting
+        monitor.pathUpdateHandler = { [weak self, weak monitor] path in
+            MainActor.assumeIsolated {
+                guard let self, let monitor, self.monitor === monitor else { return }
+                self.update(path, monitor: monitor)
+            }
+        }
+        monitor.start(queue: .main)
+    }
+
+    private func update(_ path: NWPath, monitor: NWPathMonitor) {
+        guard let interface = path.availableInterfaces.first(where: { $0.type == .wifi }),
+              let network = BCDLiveLogServer.ipv4Network(on: interface) else {
+            if server == nil {
+                state = .waitingForWiFi
+            } else {
+                stop(.failed("The Wi-Fi connection was lost."))
+            }
+            return
+        }
+        if let server {
+            if server.network != network || server.interface != interface {
+                stop(.failed("The Wi-Fi network changed."))
+            }
+            return
+        }
+        state = .starting
+        do {
+            server = try BCDLiveLogServer(logURL: LogStore.shared.logFileURL, network: network, interface: interface,
+                                         port: NWEndpoint.Port(rawValue: preferences.port)!, replayBytes: preferences.historyBytes) {
+                [weak self, weak monitor] result in
+                guard let self, let monitor else { return }
+                DispatchQueue.main.async {
+                    guard self.monitor === monitor else { return }
+                    switch result {
+                    case .success(let url): self.state = .sharing(url)
+                    case .failure(let error): self.stop(.failed(error.localizedDescription))
+                    }
+                }
+            }
+        } catch {
+            stop(.failed(error.localizedDescription))
+        }
+    }
+
+    private func stop(_ state: BCDLiveLogState) {
+        monitor?.cancel()
+        monitor = nil
+        server?.stop()
+        server = nil
+        self.state = state
+    }
+}
+
 /// Auto-tune's switch for BCD's Settings (check-autotune.py registers the one line that names it).
 struct BCDLiveSwitch {
     let read: () -> Bool
@@ -946,6 +1057,7 @@ struct BCDLiveSwitch {
     /// An install without the increased memory limit: what fixes it, said before a log goes (MemoryRights.swift).
     var sendLogAdvice: String? { MemoryRights.lacking ? MemoryRights.sendLogAdvice : nil }
     private let input = InputSettings.shared
+    private let liveLogs = BCDLiveLogAccess.shared
     private let tune = BCDLiveSwitch(read: { AutoTune.preferred }, write: { AutoTune.preferred = $0 }, running: AutoTune.enabled)   // madeira-bcd: auto-tune's switch in BCD's Settings, on by default
     private var bag = Set<AnyCancellable>()
     private var files: [String: URL] = [:]
@@ -958,7 +1070,14 @@ struct BCDLiveSwitch {
 
     init() {
         input.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
+        liveLogs.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
+
+    var liveLogState: BCDLiveLogState { liveLogs.state }
+    var liveLogPreferences: BCDLiveLogPreferences { liveLogs.preferences }
+    func setLiveLogAccess(_ on: Bool) { liveLogs.setEnabled(on) }
+    func setLiveLogPort(_ port: UInt16) { liveLogs.setPort(port) }
+    func setLiveLogHistoryMB(_ count: Int) { liveLogs.setHistoryMB(count) }
 
     func refresh() {
         LogUpload.forgetAutomatic()

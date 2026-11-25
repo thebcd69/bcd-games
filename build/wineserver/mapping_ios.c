@@ -1990,6 +1990,19 @@ DECL_HANDLER(map_view)
 
     if (!(mapping = get_mapping_obj( current->process, req->mapping, req->access ))) return;
 
+    /* madeira-bcd section-view-grow-v1 (willfaust/Madeira #632, Dragooon): the client's virtual_map_section extended the file to cover a
+     * MEM_RESERVE view (LMDB's database map, build/ntdll-unix/virtual_ios.c), so the section's size follows the file. A request that
+     * fits the section as recorded is judged exactly as before. */
+    if (!(mapping->flags & SEC_IMAGE) && mapping->fd && req->start + req->size >= req->start &&
+        req->start + req->size > round_size( mapping->size, page_mask ))
+    {
+        int unix_fd = get_unix_fd( mapping->fd );
+        struct stat st;
+        if (unix_fd == -1) clear_error();
+        else if (!fstat( unix_fd, &st ) && S_ISREG( st.st_mode ) && (mem_size_t)st.st_size > mapping->size)
+            mapping->size = st.st_size;
+    }
+
     if ((mapping->flags & SEC_IMAGE) ||
         req->start >= mapping->size ||
         req->start + req->size < req->start ||

@@ -56,7 +56,7 @@ struct BCDGOGTokens: Codable, Equatable, CustomStringConvertible, CustomDebugStr
     var userName: String?
 
     /// Refreshed when under five minutes are left.
-    func needsRefresh(now: Date) -> Bool { now.addingTimeInterval(300) >= expires }
+    func needsRefresh(now: Date) -> Bool { now.addingTimeInterval(300).timeIntervalSinceReferenceDate >= expires.timeIntervalSinceReferenceDate }
 
     var description: String { "BCDGOGTokens(<redacted>)" }
     var debugDescription: String { description }

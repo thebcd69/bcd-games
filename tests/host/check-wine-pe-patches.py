@@ -11,6 +11,10 @@
   tools/patch-wine-wintrust-diag.py         round 660 M072: [wintrust] (log only)
   tools/patch-wine-wintrust-root-pin.py     round 707 M3 S18: env.MADEIRA_CODESIGN_ROOTS, one pinned code-signing root for wintrust's own chains (MGSV)
   tools/patch-wine-wow64-token-null-sid.py  source form of tools/patch-wow64-token-null-sid.py (Garry's Mod)
+  tools/patch-wine-mf-session-keep-node.py            2026-11-25, Wine pull request #78 (wenze-allen): a session keeps a renderer node whose allocator fails
+  tools/patch-wine-wmreader-compressed-streams.py     same pull request: the sync reader's compressed samples per stream; a failed reinit keeps its streams
+  tools/patch-wine-mfplat-d3d9-discard-copy.py        same pull request: ContiguousCopyFrom of a d3d9 surface buffer locks with D3DLOCK_DISCARD
+  (tests/host/check-wine-mf-patches.py checks those three further: what each changes and the compile with the i386 flags)
 
 For each: it applies to the file as pinned (read with git show, so a tree an earlier step patched does not matter), once ("patched"/"applied", then "already"), a file
 with the anchor moved is refused by name and left alone, and with llvm-mingw and a Wine build tree (wine/build-arm64ec, ~/madeira-bcd/wine/build-arm64ec) the patched
@@ -62,6 +66,9 @@ SCRIPTS = {
     "patch-wine-wintrust-diag.py": ["dlls/wintrust/wintrust_main.c", "dlls/wintrust/softpub.c"],
     "patch-wine-wintrust-root-pin.py": ["dlls/wintrust/softpub.c"],
     "patch-wine-wow64-token-null-sid.py": ["dlls/wow64/security.c"],
+    "patch-wine-mf-session-keep-node.py": ["dlls/mf/session.c"],
+    "patch-wine-wmreader-compressed-streams.py": ["dlls/winegstreamer/wm_reader.c"],
+    "patch-wine-mfplat-d3d9-discard-copy.py": ["dlls/mfplat/buffer.c"],
 }
 # a text of each script's anchor that the "moved" variant of the file breaks (one edit that keeps the file valid C)
 MOVE = {
@@ -74,6 +81,9 @@ MOVE = {
     "patch-wine-wintrust-root-pin.py": ("dlls/wintrust/softpub.c", "                if (data->pasSigners[signer].pChainContext->cChain != 1)",
                                         "                if (data->pasSigners[signer].pChainContext->cChain  != 1)"),
     "patch-wine-wow64-token-null-sid.py": ("dlls/wow64/security.c", "        sid = owner->Owner;\n", "        sid = owner->Owner ;\n"),
+    "patch-wine-mf-session-keep-node.py": ("dlls/mf/session.c", "                                2, media_type)))\n", "                                2,  media_type)))\n"),
+    "patch-wine-wmreader-compressed-streams.py": ("dlls/winegstreamer/wm_reader.c", "    reinit_stream(reader, compressed);\n", "    reinit_stream(reader,  compressed);\n"),
+    "patch-wine-mfplat-d3d9-discard-copy.py": ("dlls/mfplat/buffer.c", "    d3d9_surface_buffer_Lock2DSize,\n", "    d3d9_surface_buffer_Lock2DSize ,\n"),
 }
 
 

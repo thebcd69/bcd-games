@@ -68,6 +68,9 @@ patch-wine-cpu-error-diag.py @W@
 patch-wine-msgbox-timeout.py @W@
 patch-wine-wintrust-diag.py @W@
 patch-wine-wintrust-root-pin.py @W@
+patch-wine-mf-session-keep-node.py @W@
+patch-wine-wmreader-compressed-streams.py @W@
+patch-wine-mfplat-d3d9-discard-copy.py @W@
 patch-wine-woa-recheck.py @W@/dlls/ntdll/sync.c @W@/dlls/ntdll/unix/sync.c
 patch-wine-woa-wake-order.py @W@/dlls/ntdll/sync.c
 patch-wine-x64-machine.py @W@

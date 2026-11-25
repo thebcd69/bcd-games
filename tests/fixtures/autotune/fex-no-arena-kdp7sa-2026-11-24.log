@@ -1,0 +1,238 @@
+[20:45:28.648] [INFO] Checking entitlements...
+[20:45:28.648] [INFO] [build] v0.1.712 (712)
+[20:45:28.649] [INFO] [device] model=iPad17,3 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=11443MB available=5094MB cores=9
+[20:45:28.649] [INFO] [device] address-map=[0x104144000,0x7180000000) 454GB increased-memory=0 extended-va=0
+[20:45:28.649] [INFO] [device] signing: cs-flags=0x22003305 get-task-allow=1 cs-debugged=0 debugger-attached=0 traced=0 profile=none appid-match=0 wildcard=0 lc=1
+[20:45:28.656] [INFO] [device] settings: low-power=0 thermal=nominal screen=2064x2752@1.72x max-fps=120 utc-offset=+01:00 free-disk=41GB stikdebug-url=1
+[20:45:28.659] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:46:51.174] [INFO] Requesting JIT with StikDebug...
+[20:46:51.177] [INFO] Opening StikDebug to enable JIT...
+[20:47:08.520] [INFO] [bcd-ui] play local
+[20:47:08.533] [INFO] [bcd] library launch The Jackbox Party Pack 10.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off lc=1
+[20:47:11.353] [INFO] Running full Wine sequence...
+[20:47:11.353] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104144000,0x7180000000) 454GB available=5063MB low-power=0 thermal=nominal
+[20:47:11.354] [INFO] [game-cfg] env.MADEIRA_EC_HOOK_TRACE=0
+[20:47:11.354] [INFO] [d3d9-x64] default unchanged (Wine's d3d9.dll): the library knows this game as D3D11
+[20:47:11.356] [INFO] [gecko] downloaded Wine Gecko 2.47.4 is this session's cache (XDG_CACHE_HOME)
+[20:47:11.358] [INFO] D3D9 frontend: MADEIRA_D3D9=native via bcd.cfg d3d9
+[20:47:11.359] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[20:47:11.360] [INFO] Allocating 896MB JIT pool via debugger...
+[20:47:11.360] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:47:11.360] [INFO] [jit-debugger] attached=1 at the pool request
+[20:47:11.360] [INFO] [jit-age] attach age=10s source=enable-jit method=stikdebug thermal=0
+[20:47:11.361] [OK] ml1040: executable window [0x140000000,+128MB) held since image load
+[20:47:11.362] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:47:13.047] [INFO] RX pool at 0x148000000
+[20:47:13.071] [OK] JIT pool ready (debugger still attached).
+[20:47:13.072] [INFO] BRK suspension lasted 1.71s
+[20:47:13.073] [INFO] Detaching debugger...
+[20:47:13.077] [OK] Debugger detached.
+[20:47:13.078] [OK] [early-detach] rev=ml524 took 5 ms
+[20:47:13.085] [INFO] Starting wineserver...
+[phase] wine-start             t+  1.768s rev=ml526
+[20:47:13.128] [wineserver] send_client_fd: fd=38 handle=0x3a2 msg_fd_unix=35 proc=0020 tid=0000
+[swap] ml1150 pool: LiveContainer helper memory on (env.MADEIRA_LC_HELPER_MEMORY)
+[swap] ml1150 app: helper memory takes more (env.MADEIRA_POOL_MORE)
+[swap] ml1150 pool: regions of 512 MB, guard margin 1024 MB
+[swap] ml1150 pool: 10 x 512 MB registered, extension exited
+[swap] ml1150 pool: memory-pressure source with BCD's own limit events apart
+[game-cfg] <container>/Documents/Data/Application/<uuid>/Library/Application Support/GameConfigs/a7f14f809be0144a.cfg (read)
+[WineProc] Target exe: C:\The Jackbox Party Pack 10\The Jackbox Party Pack 10.exe (bundle=arm64ec-windows)
+[msiexec64] removed BCD's system32\msiexec.exe link (not asked for this session)
+[x86-tools] system32: 26 of 26 i386 command-line tools linked for 64-bit programs, 0 names already there left alone, 0 of BCD's links removed (env.MADEIRA_SYSTEM32_X86_TOOLS=on)
+[shell-dir] user folders for madeira, mobile: 0 created (Start Menu included)
+[swap] ml1150 pool: 10 regions, taking more (MADEIRA_POOL_MORE): takes stop below 1024 MB available (now 3402 MB) or at critical system pressure; reservations under the file's floor: off, 0 KB; FEX arena: off (MADEIRA_POOL_MARGIN_MB, MADEIRA_POOL_MIN_KB, MADEIRA_POOL_FEX)
+[valloc] ml959 # base=0x7173000000 size=0x1000 type=0x3000 prot=0x2 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717fe00000 size=0x200000 type=0x102000 prot=0x4 tid=0000 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[valloc] ml959 # base=0x717ffe0000 size=0x20000 type=0x1000 prot=0x4 tid=0000 | req_hint=0x717ffe0000 zero_bits=0x0 limit=0x0
+[20:47:13.762] [Wine init_process] waiting for request_fd from wineserver...
+[fdtrace] pipes tid=0000 peb=0x717fff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[20:47:13.762] [fdtrace] pipes tid=0000 peb=0x717fff0000 master=36 reply=42/43 wait=44/45 rev=ml586
+[Wine init_process] reply_pipe=43, sending init_first_thread...
+[20:47:13.762] [Wine init_process] reply_pipe=43, sending init_first_thread...
+[iOS env] INCLUDED: SteamAppId=356400
+ml992: os_proc_available_memory=4489 MB + phys_footprint=630 MB = 5120 MB (hw.memsize says 11443 MB)
+ml992: clamping reported physical memory 11443 MB -> 5120 MB (jetsam kills us at the limit regardless of installed RAM)
+[exe-window] 0x140000000+0x1074000 is under the 64MB floor but its relocations are stripped: it can only run at this base, so it gets the window (MADEIRA_EXE_WINDOW_SMALL_FIXED=0 refuses it as before)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[pool-head] code-buffer budget targets 48 MB of image headroom (region C and recycled buffers unchanged)
+[jit-pool] image 0x140000000+0x1074000 (?) → pool 0x148004000 used=0x1078000/0x23000000 tramp+0x0
+[copy-verify] ?: OK, 424 .text pages executable (copy @0x148004000)
+ml957: ? backing 0x140000000+0x4000 W RESTORED (section declares EXECUTE|WRITE; backing stays non-exec, pool copy keeps X)
+[fex-arena] ml774 NO ARENA RESERVED after 9 candidates -- FEX will select its own band. On the research VM this launch is EXPECTED TO DIE before FEX initialises; relaunch rather than diagnosing it.
+[jit-pool] image 0x717fcd0000+0x130000 (ntdll.dll) → pool 0x149078000 used=0x11b0000/0x23000000 tramp+0x8000
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x149078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 armed (task-wide: burst of 4 passes / 250 ms every 20 s)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[thread-sample] ml876 tsd offset calibrated: 224 (teb key 292)
+[xp] ml1128 armed: 250 ms; perf levels 2 (0=Super, 1=Efficiency); rusage v6 rc=0 errno=0; timebase 125/3
+[subfloor] ml956 serviced 1 access(es) (0 unhandled, 0 refused) via=mach; latest guest 0x7ffe0320 -> real 0x7173000320 insn=0xb9432100
+[nls-getptr] type=11 id=1252 peb=0x717fff0000
+[nls-getptr] type=11 id=437 peb=0x717fff0000
+[window] 0x7048000000..0x7180000000 regions=33 occupied=4640 MB of 4992 MB free=431 MB maxhole=0 MB@0x7180000000 rev=ml787 CLAMPED-TO-TASK-CEILING (periodic)
+[jit-pool] image 0x717e8a0000+0x421000 (libarm64ecfex.dll) → pool 0x1491b3000 used=0x15df000/0x23000000 tramp+0x4000
+[copy-verify] libarm64ecfex.dll: OK, 133 .text pages executable (copy @0x1491b3000)
+[jit-pool] image 0x717e770000+0x130000 (ucrtbase.dll) → pool 0x1495dc000 used=0x1710000/0x23000000 tramp+0x4000
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x1495dc000)
+[window] 0x16c57c000..0x7173000000 regions=35899 occupied=458289 MB of 458858 MB free=824 MB maxhole=312 MB@0x16c720000 rev=ml787 (layerkit-span)
+[lock-orphan] madeira-bcd stamped by default: only locks a live thread has stamped are released, after 3 monitor cycles (MADEIRA_LOCK_ORPHAN=legacy: the reaper as before build 663)
+[footprint] rev=ml358 phys=674 MB (peak 674) internal=672 MB compressed=0 MB external=135 MB reusable=22 MB (cycle=1)
+[jit-pool] image 0x717e6b0000+0xc0000 (kernel32.dll) → pool 0x149710000 used=0x17d8000/0x23000000 tramp+0x8000
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x149710000)
+[jit-pool] image 0x717e3c0000+0x2f0000 (kernelbase.dll) → pool 0x1497d8000 used=0x1ad8000/0x23000000 tramp+0x10000
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x1497d8000)
+[guest-log] madeira-bcd text-log mirror: error/GPU/display lines, 64 lines (MADEIRA_GUEST_LOG=all|0, MADEIRA_GUEST_LOG_LIMIT=N)
+ml992: clamping reported physical memory 11443 MB -> 5120 MB (jetsam kills us at the limit regardless of installed RAM)
+ml992: clamping reported physical memory 11443 MB -> 5120 MB (jetsam kills us at the limit regardless of installed RAM)
+[va-scan] FAILED window=0x7c00000000..0x8000000000 size=0x10000 align=0x10000 bottom-up tries=262144 skips=0 below-floor=0 above-ceiling=262144 | seen=0x7c00000000..0x8000000000 views=0 maxgap=0x400000000 tailgap=0x400000000 stop=no-views-in-range | firstfail=0x7c00000000 errno=12(Cannot allocate memory) no-region-above (free to end of VA)  <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x7c00000000..0x8000000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x7c00000000), largest free 0x400000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #1 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x7c00000000 high=0x7fffffffff align=0x10000]} hits=1 rev=ajan5-rockstar
+[va-scan] FAILED window=0xc00000000..0xe00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xc00000000..0xe00000000 views=0 maxgap=0x200000000 tailgap=0x200000000 stop=no-views-in-range | firstfail=0xc00000000 errno=17(File exists) OCCUPIED 0x2dc000000+0xce4000000 prot=1/1 shared=0  <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0xc00000000..0xe00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xc00000000), largest free 0x200000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #2 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0xc00000000 high=0xdffffffff align=0x10000]} hits=2 rev=ajan5-rockstar
+[va-scan] FAILED window=0x800000000..0x900000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x800000000..0x900000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0x800000000 errno=17(File exists) OCCUPIED 0x2dc000000+0xce4000000 prot=1/1 shared=0  <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x800000000..0x900000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x800000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #3 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x800000000 high=0x8ffffffff align=0x10000]} hits=3 rev=ajan5-rockstar
+[va-scan] FAILED window=0x900000000..0xa00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0x900000000..0xa00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0x900000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x900000000..0xa00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x900000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #4 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x900000000 high=0x9ffffffff align=0x10000]} hits=4 rev=ajan5-rockstar
+[va-scan] FAILED window=0xa00000000..0xb00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xa00000000..0xb00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xa00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0xa00000000..0xb00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xa00000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] FAILED window=0xb00000000..0xc00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xb00000000..0xc00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xb00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0xb00000000..0xc00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xb00000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #5 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0xd00000000 high=0xdffffffff align=0x10000]} hits=8 rev=ajan5-rockstar
+[store-noalias] #1 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x149308744 addr=0x7a0 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104144000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x149308744 addr=0x7a0 x18=0x717ffe0000 type=1 lr=0x149308734 sp=0x717381f160 x16=0x1490d1140 x17=0x717381f0d0
+[ec-fault-regs] x8=0x149570720 x9=0x0 x10=0x0 x11=0x1492cb360 x0=0x7163000000 x2=0x3000 | teb=0x717ffe0000 peb=0x717fff0000 peb->EcCodeBitMap=0x717ecd0000
+[fault-host] 149308644: 14029829 d10103ff a90153f3 a9025bf5 f9001bfe 140b3c88 f0001415 912fa2b5
+[fault-host] 149308664: c85ffea9 b5001749 c809fea8 35ffffa9 f0001408 f945e901 b40000e1 f943c028
+[fault-host] 149308684: f0001409 912f4129 f8018528 c89ffd3f 14000090 c89ffebf 90001353 f9439668
+[fault-host] 1493086a4: b5000088 aa1f03e0 940011d2 f9439668 5280f509 f0001414 f00005f6 9ac8092a
+[fault-host] 1493086c4: f94016d6 f945e68b f9001fff f940016b f94002cc f90007ff 9b08a54a cb0a0108
+[fault-host] 1493086e4: f100015f 9000054a 9122414a 911ea108 9a880133 d63f0180 9100e3e2 910023e3
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0x120001086f00e400  PE[pe+0xc04e0]=0xcb090009f2c0002a  (x16=0x1490d1140 pe=0x717e8a0000 rva_pc=0x8744)
+[mach_exc] insn_stream PC-12..PC+8: aa1403e1 90001348 911c8108 [f903d29f] 3d81e680 3d81e280 3d81de80
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffe0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x149570720 RCX=0x7163000000 RDX=0x0 RBX=0x14914a000 RSP=0x0 RBP=0x0 RSI=0x14914a000 RDI=0x717fff07c8
+[x86_live]  R8=0x3000  R9=0x4 R10=0x1 R11=0x0 R12=0x1000 R13=0x0 R14=0x14958bbe8 R15=0x14953dc90
+[x86_live] State.RIP=0x0 callret_sp=0x0
+[store-noalias] #2 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x149308744 addr=0x7a0 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x104144000+0x8000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x149308744 addr=0x7a0 x18=0x717ffe0000 type=1 lr=0x149308734 sp=0x717381f160 x16=0x1490d1140 x17=0x717381f0d0
+[ec-fault-regs] x8=0x149570720 x9=0x0 x10=0x0 x11=0x1492cb360 x0=0x7163000000 x2=0x3000 | teb=0x717ffe0000 peb=0x717fff0000 peb->EcCodeBitMap=0x717ecd0000
+[fault-host] 1493086a4: b5000088 aa1f03e0 940011d2 f9439668 5280f509 f0001414 f00005f6 9ac8092a
+[fault-host] 1493086c4: f94016d6 f945e68b f9001fff f940016b f94002cc f90007ff 9b08a54a cb0a0108
+[fault-host] 1493086e4: f100015f 9000054a 9122414a 911ea108 9a880133 d63f0180 9100e3e2 910023e3
+[fault-host] 149308704: aa1303e0 aa1f03e1 d63f0160 f945e688 9000054a 9102e14a aa0003f4 f940050b
+[fault-host] 149308724: f94002c8 d63f0100 aa1303e1 d63f0160 6f00e400 aa1403e1 90001348 911c8108
+[fault-host] 149308744: f903d29f 3d81e680 3d81e280 3d81de80 00000000 00000000 00000000 00000000
+[nls-probe] upcase ptr: pool[x16+0x4e0]=0x120001086f00e400  PE[pe+0xc04e0]=0xcb090009f2c0002a  (x16=0x1490d1140 pe=0x717e8a0000 rva_pc=0x8744)
+[mach_exc] insn_stream PC-12..PC+8: aa1403e1 90001348 911c8108 [f903d29f] 3d81e680 3d81e280 3d81de80
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffe0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[x86_live] RAX=0x149570720 RCX=0x7163000000 RDX=0x0 RBX=0x14914a000 RSP=0x0 RBP=0x0 RSI=0x14914a000 RDI=0x717fff07c8
+[x86_live]  R8=0x3000  R9=0x4 R10=0x1 R11=0x0 R12=0x1000 R13=0x0 R14=0x14958bbe8 R15=0x14953dc90
+[x86_live] State.RIP=0x0 callret_sp=0x0
+0024:err:seh:segv_handler SEGV #1: pc=0x149308744 addr=0x7a0 uctx_x18=0x717ffe0000 disp=0 mach_exc=13
+0024:err:seh:segv_handler SEGV at pc=0x149308744 addr=0x7a0 esr=0x92000046 TPIDR_EL0=0x1007 (informational only — TEB is tsd275 below)
+0024:err:seh:segv_handler   x0=0x7163000000 x1=0x0 x2=0x3000 x3=0x4
+0024:err:seh:segv_handler   x8=0x149570720 x9=0x0 x10=0x0 x16=0x1490d1140 x17=0x717381f0d0 x18=0x717ffe0000 x19=0x1000 x20=0x0
+0024:err:seh:segv_handler   fp=0x0 lr=0x149308734 sp=0x717381f160
+0024:err:seh:segv_handler   [teb-tsd] base=0x16c45f0e0 offset=0x920 raw=0x717ffe0000 teb_key_val=0x717ffe0000
+0024:err:seh:segv_handler   [guest-state] x28=0x0 UNREADABLE got=0
+0024:err:seh:segv_handler   [fex-fault] pc=libarm64ecfex.dll+0x155744 lr=libarm64ecfex.dll+0x155734 fault-addr=0x7a0 sp=0x717381f160 fp=0x0 teb=0x717ffe0000 rev=r624
+0024:err:seh:segv_handler   [fex-fault]   sp+0x0e0 = ntdll.dll+0x57240
+0024:err:seh:segv_handler   [fex-fault]   sp+0x0f8 = ntdll.dll+0x42524
+0024:err:seh:segv_handler   [fex-fault]   sp+0x148 = ntdll.dll+0xd0000
+0024:err:seh:segv_handler   [fex-fault]   sp+0x168 = ntdll.dll+0x56e6c
+0024:err:seh:segv_handler   insn_stream PC-12..PC+8: aa1403e1 90001348 911c8108 [f903d29f] 3d81e680 3d81e280 3d81de80
+0024:err:seh:segv_handler setup_exception for SEGV at pc=0x149308744 addr=0x7a0 (virtual_handle_fault failed)
+[fault-rgn] addr=0x7a0 page=0x0 vprot prev/this/next=00/00/00 region=unknown/foreign
+[fault-rgn]   NO wine view — Wine doesn't own this addr (FEX/foreign mmap)
+[fault-rgn]   VIEW BELOW: none holds the byte before the fault
+[fault-rgn]   VIEW ABOVE: no view in the next 1 MB
+[fault-rgn]   history: no view of 1 MB+ covered this address in the last 4096 records
+[fault-rgn]   small-view history: no view under 1 MB within 0x40000 of this address in the last 2048 records
+[exc-disp] raise tid=0024 code=c0000005 flags=0 addr=0x717e9f5744 pc=149308744 nparams=2 p0=1 p1=7a0
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x717e9f5744 RX from -32, 64 of 64 bytes: c8 02 40 f9 00 01 3f d6 e1 03 13 aa 60 01 3f d6 00 e4 00 6f e1 03 14 aa 48 13 00 90 08 81 1c 91 9f d2 03 f9 80 e6 81 3d 80 e2 81 3d 80 de 81 3d 80 da 81 3d 80 d6 81 3d 80 d2 81 3d 80 ce 81 3d 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x717e9f5744 (not an anon-JIT page)
+[nt-fail] #6 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0xb00000000 high=0xbffffffff align=0x10000]} hits=16 rev=ajan5-rockstar
+[store-noalias] #3 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x717e9f5744 RX from -32, 64 of 64 bytes: c8 02 40 f9 00 01 3f d6 e1 03 13 aa 60 01 3f d6 00 e4 00 6f e1 03 14 aa 48 13 00 90 08 81 1c 91 9f d2 03 f9 80 e6 81 3d 80 e2 81 3d 80 de 81 3d 80 da 81 3d 80 d6 81 3d 80 d2 81 3d 80 ce 81 3d 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x717e9f5744 (not an anon-JIT page)
+[store-noalias] #4 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x717e9f5744 RX from -32, 64 of 64 bytes: c8 02 40 f9 00 01 3f d6 e1 03 13 aa 60 01 3f d6 00 e4 00 6f e1 03 14 aa 48 13 00 90 08 81 1c 91 9f d2 03 f9 80 e6 81 3d 80 e2 81 3d 80 de 81 3d 80 da 81 3d 80 d6 81 3d 80 d2 81 3d 80 ce 81 3d 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x717e9f5744 (not an anon-JIT page)
+[nt-fail] #7 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0xc00000000 high=0xdffffffff align=0x10000]} hits=32 rev=ajan5-rockstar
+[store-noalias] #5 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x717e9f5744 RX from -32, 64 of 64 bytes: c8 02 40 f9 00 01 3f d6 e1 03 13 aa 60 01 3f d6 00 e4 00 6f e1 03 14 aa 48 13 00 90 08 81 1c 91 9f d2 03 f9 80 e6 81 3d 80 e2 81 3d 80 de 81 3d 80 da 81 3d 80 d6 81 3d 80 d2 81 3d 80 ce 81 3d 
+0024:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 no RW alias for 0x717e9f5744 (not an anon-JIT page)
+[store-noalias] #6 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[va-scan] window room 0xe00000000..0xf00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xe00000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0xf00000000..0x1000000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xf00000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[store-noalias] #7 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[va-scan] window room 0x7c00000000..0x8000000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x7c00000000), largest free 0x400000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0xc00000000..0xe00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0xc00000000), largest free 0x200000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0x800000000..0x900000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x800000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[va-scan] window room 0x900000000..0xa00000000 for 0x10000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x900000000), largest free 0x100000000 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[nt-fail] #8 NtAllocateVirtualMemoryEx status=c0000017 proc=the jackbox party pack 10.exe tid=0024 size=0x10000 type=0x2000 prot=0x1 hint=0x0 zb=0x0 ext={addr[low=0x900000000 high=0x9ffffffff align=0x10000]} hits=64 rev=ajan5-rockstar
+[store-noalias] #8 rev=ml348 addr=0x7a0 insn=0xf903d29f pc=0x149308744 NO pool/anon alias | region 0x104144000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #8 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[valloc] ml959 # base=0x7163070000 size=0x1000 type=0x3000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[av-detail] ml613 #9 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[valloc] ml959 # base=0x7163080000 size=0x1000 type=0x3000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[av-detail] ml613 #10 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[valloc] ml959 # base=0x7163090000 size=0x1000 type=0x3000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[av-detail] ml613 #11 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+[va-scan] FAILED window=0xa00000000..0xb00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xa00000000..0xb00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xa00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0xb00000000..0xc00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xb00000000..0xc00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xb00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0xc00000000..0xd00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xc00000000..0xd00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xc00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0xd00000000..0xe00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xd00000000..0xe00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xd00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0xe00000000..0xf00000000 size=0x10000 align=0x10000 bottom-up tries=1 skips=1 below-floor=0 above-ceiling=0 | seen=0xe00000000..0xf00000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xe00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] FAILED window=0xf00000000..0x1000000000 size=0x10000 align=0x10000 bottom-up tries=2 skips=2 below-floor=0 above-ceiling=0 | seen=0xf00000000..0x1000000000 views=0 maxgap=0x100000000 tailgap=0x100000000 stop=no-views-in-range | firstfail=0xf00000000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[valloc] ml959 # base=0x71630a0000 size=0x1000 type=0x3000 prot=0x4 tid=0024 | req_hint=0x0 zero_bits=0x0 limit=0x0
+[av-detail] ml613 #12 p0=WRITE p1=0x7a0 hostpc=0x149308744 hinsn=0xf903d29f rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [exc] ml811 code=c0000005 addr=000000717E9F5744 flags=0 nparams=2 tid=0024 hit=1
+[av-detail] ml613 #13 p0=WRITE p1=0x7173027fe0 hostpc=0x149616138 hinsn=0xa90153f3 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=none regs=0 rev=ml613
+0024:err:seh:call_seh_handlers [exc] ml811 code=c00000fd addr=000000717E7AA138 flags=0 nparams=2 tid=0024 hit=1
+0024:err:seh:NtRaiseException Exception frame is not in stack limits => unable to dispatch exception.
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc00000fd) syscalls=0 unix_calls=133
+[Wine ntdll/server] process_exit_wrapper(-1073741571)
+[WineProc] Wine exited with code -1073741571 (caught by longjmp)
+[WineProc] stopping wineserver...
+[20:47:14.354] [INFO] [session] length=3s play=0s frames=0 stalls=0/0s peak=686MB limit=5119MB thermal=nominal lpm=0 api=D3D11/64 res=1112x832 cap=60 game=The Jackbox Party Pack 10
+[20:47:14.362] [INFO] [exit-report] status=0xc00000fd
+[frontend] returned to library
+[xp] 20:47:14.439 +0.63 dt=302 cpu=170 (thr 169) P=66 E=104 run=164 pgw=5.6 GHz P=2.96 E=2.72 Minst=1925 IPC=4.02 mJ=185 pin=81 rdKB=1980 fpMB=688
+[xp] 20:47:14.723 +0.90 dt=275 cpu=323 (thr 309) P=53 E=269 run=348 pgw=1.7 GHz P=4.08 E=2.99 Minst=3940 IPC=3.86 mJ=472 pin=46 rdKB=1240 fpMB=694
+[xp] 20:47:14.998 +1.19 dt=284 cpu=7 (thr 16) P=0 E=7 run=9 pgw=0.0 GHz P=1.35 E=2.67 Minst=35 IPC=1.83 mJ=4 pin=0 rdKB=0 fpMB=694
+[xp] 20:47:15.324 +1.51 dt=327 cpu=9 (thr 10) P=0 E=9 run=10 pgw=0.0 GHz P=0.00 E=1.34 Minst=21 IPC=1.64 mJ=1 pin=0 rdKB=0 fpMB=694
+[xp] 20:47:15.650 +1.84 dt=326 cpu=10 (thr 10) P=0 E=10 run=11 pgw=0.0 GHz P=0.00 E=1.01 Minst=19 IPC=1.86 mJ=1 pin=0 rdKB=0 fpMB=694
+[footprint] rev=ml358 phys=695 MB (peak 695) internal=694 MB compressed=0 MB external=142 MB reusable=21 MB (cycle=2)
+[20:47:15.898] [INFO] Detaching debugger...
+[xp] 20:47:15.945 +2.13 dt=295 cpu=125 (thr 125) P=92 E=34 run=126 pgw=0.0 GHz P=3.23 E=2.09 Minst=968 IPC=2.64 mJ=191 pin=0 rdKB=0 fpMB=695
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous | committed data in the file 0 MB (peak 0), 0 MB kept in memory by swap-mb, 0 MB committed past it
+[footprint] rev=ml358 phys=679 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=3)
+[footprint] rev=ml358 phys=679 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=4)
+[footprint] rev=ml358 phys=678 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=5)
+[footprint] rev=ml358 phys=678 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=6)
+[footprint] rev=ml358 phys=678 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=7)
+[footprint] rev=ml358 phys=679 MB (peak 695) internal=678 MB compressed=0 MB external=142 MB reusable=32 MB (cycle=8)
+[footprint] rev=ml358 phys=681 MB (peak 695) internal=681 MB compressed=0 MB external=152 MB reusable=32 MB (cycle=9)
+[footprint] rev=ml358 phys=681 MB (peak 695) internal=681 MB compressed=0 MB external=152 MB reusable=32 MB (cycle=10)
+[xp] 20:47:32.041 +18.23 dt=320 cpu=10 (thr 10) P=1 E=10 run=11 pgw=0.0 GHz P=1.85 E=0.97 Minst=25 IPC=2.36 mJ=1 pin=0 rdKB=0 fpMB=681
+[xp] 20:47:32.367 +18.56 dt=326 cpu=8 (thr 8) P=0 E=8 run=9 pgw=0.0 GHz P=0.00 E=1.34 Minst=23 IPC=2.05 mJ=1 pin=0 rdKB=0 fpMB=681
+[xp] 20:47:32.618 +18.81 dt=252 cpu=14 (thr 14) P=0 E=14 run=15 pgw=0.0 GHz P=0.00 E=1.52 Minst=32 IPC=1.51 mJ=2 pin=0 rdKB=0 fpMB=681
+[xp] 20:47:32.877 +19.07 dt=258 cpu=48 (thr 48) P=24 E=24 run=53 pgw=0.0 GHz P=2.10 E=2.09 Minst=189 IPC=1.87 mJ=26 pin=0 rdKB=0 fpMB=681
+[20:47:32.877] [xp] 20:47:32.877 +19.07 dt=258 cpu=48 (thr 48) P=24 E=24 run=53 pgw=0.0 GHz P=2.10 E=2.09 Minst=189 IPC=1.87 mJ=26 pin=0 rdKB=0 fpMB=681
+[20:47:33.150] [xp] 20:47:33.150 +19.34 dt=274 cpu=90 (thr 90) P=9 E=81 run=94 pgw=0.0 GHz P=1.90 E=2.56 Minst=665 IPC=2.94 mJ=52 pin=2 rdKB=0 fpMB=682

@@ -659,6 +659,72 @@ The scan's other end is BCD's own (the address map's ceiling, `ios_va_map_ceilin
 eight of its lines in `virtual_ios.c` are lines of that pull request, and its check `tests/host/check-va-scan-ceiling.py` runs in #622's host
 harness (106 lines). Both are in the table above.
 
+Taken on 2026-11-25: from Madeira's open pull request #632 ("iPhone Duo work", Dragooon; commits `4e23f553`, `4cf01a9a` and `7bcd6c62` of 2026-11-11 and
+2026-11-14, only these three of its 76), a MEM_RESERVE view of a file section that is longer than its file (Path of Exile 2's LMDB caches) is mapped by
+extending the file, in `build/ntdll-unix/virtual_ios.c` and `build/wineserver/mapping_ios.c`, under GPL-3.0-or-later with the Madeira Converter Exception
+(the lines in `build/ntdll-unix` and `build/wineserver`: LGPL-2.1-or-later, as those Wine files); BCD's section 7 terms do not apply to these lines.
+BCD changed it in four places: the size the caller asked for is kept per call, the table of grown views reuses the slot of a view that is gone and
+refuses a 17th live one, the cap cannot overflow, and the log names only the end of the file's path. Counted as above (lines added):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `build/ntdll-unix/virtual_ios.c` | portions | 151 | #632 Dragooon 151 |
+| `build/wineserver/mapping_ios.c` | portions | 13 | #632 Dragooon 13 |
+
+`tests/host/check-section-view-grow.py` is BCD's own file; it borrows the idea of the source anchors from the pull request's check of the same name.
+
+Taken on 2026-11-25 (the owner chose the list of the upstream check of that day): from Madeira's open pull request #629 (spenstars1, commit `0d057f1b`),
+bcd.cfg is read and written as bytes, so a byte that is not UTF-8 (a comment saved as Windows-1252 by an editor on a PC) neither hides the file from
+Settings nor is lost when Settings writes one key. It is under GPL-3.0-or-later with the Madeira Converter Exception; BCD's section 7 terms do not apply to
+these lines. BCD took that half of the pull request and not its UTF-16 `.ini` reading (BCD's `BCDIniText` reads UTF-16 LE and BE already) nor its Get Help
+change (BCD has none). Counted as above (9 lines in 1 file: spenstars1 9):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `app/Madeira/MadeiraConfig.swift` | portions | 9 | #629 spenstars1 9 |
+
+The reader of the env.* lines in `app/Madeira/WineProcessBridge.m` (the block marked `bcd-cfg-bytes-v1`) follows the pull request's idea and is BCD's code: the
+pull request reads a file with such a byte as Latin 1 as a whole, BCD line by line, so that no UTF-8 value is re-encoded (0 identical lines). The stray-byte cases of
+`tests/host/check-runtime-settings.py` follow the pull request's check of the same file (3 identical lines, below the count's threshold; credited in the file's header).
+
+Three changes of Madeira's Wine fork, also taken on 2026-11-25: pull request #78 (`willfaust/wine`, wenze-allen; commits `18689a0897`, `b0d33cbd85` and
+`34765056b9`) is Media Foundation and the Windows Media Format reader on Wine's own code: a media session keeps a renderer node whose video sample allocator
+fails to initialize (`dlls/mf/session.c`), the sync reader reads compressed samples per stream and keeps its streams when a re-initialization fails (the next
+call wrote through a NULL array: `dlls/winegstreamer/wm_reader.c`), and the copy into a Direct3D 9 surface buffer locks the surface with `D3DLOCK_DISCARD`
+(`dlls/mfplat/buffer.c`). They are not commits of BCD's Wine fork: BCD writes them into the Wine tree at build time with the scripts below, so the
+**LGPL-2.1-or-later** lines are wenze-allen's like Wine's, and Wine's own notices stay in those files (BCD's section 7 terms do not apply to those lines;
+the scripts and their check, `tests/host/check-wine-mf-patches.py`, are BCD's). The same pull request's fourth commit (`1f0f5075e9`, DXVA2 render targets)
+and the Madeira pull request #631 that pins it were not taken. Counted as above (48 lines in 3 files: wenze-allen 48):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `tools/patch-wine-mf-session-keep-node.py` | portions | 7 | Wine fork pull request #78 `18689a0897` wenze-allen 7 |
+| `tools/patch-wine-mfplat-d3d9-discard-copy.py` | portions | 7 | Wine fork pull request #78 `34765056b9` wenze-allen 7 |
+| `tools/patch-wine-wmreader-compressed-streams.py` | portions | 34 | Wine fork pull request #78 `b0d33cbd85` wenze-allen 34 |
+
+Taken on 2026-11-25 (the owner chose this item of that day's upstream check): from the draft pull request willfaust/dxmt #58 of Dragooon on Madeira's
+DXMT fork, commit `3dacbe5b`: a burst of `GetData` polls on a Direct3D 11 event query parks on the command queue's event instead of spinning. It arrives as
+BCD's build-time patch script, opt-in (`env.MADEIRA_D3D11_QUERY_PARK = 1`) and off by default, not as a commit of BCD's DXMT fork; the C++ it writes is the pull
+request's code reshaped for BCD's tree (BCD's own stuck-query probe kept as it was), under GPL-3.0-or-later with the Madeira Converter Exception (Madeira's
+rule for contributions: DCO sign-off, copyright stays with the author); BCD's section 7 terms do not apply to those lines. Counted as above (lines of the script
+that are the pull request's own lines, comments left out):
+
+Taken on 2026-11-25 (the owner chose two items of that day's upstream check): from the draft pull requests of Dragooon on Madeira's forks,
+willfaust/dxmt #58 (commit `3dacbe5b`: a burst of `GetData` polls on a Direct3D 11 event query parks on the command queue's event instead of
+spinning) and willfaust/FEX #40 (commit `71d78809`: no code invalidation for an unmapped section that was never executable; the sub-floor check
+is the one of the same pull request's `e6906d84`). Both arrive as BCD's build-time patch scripts, opt-in and off by default, not as commits of
+BCD's forks; the C++ they write is the pull requests' code reshaped for BCD's tree (BCD's own stuck-query probe and the invalidation bookkeeping
+kept as they were), under GPL-3.0-or-later with the Madeira Converter Exception (Madeira's rule for contributions: DCO sign-off, copyright stays
+with the author); BCD's section 7 terms do not apply to those lines. Counted as above (lines of the scripts that are the pull requests' own
+lines, comments left out):
+
+| File | Taken | Lines | Source, author, lines |
+|---|---|---|---|
+| `tools/patch-dxmt-d11-query-park.py` | portions | 37 | willfaust/dxmt #58 `3dacbe5b` Dragooon 37 |
+| `tools/patch-fex-ios-section-skip.py` | portions | 20 | willfaust/FEX #40 `71d78809` and `e6906d84` Dragooon 20 |
+
+The scripts' checks (`tests/host/check-d11-query-park.py`, `tests/host/check-fex-section-skip.py`) are BCD's own.
+
 Vulkan for 32-bit programs (2026-11-14, build 660) is BCD's own work on that route and on Wine's own WoW64 Vulkan path; Madeira has no 32-bit
 Vulkan and no Madeira code was taken for it. `tools/patch-wine-vulkan-wow64.py` changes Wine's `dlls/winevulkan` (the generator `make_vulkan`, the
 generated `vulkan_thunks.c`, `vulkan.c`, `vulkan_private.h`) and `dlls/win32u/vulkan.c` in the checked-out tree at build time: the text it writes and
@@ -700,8 +766,8 @@ Wine tree at build time, for the 32-bit ntdll only (the 64-bit ntdll.dll is a co
 
 ### Other people's work in BCD
 
-Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5 and #16 by le0-VV, #11 by vancez, #12 by Pardoxum, #27 by creeper4004, #31 by iqui27 (Henrique Rocha), #33 by Taala2, #43, #49, #50 and #51 by pauloec (Paulo Eduardo Correa),
-#46 by rbarton124, #55 by bogsen (Bogdan Seniuc), #57 by RageMC) and work from rtmtree's
+Pull requests sent to BCD (`thebcd69/bcd-games`: #4 by mckenna654, #5, #16, #71 and #74 by le0-VV, #11 by vancez, #12 by Pardoxum, #27 by creeper4004, #31 by iqui27 (Henrique Rocha), #33 and #64 by Taala2, #43, #49, #50 and #51 by pauloec (Paulo Eduardo Correa),
+#46 by rbarton124, #55 by bogsen (Bogdan Seniuc), #57 by RageMC, #67 by noralstat, #69 by sky9662) and work from rtmtree's
 Persona 3 Reload fork of BCD (helper memory, root certificate enumeration, the bytes at the instruction pointer in the guest log) are credited
 in the files that hold them and in `README-BCD.md`.
 
@@ -816,6 +882,11 @@ Each file below also carries the author's "Portions copyright" line in its heade
 
 | Pull request | Author | Files and what |
 |---|---|---|
+| #69, 2026-11-22 | sky9662 | Multiselect and alignment guides in the touch-control editor: `app/Madeira/BCDTouchControls.swift` (marquee selection, group drag, guides), `BCDTouchEditor.swift` (the group panel and its Size slider), `BCDTouchLive.swift` (group moves, snapping, group size), `ContentView.swift` (the selection and guide state, the group pinch), `app/BCDPreview/BCDTouchPreview.swift`, `tests/host/check-touch-floating.py` |
+| #67, 2026-11-21 | noralstat | Multi-argument ExecuteIndirect from CPU-written records (`indirect-expand`, Teardown): `madeira-d3d12/src/pe/madeira_d3d12.c` (`mad_indirect_expand`, `mad_indirect_arg_size`, the skip line's reason), the catalog entry in `build/tools/gen-config-catalog.py`, `tests/host/check-d3d12-indirect-expand.py`; BCD added Teardown's recommended-settings row |
+| #64, 2026-11-20 | Taala2 | Auto-tune's `[prev-end]` skip and the exits of a system32 program Wine could not start (`app/Madeira/AutoTuneCore.swift`, `tests/host/autotune_engine_checks.swift`, the Bully fixture's stage); the exit-pool slots of a pool's first objects (`build/ntdll-unix/thread_ios.c`, `tests/host/check-exit-pool.py`); its DXC build change was not taken |
+| #74, 2026-11-24 | le0-VV | LiveContainer 3.8.14 helper discovery: `app/Madeira/BCDJIT.swift` (`BCDJITRules.lcHelperState`), `app/Madeira/JITBuiltInHost.swift` (`LiveContainerHelper.look`); the LiveContainer cases of `tests/host/check-jit-method.py`, `check-jit-enable-join.py` and `check-bcd-settings-accounts.py` |
+| #71, 2026-11-23 | le0-VV | Live logs over the local Wi-Fi: `app/Madeira/BCDLiveLogServer.swift`, the Live logs group of `BCDSettingsSections.swift`, `BCDSettingsLive.swift` (`BCDLiveLogAccess`), `BCDSettings.swift`, `MadeiraApp.swift`, `Info.plist`, `tests/host/check-live-log-server.py`; BCD added the URL's key |
 | #57, 2026-11-16 | RageMC | The patched MoltenVK: `build/moltenvk-ios/build-patched.sh` (from `build.sh` and the pull request's patch steps; BCD wrote it again as an opt-in second library), `build/moltenvk-ios/patches/0001-moltenvk-enshrouded.patch` and `spirv-cross-0001-instance-relative-patch-id.patch` (whole files as received, byte for byte; the first is made of other people's work too, credited file by file below), the Enshrouded settings of the `enshrouded` row of `recommended/recommendations.json` and the kk-retry shim (components table above). BCD's own parts: the `vulkan = moltenvk-patched` word, the library check and log lines in `WineProcessBridge.m`, Zink taking the same library in such a session (`build/win32u-unix/opengl_ios.c`), the list policy, the settings catalog entries, the game page's choice, the CI steps and `tests/host/check-moltenvk-patched.py` |
 | #55, 2026-11-15 | bogsen (Bogdan Seniuc) | Trackmania and Ubisoft Connect: the program's writes into its own private allocations (`build/ntdll-unix/virtual_ios.c` `ios_self_write_private_view`; BCD put it behind `env.MADEIRA_SELF_WRITE_PRIVATE`), the private zero-file backing (`ios_zero_file_*`, `env.MADEIRA_FEX_ZERO_FILE`), `ios_alert_exit_safe` in `server_ios.c`, the nonblocking overlapped poll (`tools/patch-wine-overlapped-system-apc.py`; BCD builds its 64-bit half only into `kernelbase-optin.dll`), the tagged JIT pool (`app/Madeira/JITAllocator.c` `jit_tagged_region`, `jit_tagged_prepare_owned_region`, `JITAllocator.h`, `StikJITHelper.swift` `pool-tagged`), the patchable x64 D3D11 swapchain entries (`tools/patch-dxmt-x64-swapchain-entry.py`, `tools/build-d3d11-dll.sh`), the shared launcher depot (`app/Madeira/SwiftSteam/Library/SteamAppInfo.swift`, `SteamLibraryFetcher.swift`, `BCDSteamDLC/BCDSteamDLC.swift`; BCD narrowed it to Ubisoft Connect Services, app 4099820), their catalog entries (`build/tools/gen-config-catalog.py`) and checks (`tests/host/check-fex-zero-file.py`, `check-overlapped-system-apc.py`, `check-pool-tagged.py`, `check-tagged-pool-region.py`, parts of `check-self-write.py`, `check-pool-split-retry.py`, `check-steam-dlc.py`, `check-steam-library.py`, `check-x64-graphics-entry.py`); the Trackmania settings of `recommended/recommendations.json` (row trackmania v1) |
 | #51, 2026-11-13 | pauloec (Paulo Eduardo Correa) | C-style comments in Lua: `build/luajit-x64/c-style-comments.patch` and `c-style-comments-diagnostic.patch` (MIT), `build/luajit-x64/build.sh` (the two variants), `build/wineserver/luajit_compat.c` (`env.MADEIRA_LUAJIT_C_COMMENTS`), `mapping_ios.c` (a comment), `app/Madeira/MadeiraDock.swift` (Grim Dawn's compatibility launch), the rule `luajit-c-style-comments` of `build/tools/autotune_rules.py` with its three fixtures, `tests/host/check-luajit-compat.py` (parts), the catalog entry |

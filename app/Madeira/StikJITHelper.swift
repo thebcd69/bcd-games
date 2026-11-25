@@ -129,7 +129,7 @@ enum StikJITHelper {
                     + "cannot build the JIT memory without one (\(JITNoDebuggerPool.current.reason)). "
                     + RequestError.attachedAndLeft.localizedDescription, level: .error)
                 completion(.failure(RequestError.attachedAndLeft))
-            } else if Date() >= deadline {
+            } else if Date().timeIntervalSinceReferenceDate >= deadline.timeIntervalSinceReferenceDate {
                 timer.invalidate()
                 // JIT came on at some point but nothing is attached now: most likely StikDebug ran
                 // without the script (an attach this short can fall between two polls).
@@ -372,16 +372,21 @@ enum StikJITHelper {
     /// Round 669 (S9): the window an `exe-window-mb` request can still have when a mapping lies inside the range it asked for: the
     /// largest 16 MB multiple below that mapping, if it is at least exeWindowFallbackFloorMB. nil when the mapping is not inside the
     /// wanted range, when the room is smaller, or when the request is under 256 MB (a program that size needs the whole of it).
-    static func exeWindowFallbackMB(wantMB: Int, haveMB: Int, windowBase: UInt, firstMappedBase: UInt) -> Int? {
+    static func exeWindowFallbackMB(wantMB: Int, haveMB: Int, windowBase: UInt, firstMappedBase: UInt, needMB: Int = 0) -> Int? {
         guard wantMB >= 256, haveMB > 0, wantMB > haveMB,
               firstMappedBase > windowBase + (UInt(haveMB) << 20),
               firstMappedBase < windowBase + (UInt(wantMB) << 20) else { return nil }
         let room = Int((firstMappedBase - windowBase) >> 20) & ~15
-        return room >= exeWindowFallbackFloorMB(wantMB: wantMB, haveMB: haveMB) ? room : nil
+        return room >= exeWindowFallbackFloorMB(wantMB: wantMB, haveMB: haveMB, needMB: needMB) ? room : nil
     }
 
     /// The smallest fallback window: 64 MB more than the window had, and three quarters of the size asked for.
-    static func exeWindowFallbackFloorMB(wantMB: Int, haveMB: Int) -> Int { max(haveMB + 64, wantMB * 3 / 4) }
+    /// Round 714 (agent F1 S8a; DRAGON BALL FighterZ 1RM2SS): when the program's own measured need (exe-window-auto: 192 MB for a 184 MB program)
+    /// is below that floor (the request was auto-tune's 512), the room only has to hold the program.
+    static func exeWindowFallbackFloorMB(wantMB: Int, haveMB: Int, needMB: Int = 0) -> Int {
+        let old = max(haveMB + 64, wantMB * 3 / 4)
+        return needMB > haveMB && needMB < old ? needMB : old
+    }
 
     static func fixedBaseWindowMB(in folder: URL) -> (mb: Int, exe: String)? {
         let winBase: UInt64 = 0x140000000, ceiling: UInt64 = 0x180000000
@@ -754,8 +759,9 @@ enum StikJITHelper {
                 }
                 var widened = 0
                 if regionKr == KERN_SUCCESS,
-                   var fit = StikJITHelper.exeWindowFallbackMB(wantMB: mb, haveMB: haveMB, windowBase: UInt(exeWinBase), firstMappedBase: UInt(firstMapped)) {
-                    let floorMB = StikJITHelper.exeWindowFallbackFloorMB(wantMB: mb, haveMB: haveMB)
+                   var fit = StikJITHelper.exeWindowFallbackMB(wantMB: mb, haveMB: haveMB, windowBase: UInt(exeWinBase), firstMappedBase: UInt(firstMapped),
+                                                                needMB: exeWindowAuto) {
+                    let floorMB = StikJITHelper.exeWindowFallbackFloorMB(wantMB: mb, haveMB: haveMB, needMB: exeWindowAuto)
                     while fit >= floorMB {
                         var again: vm_address_t = exeWinBase + exeWinSize
                         let size = (vm_address_t(fit) << 20) - exeWinSize

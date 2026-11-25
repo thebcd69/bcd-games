@@ -7,8 +7,9 @@
 Valve's client in a BCD Dock session answers ISteamRemoteStorage only from the files its remotecache.vdf lists; for a game
 BCD starts itself that client runs just its "init" sync and an init with no list deletes the file, so the saves BCD
 downloaded were invisible to the game (Slay the Spire 2 started a new profile over them). SteamRemoteCache rewrites the
-list after each cloud comparison. It is OFF in BCD unless env.MADEIRA_STEAM_CLOUD_REMOTECACHE is set (upstream turns it
-on): it changes a file the client reads for every game with Steam Cloud API saves.
+list after each cloud comparison. In BCD the default (round 714, D1-S1) rewrites it only when a save identical on the device
+and in the cloud is missing from the list (the case where the game sees no saves: Isaac, Don't Starve);
+env.MADEIRA_STEAM_CLOUD_REMOTECACHE = 0 never rewrites it, any other value after every comparison (as upstream).
 
   1. the production SteamRemoteCache is compiled on the host with the comparison types and run over temporary prefixes:
      parse and format round-trip a client-written file (quoting, tabs, nested file blocks), a damaged one is refused;
@@ -16,8 +17,11 @@ on): it changes a file the client reads for every game with Steam Cloud API save
      entry for a file that differs or that only the device has (or gives a new one syncstate 3), leaves a cloud-only file
      out and removes its old entry, keeps entries under another root (AutoCloud), writes nothing when nothing changes, and
      does nothing for an app with no remote files and no list;
-  2. the source: the switch is read with default false (any value but 0 turns it on), the one call is gated by it and by
-     "not in a session", the rewrite touches only remotecache.vdf next to the remote folder.
+     census()/listMisses(): a list that names every identical remote file (any case) misses none, so the default writes
+     nothing; no list, or one without an identical file, misses it; AutoCloud entries, differing and device-only files are
+     never "missing";
+  2. the source: unset is when-missing, 0 is off, any other value always; the one call is gated by the mode and by
+     "not in a session"; the rewrite touches only remotecache.vdf next to the remote folder.
 """
 import os
 import shutil
@@ -46,11 +50,18 @@ remote = cloud[cloud.index("// MARK: - Valve's client's file list"):cloud.index(
 plan = cloud[cloud.index("// MARK: - What to do with a comparison"):cloud.index("// MARK: - Upload")]
 
 # ------------------------------------------------------------------ source
-require('static var cloudRemoteCache: Bool { SteamSignIn.flag("MADEIRA_STEAM_CLOUD_REMOTECACHE", default: false) }' in owned,
-        "the rewrite is off unless env.MADEIRA_STEAM_CLOUD_REMOTECACHE is set")
+mode = owned[owned.index("static var cloudRemoteCacheMode"):]
+mode = mode[:mode.index("\n    }\n")]
+require('guard let value = SteamSignIn.setting("MADEIRA_STEAM_CLOUD_REMOTECACHE") else { return .whenMissing }' in mode
+        and '== "0" ? .off : .always' in mode,
+        "unset is when-missing, 0 is off, any other value always (bcd.cfg, then the environment)")
+require("static var cloudRemoteCache:" not in owned, "the old on/off switch is gone")
 require(owned.count("SteamRemoteCache.write(") == 1
-        and "if Self.cloudRemoteCache, !inSession, let written = SteamRemoteCache.write(appID: appID, audit: audit, paths: paths)" in owned,
-        "the one call is gated by the switch and by 'no session running'")
+        and "if cacheMode != .off, !inSession, cacheMode == .always || SteamRemoteCache.listMisses(audit: audit, paths: paths),\n"
+            "               let written = SteamRemoteCache.write(appID: appID, audit: audit, paths: paths)" in owned,
+        "the one call is gated by the mode, by the list check and by 'no session running'")
+require("remotecache listed=\\(census.listed) device=\\(census.device) missing=\\(census.missing) unmapped-roots=" in owned,
+        "the census line logs counts and root names only")
 require('appendingPathComponent("remotecache.vdf")' in remote and remote.count("write(to:") == 1 and remote.count(".removeItem") == 0,
         "it writes one file, remotecache.vdf beside the remote folder, and deletes nothing")
 require('"syncstate", "1"' in remote.replace('("syncstate", "1")', '"syncstate", "1"') and '("syncstate", "3")' in remote,
@@ -190,6 +201,30 @@ do {
     let w = SteamRemoteCache.write(appID: 6, audit: audit, paths: paths)
     let f = lines((try? String(contentsOf: vdf, encoding: .utf8)).flatMap(SteamRemoteCache.parse))
     check(w?.synced == 1 && f["x.save"]?["syncstate"] == "1", "a damaged list is rebuilt from the device")
+}
+// 5. census / listMisses (the when-missing default)
+do {
+    let (paths, vdf) = prefix("census")
+    var audit = SteamCloudAudit(changeNumber: 9)
+    audit.entries = [entry("persistent.dat", .same), entry("Save1.dat", .same), entry("save2.dat", .same)]
+    let none = SteamRemoteCache.census(audit: audit, paths: paths)
+    check(none.listed == 0 && none.device == 3 && none.missing == 3 && SteamRemoteCache.listMisses(audit: audit, paths: paths),
+          "no list and three identical saves: all three are missing (\(none))")
+    _ = SteamRemoteCache.write(appID: 250900, audit: audit, paths: paths)
+    let after = SteamRemoteCache.census(audit: audit, paths: paths)
+    check(after.listed == 3 && after.missing == 0 && !SteamRemoteCache.listMisses(audit: audit, paths: paths),
+          "after one rewrite the list names them: nothing missing, the default writes no more")
+    let client = SteamRemoteCache.List(appID: "250900", header: [("ChangeNumber", "9")],
+        files: [("PERSISTENT.DAT", [("root", "0")]), ("save1.dat", [("root", "0")]), ("Save2.dat", [("root", "0")])])
+    try! Data(SteamRemoteCache.format(client).utf8).write(to: vdf)
+    let before = try! Data(contentsOf: vdf)
+    check(!SteamRemoteCache.listMisses(audit: audit, paths: paths), "a client list naming every file in another case misses none")
+    check((try! Data(contentsOf: vdf)) == before, "  and the check itself leaves the file alone")
+    var other = SteamCloudAudit(changeNumber: 9)
+    other.entries = [entry("%WinAppDataLocalLow%Game/slot.sav", .same), entry("new.dat", .localOnly), entry("old.dat", .differ), entry("cloud.dat", .cloudOnly)]
+    let o = SteamRemoteCache.census(audit: other, paths: paths)
+    check(o.missing == 0 && o.device == 2 && !SteamRemoteCache.listMisses(audit: other, paths: paths),
+          "AutoCloud, device-only, differing and cloud-only files are never missing (\(o))")
 }
 try? FileManager.default.removeItem(at: tmp)
 exit(failed == 0 ? 0 : 1)

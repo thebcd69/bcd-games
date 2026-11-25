@@ -1,3 +1,5 @@
+/* Portions copyright 2026 noralstat: multi-argument ExecuteIndirect from CPU-written records (indirect-expand), from
+ * thebcd69/bcd-games pull request #67 (GPL-3.0-only). See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 spitefulowl and 125hz: code taken from https://github.com/willfaust/Madeira (pull requests #462 and #516)
  * under GPL-3.0-or-later and modified for BCD in October and November 2026. See THIRD-PARTY-NOTICES.md. */
 /* Portions copyright 2026 The Porthole authors: code taken from https://github.com/tylerkaska112/Porthole (commit 99ec315, patches 0191 and 0196)
@@ -1167,6 +1169,49 @@ static int mad_rp_drop_dual_source(struct WMTRenderPipelineInfo *rp) {
         }
     }
     return changed;
+}
+/* madeira-bcd (round 714, M1 S1; Cyberpunk 2077 D1DGGH, 5DE5T4, DNXJPE, B2RSK8, M4Y4B4, P85MWH, build 712): Metal's pipeline validation does
+ * not return an error for a SRC1 blend factor on a colour attachment other than 0, it ASSERTS ("validateWithDevice:5101: failed assertion
+ * `Render Pipeline Descriptor Validation` ... color render target(2) is using a blend factor (MTLBlendFactorSource1Color) which can only be used
+ * for render target 0 / Dual source blending is used in combination with multiple render targets") and the game ends. D3D12 hands every
+ * target RT0's blend description when IndependentBlendEnable is 0, and a disabled blend keeps whatever factors the game left in it. A SRC1
+ * factor can only be honoured on target 0, with blending on, when target 0 is the only valid target; anywhere else it is neutralised. Every
+ * pipeline this changes aborts the process today. */
+static int mad_blend_factor_is_src1(enum WMTBlendFactor f) {
+    return f == WMTBlendFactorSource1Color || f == WMTBlendFactorSource1Alpha ||
+           f == WMTBlendFactorOneMinusSource1Color || f == WMTBlendFactorOneMinusSource1Alpha;
+}
+static int mad_color_has_src1(const struct WMTColorAttachmentBlendInfo *c) {
+    return mad_blend_factor_is_src1(c->src_rgb_blend_factor) || mad_blend_factor_is_src1(c->dst_rgb_blend_factor) ||
+           mad_blend_factor_is_src1(c->src_alpha_blend_factor) || mad_blend_factor_is_src1(c->dst_alpha_blend_factor);
+}
+static void mad_color_passthrough(struct WMTColorAttachmentBlendInfo *c) {   /* "no blending" as Metal wants it written */
+    c->blending_enabled = false;
+    c->src_rgb_blend_factor = c->src_alpha_blend_factor = WMTBlendFactorOne;
+    c->dst_rgb_blend_factor = c->dst_alpha_blend_factor = WMTBlendFactorZero;
+}
+static void mad_color_drop_src1(struct WMTColorAttachmentBlendInfo *c) {   /* the round-660 mapping: SRC1 -> ZERO, INV_SRC1 -> ONE */
+    enum WMTBlendFactor *f[4] = { &c->src_rgb_blend_factor, &c->dst_rgb_blend_factor, &c->src_alpha_blend_factor, &c->dst_alpha_blend_factor };
+    unsigned k;
+    for (k = 0; k < 4; k++) {
+        if (*f[k] == WMTBlendFactorSource1Color || *f[k] == WMTBlendFactorSource1Alpha) *f[k] = WMTBlendFactorZero;
+        else if (*f[k] == WMTBlendFactorOneMinusSource1Color || *f[k] == WMTBlendFactorOneMinusSource1Alpha) *f[k] = WMTBlendFactorOne;
+    }
+}
+/* How many targets changed; *first is the first of them. */
+static unsigned mad_rp_neutralise_src1(struct WMTRenderPipelineInfo *rp, unsigned *first) {
+    unsigned i, n = 0, valid = 0;
+    for (i = 0; i < 8; i++) if (rp->colors[i].pixel_format != WMTPixelFormatInvalid) valid++;
+    for (i = 0; i < 8; i++) {
+        struct WMTColorAttachmentBlendInfo *c = &rp->colors[i];
+        if (!mad_color_has_src1(c)) continue;
+        if (!c->blending_enabled || i > 0) mad_color_passthrough(c);   /* blending off, or a target that has no second source */
+        else if (valid > 1) mad_color_drop_src1(c);                    /* target 0 beside a second valid target */
+        else continue;                                                 /* the one honoured case: target 0, blending on, the only target */
+        if (!n && first) *first = i;
+        n++;
+    }
+    return n;
 }
 /* The pipeline as Metal builds it; one second try without the dual-source factors after that one refusal (see above). The first
  * refusal is logged here; err holds the second one's, or nothing when it worked. */
@@ -20020,6 +20065,12 @@ static HRESULT device_CreateGraphicsPipelineState_impl(ID3D12Device *This,
                     if (f[k] == D3D12_BLEND_SRC1_COLOR || f[k] == D3D12_BLEND_INV_SRC1_COLOR ||
                         f[k] == D3D12_BLEND_SRC1_ALPHA || f[k] == D3D12_BLEND_INV_SRC1_ALPHA)
                         flags |= MADEIRA_IR_PS_DUAL_SOURCE_BLEND;
+                {   /* round 714 (M1 S1): SRC1 beside a second valid target aborts Metal today and is neutralised below (mad_rp_neutralise_src1):
+                     * the pixel stage is not compiled for a second output either */
+                    UINT valid = 0;
+                    for (k = 0; k < desc->NumRenderTargets && k < 8; k++) if (desc->RTVFormats[k] != DXGI_FORMAT_UNKNOWN) valid++;
+                    if (valid > 1) flags &= ~MADEIRA_IR_PS_DUAL_SOURCE_BLEND;
+                }
                 if (desc->DSVFormat == DXGI_FORMAT_UNKNOWN) flags |= MADEIRA_IR_PS_DISABLE_DEPTH;
                 for (k = 0; k < desc->NumRenderTargets && k < 8; k++)
                     if (mad_format_is_unorm(desc->RTVFormats[k])) unorm |= 1u << k;
@@ -20229,6 +20280,15 @@ static HRESULT device_CreateGraphicsPipelineState_impl(ID3D12Device *This,
                 snprintf(p->blend + used, sizeof p->blend - used, " rt%u:en=%u src=%u/%u dst=%u/%u op=%u/%u wm=%x", i,
                          (unsigned)b->BlendEnable, (unsigned)b->SrcBlend, (unsigned)b->SrcBlendAlpha, (unsigned)b->DestBlend, (unsigned)b->DestBlendAlpha,
                          (unsigned)b->BlendOp, (unsigned)b->BlendOpAlpha, (unsigned)b->RenderTargetWriteMask);
+        }
+    }
+    {   /* round 714 (M1 S1): SRC1 factors where Metal cannot honour them end the process; see mad_rp_neutralise_src1 */
+        unsigned first = 0, n = mad_rp_neutralise_src1(&rp, &first);
+        if (n) {
+            static LONG said;
+            if (InterlockedIncrement(&said) <= 8)
+                d3d12_log("[madeira-d3d12] ml-r714 SRC1 blend factors on %u target(s), first target %u, are not valid there (Metal ends the "
+                          "process for them): built without them (vs '%s')\n", n, first, p->vs_name[0] ? p->vs_name : "?");
         }
     }
     rp.depth_pixel_format = WMTPixelFormatInvalid;

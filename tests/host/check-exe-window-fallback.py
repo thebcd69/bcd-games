@@ -55,6 +55,10 @@ print("inside", show(StikJITHelper.exeWindowFallbackMB(wantMB: 512, haveMB: 128,
 print("mgsv", show(StikJITHelper.exeWindowFallbackMB(wantMB: 176, haveMB: 128, windowBase: w, firstMappedBase: 0x14a000000)))
 print("swgr", show(StikJITHelper.exeWindowFallbackMB(wantMB: 496, haveMB: 128, windowBase: w, firstMappedBase: 0x15a000000)))
 print("floor", StikJITHelper.exeWindowFallbackFloorMB(wantMB: 512, haveMB: 128))
+print("dbfz", show(StikJITHelper.exeWindowFallbackMB(wantMB: 512, haveMB: 128, windowBase: w, firstMappedBase: 0x152000000, needMB: 192)))
+print("dbfz0", show(StikJITHelper.exeWindowFallbackMB(wantMB: 512, haveMB: 128, windowBase: w, firstMappedBase: 0x152000000)))
+print("pes", show(StikJITHelper.exeWindowFallbackMB(wantMB: 448, haveMB: 128, windowBase: w, firstMappedBase: 0x149000000, needMB: 448)))
+print("floorneed", StikJITHelper.exeWindowFallbackFloorMB(wantMB: 512, haveMB: 128, needMB: 192))
 '''
     with tempfile.TemporaryDirectory() as tmp:
         t = Path(tmp)
@@ -71,6 +75,10 @@ print("floor", StikJITHelper.exeWindowFallbackFloorMB(wantMB: 512, haveMB: 128))
             check("an ask under 256 MB (MGS V's 176): nil", out["mgsv"] == "nil", out)
             check("SWGR's 496 MB ask, room 416 MB (>= 372): 416", out["swgr"] == "416", out)
             check("the floor for 512 MB is 384 MB", out["floor"] == "384", out)
+            # Round 714 (agent F1 S8a; DRAGON BALL FighterZ 1RM2SS): auto-tune's 512 over a measured need of 192, room 288.
+            check("1RM2SS: room 288 MB, measured need 192 MB -> 288; without the need: nil, as before", out["dbfz"] == "288" and out["dbfz0"] == "nil", out)
+            check("a need at or above the old floor changes nothing (PES 2021: need 448, room 144: nil)", out["pes"] == "nil", out)
+            check("the floor with a measured need below it is the need", out["floorneed"] == "192", out)
 
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "run: python3 tests/host/check-exe-window-fallback.py" in wf)

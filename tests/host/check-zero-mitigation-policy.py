@@ -268,6 +268,7 @@ check('the rule stands before "standard" (the last rule), after it only the roun
          'half-life-2-deathmatch', 'call-of-duty-modern-warfare-3', 'skyrim-2011', 'splinter-cell-double-agent']   # build 711: the owner's
          # decision, every game whose logs show the whole vertex buffer copy gets DXMT_D9_VB_RANGE
       + ['teardown']   # build 712: pull request #67, indirect-expand
+      + ['dead-space-2', 'crysis', 'kingdom-come-deliverance', 'grim-dawn', 'little-nightmares-enhanced', 'neon-abyss']   # round 714: the new rows
       + ['standard'])
 pol = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
 check('the list policy knows the name', pol.count('"%s"' % NAME) == 2)

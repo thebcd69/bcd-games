@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright 2026 thebcd69 (BCD)
 // BCD Material: additional terms under GPL-3.0 section 7 apply; see LICENSE-BCD.md.
+// Portions copyright 2026 Taala2: the [prev-end] and failed-start cases, from thebcd69/bcd-games pull request #64
 // madeira-bcd: auto-tune's engine checks (docs/AUTO-TUNE.md), compiled on the host by
 // tests/host/check-autotune.py with app/Madeira/AutoTuneCore.swift and
 // AutoTuneRules.generated.swift. No log files: reports are built by hand, and the

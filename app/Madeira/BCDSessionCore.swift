@@ -252,7 +252,8 @@ enum BCDScreenshotRules {
     static func belongs(shot: Date, logStart: Date?, logEnd: Date) -> Bool {
         let slack: TimeInterval = 60
         let from = logStart.map { $0.addingTimeInterval(-slack) } ?? logEnd.addingTimeInterval(-12 * 3600)
-        return shot >= from && shot <= logEnd.addingTimeInterval(slack)
+        let t = shot.timeIntervalSinceReferenceDate
+        return t >= from.timeIntervalSinceReferenceDate && t <= logEnd.addingTimeInterval(slack).timeIntervalSinceReferenceDate
     }
 
     /// The words under the choice to send it: the picture cannot be cleaned like the log is.
@@ -304,6 +305,9 @@ enum BCDPrevTail {
         var footprint: String?, alive: String?, summary: String?, limit: Int?
         for bytes in data.split(separator: UInt8(ascii: "\n"), omittingEmptySubsequences: true) {
             let line = String(decoding: bytes.last == UInt8(ascii: "\r") ? bytes.dropLast() : bytes, as: UTF8.self)
+            // Round 714 (A1 S2; T2TYGT): a run that died before its first footprint has, as its last "[footprint] " text, the previous
+            // start's own [prev-end] line quoting an older run: those summary lines are not this run's.
+            if line.contains("[prev-end]") || line.contains("[prev-tail]") { continue }
             if line.contains("[footprint] ") { footprint = line; if let n = number(after: "limit=", in: line) { limit = n } }
             else if line.contains("[freeze] alive") { alive = line }
             else if line.contains("[session] length=") { summary = line; if let n = number(after: "limit=", in: line) { limit = n } }

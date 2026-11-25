@@ -17,11 +17,14 @@ enum SteamSignIn {
     /// Posted on the main queue after a sign-in is stored or removed.
     static let didChange = Notification.Name("MadeiraSteamSignInDidChange")
 
+    /// `env.NAME` from bcd.cfg, then the process environment; nil when neither sets it.
+    static func setting(_ name: String) -> String? {
+        MadeiraConfig.get("env." + name) ?? ProcessInfo.processInfo.environment[name]
+    }
+
     /// `env.NAME` from bcd.cfg, then the process environment. "0" is off.
     static func flag(_ name: String, default fallback: Bool) -> Bool {
-        guard let value = MadeiraConfig.get("env." + name) ?? ProcessInfo.processInfo.environment[name] else {
-            return fallback
-        }
+        guard let value = setting(name) else { return fallback }
         return value.trimmingCharacters(in: .whitespaces) != "0"
     }
 
@@ -73,7 +76,7 @@ enum SteamSignIn {
     static func usable(accountName: String, refreshToken: String, now: Date) -> (accountName: String, refreshToken: String)? {
         let name = accountName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty, !refreshToken.isEmpty else { return nil }
-        if let expiry = expiry(of: refreshToken), expiry <= now { return nil }
+        if let expiry = expiry(of: refreshToken), expiry.timeIntervalSinceReferenceDate <= now.timeIntervalSinceReferenceDate { return nil }
         return (name, refreshToken)
     }
 

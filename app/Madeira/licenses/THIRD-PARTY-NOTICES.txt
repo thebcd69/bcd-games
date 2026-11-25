@@ -19,6 +19,11 @@ Steam sign-in, owned library and downloads (SwiftSteam): derived from
 Jfishin's Madeira Steam client and used with his permission; GPL-3.0-or-later
 with the exception, (C) 2026 Jfishin, 125hz.
 
+Section views larger than their file (build/ntdll-unix/virtual_ios.c and
+build/wineserver/mapping_ios.c): taken from Madeira pull request #632 by Dragooon
+(commits 4e23f553, 4cf01a9a, 7bcd6c62) and adapted; GPL-3.0-or-later with the
+exception, the lines in those two Wine files LGPL-2.1-or-later like Wine.
+
 Epic Cloud saves (app/Madeira/BCDEpic/EpicFormats.swift and EpicCloudSaves.swift):
 upstream Madeira's files, GPL-3.0-or-later with the exception; EpicFormats.swift is
 (C) 2026 Akshay CM. EpicCloudSaves.swift is a port of parts of Legendary
@@ -53,6 +58,26 @@ Hopkins, llamajose, Tabîrcă Nicolae-Eduard, alantangok, Will Faust, Akshay CM,
 Jelly-RayTian, SirDank, Ixion, intraducine, domainus, NevesHenry, Tomba247, byKAYRA, JMRBDev, Kesavamoorthi G and
 Nikita Kiselov. The commits that BCD's forks of Wine, FEX-Emu and DXMT took from Madeira's forks are listed in each fork's
 LICENSE-MADEIRA.md.
+
+Taken after that count, on 2026-11-25: from Madeira's pull request #629 by spenstars1 (commit 0d057f1b), 9 lines in
+app/Madeira/MadeiraConfig.swift (bcd.cfg is read and written as bytes), GPL-3.0-or-later with the same exception; the file's header and the
+"Code from Madeira after BCD's fork" section of THIRD-PARTY-NOTICES.md name the source. BCD's additional terms (LICENSE-BCD) do not apply
+to those lines.
+Also from Madeira's Wine fork, pull request #78 by wenze-allen (commits 18689a0897, b0d33cbd85 and 34765056b9), 48 lines in
+tools/patch-wine-mf-session-keep-node.py, tools/patch-wine-wmreader-compressed-streams.py and tools/patch-wine-mfplat-d3d9-discard-copy.py
+(Media Foundation's session, the Windows Media Format reader and mfplat's surface buffer; applied to the Wine tree at build time),
+LGPL-2.1-or-later like Wine; the same section names them. BCD's additional terms (LICENSE-BCD) do not apply to those lines.
+
+An opt-in switch taken on 2026-11-25 from a draft pull request of Dragooon on Madeira's DXMT fork (willfaust/dxmt #58: a burst of Direct3D 11
+event-query polls parks on the command queue's event): GPL-3.0-or-later with the exception, (C) 2026 Dragooon. The script
+tools/patch-dxmt-d11-query-park.py names the author in its header, and the "Code from Madeira after BCD's fork" part of THIRD-PARTY-NOTICES.md lists
+it. BCD's additional terms (LICENSE-BCD) do not apply to those lines.
+
+Two opt-in switches taken on 2026-11-25 from draft pull requests of Dragooon on Madeira's forks (willfaust/dxmt #58: a burst of Direct3D 11
+event-query polls parks on the command queue's event; willfaust/FEX #40: no code invalidation for an unmapped section that was never executable):
+GPL-3.0-or-later with the exception, (C) 2026 Dragooon. The scripts tools/patch-dxmt-d11-query-park.py and tools/patch-fex-ios-section-skip.py
+name the author in their headers, and the "Code from Madeira after BCD's fork" part of THIRD-PARTY-NOTICES.md lists them. BCD's additional terms
+(LICENSE-BCD) do not apply to those lines.
 
 Code from Porthole (https://github.com/tylerkaska112/Porthole, another fork of Madeira; its commit 99ec315 of
 2026-11-12), taken in November 2026: GPL-3.0-or-later with the exception, (C) 2026 The Porthole authors. The files

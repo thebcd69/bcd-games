@@ -73,7 +73,7 @@ struct BCDEpicTokens: Codable, Equatable, CustomStringConvertible, CustomDebugSt
     var displayName: String?
 
     /// Refreshed when under ten minutes are left.
-    func needsRefresh(now: Date) -> Bool { now.addingTimeInterval(600) >= accessExpires }
+    func needsRefresh(now: Date) -> Bool { now.addingTimeInterval(600).timeIntervalSinceReferenceDate >= accessExpires.timeIntervalSinceReferenceDate }
 
     var description: String { "BCDEpicTokens(<redacted>)" }
     var debugDescription: String { description }
