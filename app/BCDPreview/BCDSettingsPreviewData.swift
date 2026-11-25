@@ -92,6 +92,8 @@ extension BCDSettingsBackends {
     @Published private(set) var pointer = BCDPointerMode.touch
     @Published private(set) var touchSpeed = 2.0
     @Published private(set) var lookSpeed = 2.0
+    @Published private(set) var trackpadAcceleration = false
+    @Published private(set) var lookAcceleration = false
     @Published private(set) var mouseSpeed = 1.0
     @Published private(set) var rightStickMouse = false
     @Published private(set) var controllers = true
@@ -132,6 +134,8 @@ extension BCDSettingsBackends {
     func setPointer(_ mode: BCDPointerMode) { pointer = mode }
     func setTouchSpeed(_ value: Double) { touchSpeed = value }
     func setLookSpeed(_ value: Double) { lookSpeed = value }
+    func setTrackpadAcceleration(_ on: Bool) { trackpadAcceleration = on }
+    func setLookAcceleration(_ on: Bool) { lookAcceleration = on }
     func setMouseSpeed(_ value: Double) { mouseSpeed = value }
     func setRightStickMouse(_ on: Bool) { rightStickMouse = on }
     func setControllers(_ on: Bool) { controllers = on }

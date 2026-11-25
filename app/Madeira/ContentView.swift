@@ -646,6 +646,7 @@ final class MetalBackedView: UIView {
     // simply do nothing.
     private var relCarryX: CGFloat = 0
     private var relCarryY: CGFloat = 0
+    private var lastPanTime: TimeInterval = 0
 
     private let F_MOVE: UInt32 = 0x1, F_LDOWN: UInt32 = 0x2, F_LUP: UInt32 = 0x4
     private let F_RDOWN: UInt32 = 0x8, F_RUP: UInt32 = 0x10
@@ -763,6 +764,7 @@ final class MetalBackedView: UIView {
         let p = t.location(in: self)
         touchStartPoint = p
         lastPanPoint = p
+        lastPanTime = t.timestamp
         touchStartTime = now
         movedBeyondSlop = false
         relCarryX = 0; relCarryY = 0   // ml641: never carry motion across a lift
@@ -821,7 +823,9 @@ final class MetalBackedView: UIView {
         }
         let p = t.location(in: self)
         let dx = p.x - lastPanPoint.x, dy = p.y - lastPanPoint.y
+        let elapsed = t.timestamp - lastPanTime
         lastPanPoint = p
+        lastPanTime = t.timestamp
         if hypot(p.x - touchStartPoint.x, p.y - touchStartPoint.y) > 10 { movedBeyondSlop = true }
 
         /* ml641 RELATIVE (mouse-look) MODE.
@@ -846,7 +850,10 @@ final class MetalBackedView: UIView {
          * by dragging RIGHT. That is the same sign as a mouse. Negate both terms
          * for content-drag (finger-follows-world) feel. */
         if InputSettings.shared.relative {
-            let sens = CGFloat(InputSettings.shared.sensRel)
+            let input = InputSettings.shared
+            let gain = BCDTouchAcceleration.multiplier(dx: Double(dx), dy: Double(dy),
+                                                       elapsed: elapsed, enabled: input.accelLook)
+            let sens = CGFloat(input.sensRel * gain)
             relCarryX += dx * sens
             relCarryY += dy * sens
             let ix = Int32(max(-30000, min(30000, relCarryX)))
@@ -861,7 +868,10 @@ final class MetalBackedView: UIView {
             return
         }
 
-        let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
+        let input = InputSettings.shared
+        let gain = BCDTouchAcceleration.multiplier(dx: Double(dx), dy: Double(dy),
+                                                   elapsed: elapsed, enabled: input.accelTrackpad)
+        let sens = CGFloat(input.sensAbs * gain)   // desktop px per view pt
         let lim = pointerMax()
         Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), lim.x)
         Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), lim.y)
@@ -1038,6 +1048,9 @@ final class InputSettings: ObservableObject {
     }
     @Published var sensAbs:  Double = 2.0  { didSet { save() } }
     @Published var sensRel:  Double = 2.0  { didSet { save() } }
+    /// These switches affect finger swipes only, not hardware mouse movement.
+    @Published var accelTrackpad = false { didSet { save() } }
+    @Published var accelLook = false { didSet { save() } }
     /// Touch pointer mode (MetalBackedView.touchModeBegan): tap to click where
     /// the finger is, hold or move to drag. Checked before `relative`; the
     /// library's pointer picker keeps the two mutually exclusive.
@@ -1074,6 +1087,8 @@ final class InputSettings: ObservableObject {
             directTouch = j["directTouch"] as? Bool ?? false
             sensAbs  = j["sensAbs"]  as? Double ?? 2.0
             sensRel  = j["sensRel"]  as? Double ?? 2.0
+            accelTrackpad = j["accelTrackpad"] as? Bool ?? false
+            accelLook = j["accelLook"] as? Bool ?? false
             touchMode = j["touchMode"] as? Bool ?? false
             diagnostics = j["diagnostics"] as? Bool ?? false
             sensMouse = j["sensMouse"] as? Double ?? 1.0
@@ -1087,6 +1102,7 @@ final class InputSettings: ObservableObject {
     private func save() {
         guard !loading else { return }
         let j: [String: Any] = ["relative": relative, "sensAbs": sensAbs, "sensRel": sensRel, "diagnostics": diagnostics,
+                                "accelTrackpad": accelTrackpad, "accelLook": accelLook,
                                 "sensMouse": sensMouse, "ignoreTouchesWithMouse": ignoreTouchesWithMouse,
                                 "padRightStickMouse": padRightStickMouse,
                                 "touchMode": touchMode]

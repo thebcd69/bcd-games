@@ -59,7 +59,7 @@ enum BCDInputLines {
     static let turboToggle = "turbo:"
 
     /// The lines that are a switch: off is no line.
-    static let toggles: Set<String> = ["radial", "aim-invert", "aim-tap", "pencil"]
+    static let toggles: Set<String> = ["radial", "aim-invert", "aim-tap", "aim-accel", "pencil"]
 
     /// Whether a setting of the game's page is one of this round's (checked before anything is looked up).
     static func handles(_ setting: String) -> Bool { setting.hasPrefix(turboToggle) || feature(of: setting) != nil }

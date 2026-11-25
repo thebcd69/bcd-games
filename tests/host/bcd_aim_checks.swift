@@ -16,7 +16,7 @@ func aim(_ lines: [String: String]) -> BCDAimSettings { BCDAimSettings.parse { l
 
 // ---- the settings --------------------------------------------------------------------------------------------------
 require(aim([:]) == BCDAimSettings() && !aim([:]).isOn && aim([:]).zone == .off, "no lines: off")
-require(aim([:]).sensitivity == 1 && aim([:]).vertical == 100 && !aim([:]).invertY && !aim([:]).tapClicks, "... with the default values")
+require(aim([:]).sensitivity == 1 && aim([:]).vertical == 100 && !aim([:]).invertY && !aim([:]).tapClicks && !aim([:]).mouseAcceleration, "... with the default values")
 require(aim(["aim-zone": "right"]).zone == .right && aim(["aim-zone": " LEFT "]).zone == .left && aim(["aim-zone": "all"]).zone == .all, "zones, any case")
 require(aim(["aim-zone": "middle"]).zone == .off && aim(["aim-zone": "1"]).zone == .off && !aim(["aim-zone": "on"]).isOn, "anything else is off")
 require(aim(["aim-zone": "all"]).isOn, "a zone is on")
@@ -24,7 +24,8 @@ require(aim(["aim-sens": "2"]).sensitivity == 2 && aim(["aim-sens": "99"]).sensi
         && aim(["aim-sens": "nan"]).sensitivity == 1 && aim(["aim-sens": "inf"]).sensitivity == 1, "the sensitivity is kept in range, a bad one is the default")
 require(aim(["aim-vertical": "150"]).vertical == 150 && aim(["aim-vertical": "5"]).vertical == 25 && aim(["aim-vertical": "900"]).vertical == 200 && aim(["aim-vertical": "?"]).vertical == 100, "the vertical share too")
 require(aim(["aim-invert": "1"]).invertY && !aim(["aim-invert": "0"]).invertY && aim(["aim-tap": "1"]).tapClicks && !aim(["aim-tap": ""]).tapClicks, "invert and tap")
-require(BCDAimSettings.lineNames.count == 6 && Set(BCDAimSettings.lineNames).count == 6 && BCDAimSettings.lineNames.contains("aim-as"), "six lines (aim-as: night round 2026-11-11)")
+require(BCDAimSettings.lineNames.count == 7 && Set(BCDAimSettings.lineNames).count == 7 && BCDAimSettings.lineNames.contains("aim-accel"), "seven lines including mouse acceleration")
+require(aim(["aim-accel": "1"]).mouseAcceleration && !aim(["aim-accel": "0"]).mouseAcceleration, "aim acceleration is opt-in")
 require(BCDAimSettings.sensitivityChoices.allSatisfy { BCDAimSettings.sensitivityRange.contains($0) } && BCDAimSettings.verticalChoices.allSatisfy { BCDAimSettings.verticalRange.contains($0) }, "every offered value is in range")
 require(BCDAimSettings.Zone.allCases.allSatisfy { !$0.title.isEmpty } && BCDAimSettings.Zone.allCases.count == 4, "four zones with words")
 
@@ -64,16 +65,46 @@ require(c.dx == 30000 && c.dy == -30000, "a huge move is clamped")
 c = BCDAimMath.counts(dx: .nan, dy: .infinity, s, carry: &carry)
 require(c.dx == 0 && c.dy == 0, "a number that is no number is nothing")
 
+// ---- optional swipe acceleration ----------------------------------------------------------------------------------------
+require(BCDTouchAcceleration.multiplier(dx: 10, dy: 0, elapsed: 0.01, enabled: false) == 1,
+        "off means the original gain at any swipe speed")
+require(BCDTouchAcceleration.multiplier(dx: 2, dy: 0, elapsed: 0.02, enabled: true) == 1,
+        "slow swipes keep precise 1x movement")
+require(BCDTouchAcceleration.multiplier(dx: 12, dy: 0, elapsed: 0.01, enabled: true) == 2.5,
+        "fast swipes reach the capped 2.5x multiplier")
+require(BCDTouchAcceleration.multiplier(dx: 6, dy: 0, elapsed: 0.01, enabled: true) ==
+        BCDTouchAcceleration.multiplier(dx: 12, dy: 0, elapsed: 0.02, enabled: true),
+        "gain is based on speed, independent of touch event frequency")
+require(BCDTouchAcceleration.multiplier(dx: 12, dy: 0, elapsed: 0, enabled: true) == 1 &&
+        BCDTouchAcceleration.multiplier(dx: .nan, dy: 1, elapsed: 0.01, enabled: true) == 1,
+        "invalid samples fall back to unaccelerated gain")
+var accelerated = BCDAimSettings(); accelerated.zone = .all; accelerated.mouseAcceleration = true
+var accelCarry = BCDAimMath.Carry()
+require(BCDAimMath.counts(dx: 12, dy: 0, accelerated, elapsed: 0.01, carry: &accelCarry).dx == 60,
+        "Aim mouse acceleration multiplies existing mouse sensitivity")
+accelerated.output = .stick
+require(BCDAimMath.stickPush(dx: 1, dy: 0, accelerated).x == 0.4,
+        "Aim right-stick output never uses mouse acceleration")
+
+// A real gesture measures elapsed time from touch-down, with no hidden default timestamp.
+var fastFinger = BCDAimTouch()
+var fastSettings = BCDAimSettings(); fastSettings.zone = .all; fastSettings.mouseAcceleration = true
+require(fastFinger.began(id: 20, at: CGPoint(x: 10, y: 10), time: 1, bounds: screen, fastSettings),
+        "an accelerating finger starts in the aim zone")
+require(fastFinger.moved(id: 20, to: CGPoint(x: 22, y: 10), fastSettings, time: 1.01)?.dx == 60,
+        "touch timestamps drive Aim's accelerated mouse counts")
+require(fastFinger.ended(id: 20, time: 1.02) == false, "ending a moved accelerating finger does not click")
+
 // ---- the aiming finger ---------------------------------------------------------------------------------------------------
 var touch = BCDAimTouch()
 var live = BCDAimSettings(); live.zone = .right
 require(!touch.began(id: 1, at: CGPoint(x: 100, y: 100), time: 0, bounds: screen, live) && !touch.isAiming, "a touch outside the zone does not aim")
 require(touch.began(id: 2, at: CGPoint(x: 600, y: 100), time: 0, bounds: screen, live) && touch.isAiming, "a touch in the zone aims")
 require(!touch.began(id: 3, at: CGPoint(x: 700, y: 300), time: 0.1, bounds: screen, live), "a second finger does not (one aims at a time)")
-require(touch.moved(id: 3, to: CGPoint(x: 710, y: 310), live) == nil && touch.ended(id: 3, time: 0.2) == nil, "... and is none of its business")
-let move = touch.moved(id: 2, to: CGPoint(x: 610, y: 105), live)
+require(touch.moved(id: 3, to: CGPoint(x: 710, y: 310), live, time: 0.2) == nil && touch.ended(id: 3, time: 0.2) == nil, "... and is none of its business")
+let move = touch.moved(id: 2, to: CGPoint(x: 610, y: 105), live, time: 0.1)
 require(move?.dx == 20 && move?.dy == 10, "the aiming finger turns its travel into counts")
-let move2 = touch.moved(id: 2, to: CGPoint(x: 612, y: 105), live)
+let move2 = touch.moved(id: 2, to: CGPoint(x: 612, y: 105), live, time: 0.2)
 require(move2?.dx == 4 && move2?.dy == 0, "... from where it last was")
 require(touch.ended(id: 2, time: 1.0) == false && !touch.isAiming, "lifting after a drag is no tap")
 require(touch.began(id: 4, at: CGPoint(x: 500, y: 100), time: 5, bounds: screen, live), "another finger aims once the first has lifted")
@@ -81,19 +112,19 @@ require(touch.ended(id: 4, time: 5.1) == true, "a short, still touch is a tap")
 _ = touch.began(id: 5, at: CGPoint(x: 500, y: 100), time: 6, bounds: screen, live)
 require(touch.ended(id: 5, time: 6.5) == false, "a still touch held half a second is no tap")
 _ = touch.began(id: 6, at: CGPoint(x: 500, y: 100), time: 7, bounds: screen, live)
-_ = touch.moved(id: 6, to: CGPoint(x: 530, y: 100), live)
-_ = touch.moved(id: 6, to: CGPoint(x: 500, y: 100), live)
+_ = touch.moved(id: 6, to: CGPoint(x: 530, y: 100), live, time: 7.02)
+_ = touch.moved(id: 6, to: CGPoint(x: 500, y: 100), live, time: 7.04)
 require(touch.ended(id: 6, time: 7.1) == false, "a quick touch that went far and came back is no tap")
 _ = touch.began(id: 7, at: CGPoint(x: 500, y: 100), time: 8, bounds: screen, live)
 require(touch.cancelled(id: 7) && !touch.isAiming && !touch.cancelled(id: 7), "taken away: it stops aiming, once")
 _ = touch.began(id: 8, at: CGPoint(x: 500, y: 100), time: 9, bounds: screen, live)
 touch.reset()
-require(!touch.isAiming && touch.moved(id: 8, to: CGPoint(x: 1, y: 1), live) == nil, "reset forgets the finger")
+require(!touch.isAiming && touch.moved(id: 8, to: CGPoint(x: 1, y: 1), live, time: 9.02) == nil, "reset forgets the finger")
 var off = BCDAimSettings()
 require(!touch.began(id: 9, at: CGPoint(x: 500, y: 100), time: 9, bounds: screen, off), "with the zone off no finger aims")
 off.zone = .all
 _ = touch.began(id: 10, at: CGPoint(x: 5, y: 5), time: 9, bounds: screen, off)
-let leftover = touch.moved(id: 10, to: CGPoint(x: 6, y: 5), off)
+let leftover = touch.moved(id: 10, to: CGPoint(x: 6, y: 5), off, time: 9.02)
 require(leftover?.dx == 2, "(sanity: with the zone on anywhere a corner aims)")
 
 if failures > 0 { print("\(failures) FAILED"); exit(1) }

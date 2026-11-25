@@ -433,6 +433,10 @@ private enum BCDLiveKey {
     func setTouchSpeed(_ value: Double) { input.sensAbs = min(max(value, 0.1), 8) }
     var lookSpeed: Double { input.sensRel }
     func setLookSpeed(_ value: Double) { input.sensRel = min(max(value, 0.1), 8) }
+    var trackpadAcceleration: Bool { input.accelTrackpad }
+    func setTrackpadAcceleration(_ on: Bool) { input.accelTrackpad = on }
+    var lookAcceleration: Bool { input.accelLook }
+    func setLookAcceleration(_ on: Bool) { input.accelLook = on }
     var mouseSpeed: Double { input.sensMouse }
     func setMouseSpeed(_ value: Double) { input.sensMouse = min(max(value, 0.1), 8) }
     var rightStickMouse: Bool { input.padRightStickMouse }
