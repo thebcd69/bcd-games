@@ -1,0 +1,52 @@
+BCD Lab Max 712 — ~/Downloads/BCD-0.1.712-lab-max-20261125.ipa (home-screen name "BCD Lab Max 712")
+Built from BCD 0.1.712. Not tested with any game.
+
+1. SETTINGS (73 switches, written at the top of Documents/bcd.cfg each start)
+   A full pass over all 994 of BCD's settings. Every one that makes something faster is on, risky ones included.
+   - Emulator: memory-ordering barriers off (FEX_TSOENABLED=0), fast x87 math everywhere, bigger JIT caches, lean call returns,
+     W^X (wx=1), system-call shortcut, split-lock fast path, floor/sqrt kept inside the emulator, .NET/Mono code heaps as plain
+     memory, .NET W^X off.
+   - Wine: server requests on the caller's thread (SRV_DIRECT=2), fast sync from the start, yields keep priority, faster file
+     opens (F_GETPATH), cached directory listings, launcher locks dropped after it exits, launchers/web helpers demoted
+     1 s after the game draws, all profilers and debug channels off (WINEDEBUG=-all, PROBES=0), BCD's own helper threads moved
+     to the efficiency cores, iOS asked for top scheduling priority.
+   - Direct3D 12: async submit, run 2 frames ahead, early fences, fence chain 6 + no stalls on read barriers, background
+     pipeline compiles + warm-up + on-disk archive, render passes kept open, discards honoured, untracked heaps, fast
+     ExecuteIndirect, static CBVs, shaders converted without bounds checks / strict NaN / position invariance, no per-buffer
+     fault info.
+   - Direct3D 9/10/11: newer source-built DXMT for every 64-bit game (MADEIRA_DXMT_FRESH=1), D3D9 in-place buffers,
+     non-blocking readbacks, vertex-range copies, address waits, ring and command-list reuse.
+   - Vulkan (MoltenVK): async submits, fast math, Metal heaps, tracking and logs off.
+   - Games are told 120 Hz on ProMotion.
+   - 284 log-only lines removed from 121 games' recommended settings.
+
+2. CODE (rebuilt with BCD's own build scripts and recipes at 0.1.712, then tuned for the M4 chip)
+   Each one was first rebuilt unchanged and matched to the shipped file, then rebuilt with the new flags; BCD's built-in
+   checks pass.
+   - 64-bit x86 emulator (xtajit64.dll): was tuned for Cortex-A78, now -mcpu=apple-m4.
+   - 32-bit x86 emulator (xtajit.dll): was generic, now apple-m4.
+   - Direct3D 12 layer (madeira_d3d12.dll / d3d12.dll): was -O2 generic, now -O3 apple-m4.
+   - Direct3D 11 + DXGI (d3d11-src.dll, dxgi-src.dll): -O3 apple-m4.
+   - MoltenVK, plain and the Enshrouded-patched one: were -O2 generic, now -O3 apple-m4 (MoltenVK's own code and its shader
+     compiler SPIRV-Cross).
+   The tuned files only run on Apple chips from the A14/M1 generation onwards; your M4 iPad is fine.
+
+WHAT COULD NOT BE CHANGED HERE
+   - Link-time optimisation: it fails to link for the Windows-on-ARM emulator and breaks Apple's MoltenVK packaging.
+   - BCD's main app (Wine's core, the D3D12 shader converter, Metal bridge): it needs BCD's full GitHub build, which can't run
+     on this Mac. It is already built for iOS ARM by Apple's compiler.
+   - KosmicKrisp / Mesa (OpenGL, the other Vulkan driver): no iOS build recipe here.
+   - Games' own per-game settings still win over these defaults. That is what makes those particular games run.
+
+UNDO
+   In Documents/bcd.cfg (Files > On My iPad > BCD):
+     bcd-lab-speed = 1   only the 10 safe switches
+     bcd-lab-speed = 0   none
+   Or turn off one switch by adding its line at the bottom, e.g.
+     env.FEX_TSOENABLED = 1                     (multi-threaded games crash at random)
+     env.MVK_CONFIG_SYNCHRONOUS_QUEUE_SUBMITS = 1   (Vulkan games hang: Enshrouded)
+     wx = 0                                     (crashes in games that write their own code)
+     async-submit = 0 / fence-early = 0 / f6-rar = 0 / rp-carry = 0 / rp-discard = 0   (D3D12 flicker or garbage)
+     msc-bounds-check = 1                       (D3D12 GPU faults)
+     env.MADEIRA_DXMT_FRESH = 0                 (D3D11 game broke)
+   The tuned libraries can't be switched off one by one. To go back to the shipped code, install BCD-0.1.712-lab-speed-20261124.ipa.
